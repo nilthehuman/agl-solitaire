@@ -1,5 +1,6 @@
 """An implementation of basic regular grammars (equivalent to finite-state automata)."""
 
+import itertools
 import math
 import random
 import time
@@ -51,17 +52,42 @@ class Grammar:
             for state in self.transitions:
                 if not state:
                     state[None] = None
-            # check if you can speedrun the graph in too few steps
-            def shortest_path_out(state, visited):
-                if None in self.transitions[state]:
-                    return 0
-                visited.add(state)
-                reachable_states = set(self.transitions[state].values()) - visited
-                if not reachable_states:
-                    return math.inf
-                return 1 + min(map(lambda s: shortest_path_out(s, visited), reachable_states))
-            # make sure there is at least one exit and it is reachable (in no less than MIN_LENGTH steps)
-            acceptable = any(None in s for s in self.transitions) and Grammar.MIN_LENGTH <= shortest_path_out(0, set()) < math.inf
+            # make sure...
+            # 1. the graph we got is connected
+            # 2. there is at least one exit
+            # 3. the exit is reachable (in no fewer than MIN_LENGTH steps)
+            # 4. there is no dead cycle in the graph
+            acceptable = (self.is_connected() and
+                          any(None in s for s in self.transitions) and
+                          Grammar.MIN_LENGTH <= self.shortest_path_through() < math.inf and
+                          not self.has_dead_cycle())
+
+    def is_connected(self):
+        """Check if the state graph is made up of a single component."""
+        visited = set([0])
+        while True:
+            visited_new = visited | set(itertools.chain.from_iterable(self.transitions[s].values() for s in visited))
+            visited_new -= {None}
+            if visited == visited_new:
+                break
+            visited = visited_new
+        return visited == set(range(len(self.transitions)))
+
+    def shortest_path_through(self, starting_state=0):
+        """Calculate how many steps it takes to speedrun the graph to an accepting state."""
+        def descend(state, visited):
+            if None in self.transitions[state]:
+                return 0
+            visited.add(state)
+            reachable_states = set(self.transitions[state].values()) - visited
+            if not reachable_states:
+                return math.inf
+            return 1 + min(map(lambda s: descend(s, visited), reachable_states))
+        return descend(starting_state, set())
+
+    def has_dead_cycle(self):
+        """Determine if the graph contains a cycle that cannot be escaped."""
+        return any(self.shortest_path_through(s) == math.inf for s in range(len(self.transitions)))
 
 
 # TODO: include some standard grammars from classic AGL papers
