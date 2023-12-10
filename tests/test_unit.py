@@ -45,7 +45,7 @@ def test_automaton_output_short_enough():
         assert not any(len(s) > automaton.Automaton.MAX_STRING_LENGTH for s in output_strings)
 
 
-def test_automaton_accepts_what_it_produced():
+def test_automaton_accepts_grammatical():
     """See if the automaton recognizes the same output strings that it generated."""
     g = grammar.Grammar()
     a = automaton.Automaton(g)
@@ -53,6 +53,16 @@ def test_automaton_accepts_what_it_produced():
         g.randomize()
         output_strings = a.produce_grammatical(5)
         assert all(a.recognize(s) for s in output_strings)
+
+
+def test_automaton_rejects_ungrammatical():
+    """See if the automaton rejects the output strings that it generated as ungrammatical."""
+    g = grammar.Grammar()
+    a = automaton.Automaton(g)
+    for _ in range(100):
+        g.randomize()
+        output_strings = a.produce_ungrammatical(5)
+        assert all(not a.recognize(s) for s in output_strings)
 
 
 def test_automaton_predefined_reber_1967():
