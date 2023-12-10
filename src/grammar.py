@@ -17,7 +17,7 @@ class Grammar:
 
     MIN_STATES = 3
     MAX_STATES = 7
-    MIN_LENGTH = 2
+    MIN_PATH_LENGTH = 2
 
     def __init__(self):
         self.symbols = ['M', 'R', 'S', 'V', 'X']
@@ -55,11 +55,11 @@ class Grammar:
             # make sure...
             # 1. the graph we got is connected
             # 2. there is at least one exit
-            # 3. the exit is reachable (in no fewer than MIN_LENGTH steps)
+            # 3. the exit is reachable (in no fewer than MIN_PATH_LENGTH steps)
             # 4. there is no dead cycle in the graph
             acceptable = (self.is_connected() and
                           any(None in s for s in self.transitions) and
-                          Grammar.MIN_LENGTH <= self.shortest_path_through() < math.inf and
+                          Grammar.MIN_PATH_LENGTH <= self.shortest_path_through() < math.inf and
                           not self.has_dead_cycle())
 
     def is_connected(self):
