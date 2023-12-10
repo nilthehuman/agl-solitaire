@@ -90,7 +90,55 @@ class Grammar:
         return any(self.shortest_path_through(s) == math.inf for s in range(len(self.transitions)))
 
 
-# TODO: include some standard grammars from classic AGL papers
-#reber_allen_1978 = Grammar()
-#reber_allen_1978.transitions = []
+# a few example finite state grammars from classic AGL papers
 
+REBER_1967 = Grammar()
+REBER_1967.transitions = [ {'T': 1, 'V': 3},
+                           {'P': 1, 'T': 2},
+                           {'X': 3, 'S': 5},
+                           {'X': 3, 'V': 4},
+                           {'P': 2, 'S': 5},
+                           {None: None}
+                         ]
+
+# N.B. this is grammar no. 2 from the paper; grammar 1 is nondeterministic
+REBER_ALLEN_1978 = Grammar()
+REBER_ALLEN_1978.transitions = [ {'X': 1, 'V': 2},
+                                 {'M': 2, 'X': 4},
+                                 {'V': 3, 'T': 4},
+                                 {'T': 3, 'R': 1},
+                                 {'R': 4, 'M': 5, None: None},
+                                 {None: None}
+                               ]
+
+ABRAMS_REBER_1989 = Grammar()
+ABRAMS_REBER_1989 = [ {'X': 0, 'V': 1},
+                      {'J': 2, 'X': 3, 'T': 4},
+                      {'T': 0, None: None},
+                      {'J': 3, None: None},
+                      {'V': 3, None: None}
+                    ]
+
+KNOWLTON_RAMUS_SQUIRE_1992 = Grammar()
+KNOWLTON_RAMUS_SQUIRE_1992.transitions = [ {'L': 0, 'B': 1},
+                                           {'F': 2, 'Z': 3, 'L': 4},
+                                           {'Z': 0, None: None},
+                                           {'F': 3, 'B': 2, None: None},
+                                           {None: None}
+                                         ]
+
+KNOWLTON_SQUIRE_1994_I = Grammar()
+KNOWLTON_SQUIRE_1994_I.transitions = [ {'M': 1, 'V': 4},
+                                       {'X': 1, 'V': 2},
+                                       {'X': 3, None: None},
+                                       {'V': 3, 'R': 1, None: None},
+                                       {'R': 4, 'M': 3, None: None}
+                                     ]
+
+KNOWLTON_SQUIRE_1994_II = Grammar()
+KNOWLTON_SQUIRE_1994_II.transitions = [ {'T': 1, 'F': 3},
+                                        {'P': 1, 'T': 2},
+                                        {'S': 3, None: None},
+                                        {'S': 3, 'F': 4, None: None},
+                                        {'P': 2, None: None}
+                                      ]
