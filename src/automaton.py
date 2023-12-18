@@ -101,7 +101,7 @@ class Automaton:
                     wrong_symbol = random.choice(self.grammar.symbols)
                 string = grammatical_string[:wrong_index] + wrong_symbol + grammatical_string[wrong_index+1:]
             # make sure we didn't get another grammatical string by accident
-            if not self.recognize(string):
+            if not self.recognize(string) and min_length <= len(string) <= max_length:
                 ungrammatical_strings.add(string)
         return ungrammatical_strings
 
