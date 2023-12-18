@@ -22,7 +22,7 @@ half ungrammatical. After completing the test the underlying formal grammar will
 be revealed along with the correct answers and your results.
 
 Everything that happens on screen during the game is also automatically recorded
-in a file called `agl_session.log` by default (you can turn this off if you
+in a file called `agl_sessions.log` by default (you can turn this off if you
 wish). My own sessions are recorded in `arato.log` for the sake of analysis.
 
 See ./agl-solitaire --help for a more detailed explanation of options and

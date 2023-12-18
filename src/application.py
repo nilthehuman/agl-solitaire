@@ -16,7 +16,7 @@ class Settings:
     training_time:              int = 300
     test_strings_grammatical:   int = 20
     test_strings_ungrammatical: int = 20
-    logfile_filename:           str = 'agl_session.log'
+    logfile_filename:           str = 'agl_sessions.log'
 
 
 class Application:
