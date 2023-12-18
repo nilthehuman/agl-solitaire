@@ -27,14 +27,18 @@ class Grammar:
         return self.__str__()
 
     def __str__(self):
-        return '\n'.join([f'{i} -{t[0]}-> {t[1]}' for i, state in enumerate(self.transitions) for t in state.items()])
+        def entry_to_str(i, t):
+            if t[0] is None:
+                return f"{i} ---> OUT"
+            return f"{i} -{t[0]}-> {t[1]}"
+        return '\n'.join([entry_to_str(i, t) for i, state in enumerate(self.transitions) for t in state.items()])
 
-    def randomize(self):
+    def randomize(self, min_states=MIN_STATES, max_states=MAX_STATES):
         """Construct an arbitrary grammar by choosing states and transitions at random."""
         acceptable = False
         while not acceptable:
             self.transitions = []
-            num_states = random.randint(Grammar.MIN_STATES, Grammar.MAX_STATES)
+            num_states = random.randint(min_states, max_states)
             for _ in range(num_states):
                 self.transitions.append({})
                 num_transitions = random.randint(0, num_states)

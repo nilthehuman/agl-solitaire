@@ -3,7 +3,9 @@
 import dataclasses
 import datetime
 import os
+import random
 import re
+import threading
 import time
 
 from src import grammar
@@ -12,10 +14,14 @@ from src import automaton
 
 @dataclasses.dataclass
 class Settings:
+    """User options for controlling the details of the experimental paradigm."""
     training_strings:           int = 20
     training_time:              int = 300
     test_strings_grammatical:   int = 20
     test_strings_ungrammatical: int = 20
+    minimum_string_length:      int = 2
+    maximum_string_length:      int = 8
+    # idea: test_strings_reuse_from_training?
     logfile_filename:           str = 'agl_sessions.log'
 
 
@@ -30,7 +36,10 @@ class Application:
         if not log_only:
             print(string)
         with open(self.settings.logfile_filename, 'a', encoding='UTF-8') as logfile:
-            logfile.write(string + '\n')
+            # prepend timestamp
+            stamped_list = ['[' + str(datetime.datetime.now().replace(microsecond=0)) + '] ' + line for line in string.split('\n')]
+            stamped_string = '\n'.join(stamped_list)
+            logfile.write(stamped_string + '\n')
 
     def main_menu(self):
         """Show the starting menu screen."""
@@ -43,17 +52,17 @@ class Application:
             choice = ''
             while not choice:
                 choice = input('> ')
-            choice = choice[0]
+            choice = choice[0].lower()
             if choice in ['1', 's']:
                 self.run_experiment()
             elif choice in ['2', 'c']:
-                self.tweak_settings()
+                self.settings_menu()
             elif choice in ['3', 'q']:
                 break
             else:
                 print('no such option')
 
-    def tweak_settings(self):
+    def settings_menu(self):
         """Enable user to adjust game options."""
         while True:
             choice = ''
@@ -62,11 +71,13 @@ class Application:
             print(f"2: [t]ime allotted for training:\t\t{self.settings.training_time} seconds")
             print(f"3: number of [g]rammatical test strings:\t{self.settings.test_strings_grammatical}")
             print(f"4: number of [u]ngrammatical test strings:\t{self.settings.test_strings_ungrammatical}")
-            print(f"5: [l]ogfile to record sessions in:\t\t{self.settings.logfile_filename}")
-            print('6: [b]ack to main menu')
+            print(f"5: mi[n]imum string length:\t\t\t{self.settings.minimum_string_length}")
+            print(f"6: ma[x]imum string length:\t\t\t{self.settings.maximum_string_length}")
+            print(f"7: [l]ogfile to record sessions in:\t\t{self.settings.logfile_filename}")
+            print('8: [b]ack to main menu')
             while not choice:
                 choice = input('what to change> ')
-            choice = choice[0]
+            choice = choice[0].lower()
             attr_to_change = None
             if choice in ['1', 's']:
                 prompt = 'number of training strings: '
@@ -80,39 +91,57 @@ class Application:
             elif choice in ['4', 'u']:
                 prompt = 'number of ungrammatical test strings: '
                 attr_to_change = 'test_strings_ungrammatical'
-            elif choice in ['5', 'l']:
+            elif choice in ['5', 'n']:
+                prompt = 'minimum string length: '
+                attr_to_change = 'minimum_string_length'
+            elif choice in ['6', 'x']:
+                prompt = 'maximum string length: '
+                attr_to_change = 'maximum_string_length'
+            elif choice in ['7', 'l']:
                 new_filename = input('logfile name: ')
                 if os.path.exists(new_filename):
                     if not os.path.isfile(new_filename):
                         print('error: not a file (maybe a folder?)')
                     with open(new_filename, 'r', encoding='UTF-8') as logfile:
                         first_line = logfile.readline()
-                    if not re.match(r'^agl-solitaire', first_line):
+                    if not re.search(r'agl-solitaire', first_line):
                         print('file does not look like an agl-solitaire log file')
                         while choice not in ['y', 'n']:
                             choice = input('are you sure you want to use this file? (y/n)> ')
                             if choice:
-                                choice = choice[0]
+                                choice = choice[0].lower()
                 else:
                     while choice not in ['y', 'n']:
                         choice = input('file does not exist, create it? (y/n)> ')
                         if choice:
-                            choice = choice[0]
-                if choice in ['5', 'l', 'y']:
+                            choice = choice[0].lower()
+                if choice in ['7', 'l', 'y']:
                     self.settings.logfile_filename = new_filename
-            elif choice in ['6', 'b']:
+            elif choice in ['8', 'b']:
                 break
             else:
                 print('no such setting')
             if attr_to_change is not None:
                 new_value = input(prompt)
                 try:
+                    if int(new_value) != float(new_value):
+                        raise ValueError('error: please provide an integer')
                     if int(new_value) < 0:
-                        raise ValueError
+                        raise ValueError('error: cannot set less than zero')
+                    if (attr_to_change == 'maximum_string_length' and int(new_value) < self.settings.minimum_string_length or
+                        attr_to_change == 'minimum_string_length' and int(new_value) > self.settings.maximum_string_length):
+                        raise ValueError('error: minimum string length cannot be larger than maximum string length')
                     # this is not normal, but in Python it is
                     setattr(self.settings, attr_to_change, int(new_value))
-                except ValueError:
-                    print('error: invalid number')
+                    if (self.settings.training_strings +
+                        self.settings.test_strings_grammatical +
+                        self.settings.test_strings_ungrammatical) > 100:
+                        print('warning: you are advised to keep the total number of training items plus test items under 100')
+                except ValueError as err:
+                    if err:
+                        print(err)
+                    else:
+                        print('error: invalid number')
 
     def run_experiment(self):
         """Run one session of training and testing with a random regular grammar and record everything in the log file."""
@@ -120,32 +149,87 @@ class Application:
             if os.system('cls'):
                 # non-zero exit code, try the other command
                 os.system('clear')
-        gmr = grammar.Grammar()
-        gmr.randomize()
-        aut = automaton.Automaton(gmr)
         clear()
-        self.duplicate_print(f"agl-solitaire session started at {datetime.datetime.now().replace(microsecond=0)} with the following settings:")
+        self.duplicate_print(f"agl-solitaire session started with the following settings:")
         for field in dataclasses.fields(self.settings):
             self.duplicate_print(f"{field.name}: {getattr(self.settings, field.name)}")
-        self.duplicate_print('You may now add any notes or comments before the training phase begins (optional). Please enter an empty line when you\'re done:')
+        self.duplicate_print('Looking for a suitable random grammar...')
+        gmr = grammar.Grammar()
+        aut = automaton.Automaton(gmr)
+        required_strings = self.settings.training_strings + self.settings.test_strings_grammatical
+        grammatical_strings = []
+        max_attempts = 12
+        oversize_grammar = 0
+        while required_strings != len(grammatical_strings):
+            attempts = 0
+            while attempts < max_attempts:
+                attempts += 1
+                gmr.randomize(min_states=gmr.MIN_STATES + oversize_grammar,
+                              max_states=gmr.MAX_STATES + oversize_grammar)
+                # TODO: figure out why this call gets stuck :o
+                grammatical_strings = list(aut.produce_grammatical(num_strings=required_strings,
+                                                                   min_length=self.settings.minimum_string_length,
+                                                                   max_length=self.settings.maximum_string_length))
+            oversize_grammar += 1
+        self.duplicate_print('Grammar selected. The rules of the grammar will be printed at the end of the session.')
+        self.duplicate_print('Generating training strings and test strings...')
+        # partition grammatical_strings into two subsets
+        picked_for_training = random.sample(range(0,required_strings), k=self.settings.training_strings)
+        training_set = [grammatical_strings[i] for i in picked_for_training]
+        test_set = [(grammatical_strings[i], 'y') for i in set(range(0,required_strings)) - set(picked_for_training)]
+        test_set += [(string, 'n') for string in aut.produce_ungrammatical(self.settings.test_strings_ungrammatical)]
+        assert len(test_set) == self.settings.test_strings_grammatical + self.settings.test_strings_ungrammatical
+        # permute test_set
+        random.shuffle(test_set)
+        self.duplicate_print('Done.')
+        self.duplicate_print('You may add any notes or comments before the training phase begins (optional). Please enter an empty line when you\'re done:')
         comments = '\n'.join(iter(input, ''))
         self.duplicate_print(comments, log_only=True)
-        self.duplicate_print(f"The training phase will now begin. You will have {self.settings.training_time} seconds to study the exemplars. Please press return when you are ready.")
+        self.duplicate_print(f"The training phase will now begin. You will have {self.settings.training_time} seconds to study a list of {self.settings.training_strings} exemplars.")
+        self.duplicate_print('Please press return when you are ready.')
         input()
-        self.duplicate_print(f"Training phase started at {datetime.datetime.now().replace(microsecond=0)}. Please study the following list of strings:")
-        self.duplicate_print('\n'.join(aut.produce_grammatical(self.settings.training_strings)))
+        self.duplicate_print(f"Training phase started. Please study the following list of strings:")
+        self.duplicate_print('\n'.join(training_set))
         print()
+        input_thread = threading.Thread(target=input)
+        input_thread.start()
         remaining_time = self.settings.training_time
-        while 0 < remaining_time:
-            print(f"\r{remaining_time} seconds remaining...  ", end='')
+        while input_thread.is_alive() and 0 < remaining_time:
+            print(f"\r{remaining_time} seconds remaining (press return to finish early)...", end='')
             time.sleep(1)
             remaining_time -= 1
-        print(f"\rTraining phase finished.      ")
-        self.duplicate_print(f"Training phase finished.", log_only=True)
+        print('\rTraining phase finished.' + ' ' * 20)
+        self.duplicate_print('Training phase finished.', log_only=True)
         clear()
-        self.duplicate_print(f"Testing phase started at {datetime.datetime.now().replace(microsecond=0)}.")
-        # TODO measure subject's performance and show results
-        self.duplicate_print('You may now add any post hoc notes or comments (optional). Please enter an empty line when you\'re done:')
+        self.duplicate_print(f"The test phase will now begin. You will be shown {len(test_set)} new strings one at a time and prompted to judge the grammaticality of each.")
+        self.duplicate_print("You may type 'y' for yes and 'n' for no, or 'g' for grammatical and 'u' for ungrammatical.")
+        self.duplicate_print('Please press return when you are ready.')
+        input()
+        for i in range(len(test_set)):
+            clear()
+            print(f"Test item #{i}. Is the following string grammatical? (y/n/g/u)")
+            print(test_set[i][0])
+            answer = '_'
+            while answer[0] not in ['y', 'n']:
+                answer = None
+                while not answer:
+                    answer = input('> ')
+                answer = answer[0].lower()
+                if answer == 'g':
+                    answer = 'y'
+                elif answer == 'u':
+                    answer = 'n'
+            test_set[i] = (test_set[i][0], test_set[i][1], answer)
+        clear()
+        self.duplicate_print('Test phase finished. Hope you had fun!')
+        self.duplicate_print('Strings were generated using the following regular grammar:')
+        self.duplicate_print(str(gmr))
+        correct = sum(item[1] == item[2] for item in test_set)
+        self.duplicate_print(f"You gave {correct} correct answers out of {len(test_set)} ({100 * correct/len(test_set)}%). The answers were the following:")
+        self.duplicate_print(f"{'Test string':<16}{'Correct answer':<16}{'Your answer':<16}")
+        for item in test_set:
+            self.duplicate_print(f"{item[0]:<16}{'yes' if 'y' == item[1] else 'no':<16}{'yes' if 'y' == item[2] else 'no':<16}")
+        self.duplicate_print('You may now add any post hoc notes or comments if you wish. Please enter an empty line when you\'re done:')
         comments = '\n'.join(iter(input, ''))
         self.duplicate_print(comments, log_only=True)
 
