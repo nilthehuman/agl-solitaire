@@ -116,12 +116,14 @@ class Application:
 
     def run_experiment(self):
         """Run one session of training and testing with a random regular grammar and record everything in the log file."""
+        def clear():
+            if os.system('cls'):
+                # non-zero exit code, try the other command
+                os.system('clear')
         gmr = grammar.Grammar()
         gmr.randomize()
         aut = automaton.Automaton(gmr)
-        if os.system('cls'):
-            # non-zero exit code, try the other command
-            os.system('clear')
+        clear()
         self.duplicate_print(f"agl-solitaire session started at {datetime.datetime.now().replace(microsecond=0)} with the following settings:")
         for field in dataclasses.fields(self.settings):
             self.duplicate_print(f"{field.name}: {getattr(self.settings, field.name)}")
@@ -140,6 +142,7 @@ class Application:
             remaining_time -= 1
         print(f"\rTraining phase finished.      ")
         self.duplicate_print(f"Training phase finished.", log_only=True)
+        clear()
         self.duplicate_print(f"Testing phase started at {datetime.datetime.now().replace(microsecond=0)}.")
         # TODO measure subject's performance and show results
         self.duplicate_print('You may now add any post hoc notes or comments (optional). Please enter an empty line when you\'re done:')
