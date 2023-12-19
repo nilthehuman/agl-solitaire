@@ -203,7 +203,9 @@ class Application:
         picked_for_training = random.sample(range(0,required_strings), k=self.settings.training_strings)
         training_set = [grammatical_strings[i] for i in picked_for_training]
         test_set = [(grammatical_strings[i], 'y') for i in set(range(0,required_strings)) - set(picked_for_training)]
-        test_set += [(string, 'n') for string in aut.produce_ungrammatical(self.settings.test_strings_ungrammatical)]
+        test_set += [(string, 'n') for string in aut.produce_ungrammatical(num_strings=self.settings.test_strings_ungrammatical,
+                                                                           min_length=self.settings.minimum_string_length,
+                                                                           max_length=self.settings.maximum_string_length)]
         assert len(test_set) == self.settings.test_strings_grammatical + self.settings.test_strings_ungrammatical
         # permute test_set
         random.shuffle(test_set)
