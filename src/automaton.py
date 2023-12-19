@@ -11,7 +11,7 @@ class Automaton:
 
     MIN_STRING_LENGTH = 2
     MAX_STRING_LENGTH = 8
-    MAX_ATTEMPTS = 10 ** 5
+    MAX_ATTEMPTS = 10 ** 4
 
     def __init__(self, grammar=None):
         self.grammar = grammar
@@ -26,10 +26,10 @@ class Automaton:
         while len(grammatical_strings) < num_strings and attempts < max_attempts:
             string = ''
             # keep trying until we get the string length right
-            while not min_length <= len(string) <= max_length:
+            while not min_length <= len(string) <= max_length and attempts < max_attempts:
                 string = ''
                 current_state = 0
-                while current_state is not None:
+                while len(string) < max_length and current_state is not None:
                     # pick a random edge
                     available_symbols = list(self.grammar.transitions[current_state])
                     next_symbol = random.choice(available_symbols)

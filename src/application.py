@@ -190,20 +190,25 @@ class Application:
         aut = automaton.Automaton(gmr)
         required_strings = self.settings.training_strings + self.settings.test_strings_grammatical
         grammatical_strings = []
-        max_attempts = 12
+        max_grammar_attempts = 64
+        max_oversize_attempts = 5
         oversize_grammar = 0
-        while required_strings != len(grammatical_strings):
-            attempts = 0
-            while attempts < max_attempts:
-                attempts += 1
+        while required_strings != len(grammatical_strings) and oversize_grammar <= max_oversize_attempts:
+            grammar_attempts = 0
+            while required_strings != len(grammatical_strings) and grammar_attempts < max_grammar_attempts:
+                grammar_attempts += 1
                 gmr.randomize(min_states=gmr.MIN_STATES + oversize_grammar,
                               max_states=gmr.MAX_STATES + oversize_grammar)
-                # TODO: figure out why this call gets stuck :o
                 grammatical_strings = list(aut.produce_grammatical(num_strings=required_strings,
                                                                    min_length=self.settings.minimum_string_length,
                                                                    max_length=self.settings.maximum_string_length))
             oversize_grammar += 1
-        self.duplicate_print('Grammar selected. The rules of the grammar will be printed at the end of the session.')
+            if required_strings != len(grammatical_strings):
+                self.duplicate_print(f"None found, expanding search to between {gmr.MIN_STATES+oversize_grammar} and {gmr.MAX_STATES+oversize_grammar} states...")
+        if required_strings != len(grammatical_strings):
+            self.duplicate_print('Sorry, no grammar found that would satisfy the current settings. Try relaxing some of your preferences.')
+            return
+        self.duplicate_print('Grammar selected. The rules of the grammar will be printed after the session.')
         self.duplicate_print('Generating training strings and test strings...')
         # partition grammatical_strings into two subsets
         picked_for_training = random.sample(range(0,required_strings), k=self.settings.training_strings)
