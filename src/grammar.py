@@ -26,7 +26,39 @@ class Grammar:
         self.transitions = []
 
     def __repr__(self):
-        return self.__str__()
+        return str(self.transitions)
+
+    def obfuscated_repr(self):
+        """A marshalled representation of the Grammar made unreadable for repeat experiments."""
+        repr_string = self.__repr__()
+        coprimes = (2, 2)
+        while 1 != math.gcd(*coprimes):
+            coprimes = sorted((random.randrange(128), random.randrange(128)))
+        obfuscated_repr_string = ''
+        for i, char in enumerate(repr_string):
+            obfuscated_repr_string += chr(ord(char) + coprimes[0] ** i % coprimes[1])
+        return chr(coprimes[0]) + chr(coprimes[1]) + obfuscated_repr_string
+
+    @classmethod
+    def from_repr(cls, repr_string):
+        """Restore Grammar from string representation."""
+        grammar = cls()
+        grammar.transitions = eval(repr_string)
+        return grammar
+
+    @classmethod
+    def from_obfuscated_repr(cls, obfuscated_repr_string):
+        """Restore Grammar from obfuscated string representation."""
+        repr_string = ''
+        coprimes = (ord(obfuscated_repr_string[0]),
+                    ord(obfuscated_repr_string[1]))
+        obfuscated_repr_string = obfuscated_repr_string[2:]
+        repr_string = ''
+        for i, char in enumerate(obfuscated_repr_string):
+            repr_string += chr(ord(char) - coprimes[0] ** i % coprimes[1])
+        grammar = cls()
+        grammar.transitions = eval(repr_string)
+        return grammar
 
     def __str__(self):
         def entry_to_str(i, t):
