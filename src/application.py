@@ -56,7 +56,7 @@ class Application:
         """Show the starting menu screen."""
         print('agl-solitaire\n-------------\n\n(a terminal-based tool for Artificial Grammar Learning experiments)')
         while True:
-            print('\n--- main menu ---')
+            print('\n--------  MAIN MENU  --------')
             print('1: [s]tart experiment session')
             print('2: [c]onfigure settings')
             print('3: [q]uit')
@@ -77,7 +77,7 @@ class Application:
         """Enable user to configure and adjust the experiment's protocol."""
         while True:
             choice = ''
-            print('\n--- settings ---')
+            print('\n--------  SETTINGS  --------')
             print(f"1: number of training [s]trings:\t\t{self.settings.training_strings}")
             print(f"2: [t]ime allotted for training:\t\t{self.settings.training_time} seconds")
             print(f"3: number of [g]rammatical test strings:\t{self.settings.test_strings_grammatical}")
@@ -176,6 +176,7 @@ class Application:
                 # non-zero exit code, try the other command
                 os.system('clear')
         clear()
+        self.duplicate_print('=' * 120, log_only=True)
         self.duplicate_print('agl-solitaire session started with the following settings:')
         self.duplicate_print(str(self.settings))
         self.duplicate_print('Looking for a suitable random grammar...')
@@ -207,7 +208,7 @@ class Application:
         # permute test_set
         random.shuffle(test_set)
         self.duplicate_print('Done.')
-        self.duplicate_print('You may add any notes or comments before the training phase begins (optional). Please enter an empty line when you\'re done:')
+        self.duplicate_print('You may add any notes or comments for the record before the training phase begins (optional). Please enter an empty line when you\'re done:')
         comments = '\n'.join(iter(input, ''))
         self.duplicate_print(comments, log_only=True)
         self.duplicate_print(f"The training phase will now begin. You will have {self.settings.training_time} seconds to study a list of {self.settings.training_strings} exemplars.")
@@ -216,25 +217,29 @@ class Application:
         self.duplicate_print('Training phase started. Please study the following list of strings:')
         self.duplicate_print('\n'.join(training_set))
         print()
-        input_thread = threading.Thread(target=input)
+        input_thread = threading.Thread(target=input, daemon=True)
         input_thread.start()
         remaining_time = self.settings.training_time
         while input_thread.is_alive() and 0 < remaining_time:
             print(f"\r{remaining_time} seconds remaining (press return to finish early)...", end='')
             time.sleep(1)
             remaining_time -= 1
-        print('\rTraining phase finished.' + ' ' * 20)
+        print('\rTraining phase finished.' + ' ' * 30)
         self.duplicate_print('Training phase finished.', log_only=True)
         clear()
         self.duplicate_print(f"The test phase will now begin. You will be shown {len(test_set)} new strings one at a time and prompted to judge the grammaticality of each.")
         self.duplicate_print("You may type 'y' for yes and 'n' for no, or 'g' for grammatical and 'u' for ungrammatical.")
         self.duplicate_print('Please press return when you are ready.')
-        input()
+        # recycle input_thread if it's still running...
+        if input_thread.is_alive():
+            input_thread.join()
+        else:
+            input()
         # N.B. you can't do the following because you want to update the original test_set
         #for i, item in enumerate(test_set):
         for i in range(len(test_set)):
             clear()
-            print(f"Test item #{i}. Is the following string grammatical? (y/n/g/u)")
+            print(f"Test item #{i+1} out of {len(test_set)}. Is the following string grammatical? (y/n/g/u)")
             print(test_set[i][0])
             answer = '_'
             while answer[0] not in ['y', 'n']:
@@ -253,10 +258,12 @@ class Application:
         self.duplicate_print(str(gmr))
         correct = sum(item[1] == item[2] for item in test_set)
         self.duplicate_print(f"You gave {correct} correct answers out of {len(test_set)} ({100 * correct/len(test_set)}%). The answers were the following:")
-        self.duplicate_print(f"{'Test string':<16}{'Correct answer':<16}{'Your answer':<16}")
+        # make table columns wider if needed
+        width = max(16, 2 + max(len(item[0]) for item in test_set))
+        self.duplicate_print(f"{'Test string':<{width}}{'Correct answer':<16}{'Your answer':<16}")
         for item in test_set:
-            self.duplicate_print(f"{item[0]:<16}{'yes' if 'y' == item[1] else 'no':<16}{'yes' if 'y' == item[2] else 'no':<16}")
-        self.duplicate_print('You may now add any post hoc notes or comments if you wish. Please enter an empty line when you\'re done:')
+            self.duplicate_print(f"{item[0]:<{width}}{'yes' if 'y' == item[1] else 'no':<16}{'yes' if 'y' == item[2] else 'no':<16}")
+        self.duplicate_print('You may now add any post hoc notes or comments for the record if you wish. Please enter an empty line when you\'re done:')
         comments = '\n'.join(iter(input, ''))
         self.duplicate_print(comments, log_only=True)
 
