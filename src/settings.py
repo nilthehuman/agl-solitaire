@@ -23,11 +23,26 @@ class Settings:
     skip_questionnaire:         bool = False
 
     def __str__(self):
-        """Print all settings in a human-readable format."""
+        """Print all settings in an .ini config file format."""
         str_repr = ''
         for field in dataclasses.fields(self):
             str_repr += f"{field.name}: {getattr(self, field.name)}\n"
         return str_repr
+
+    def pretty_print(self):
+        """Print all settings in an even more conveniently readable format."""
+        pretty = ''
+        pretty += f"Username: {self.username}\n"
+        pretty += f"Number of training strings: {self.training_strings}\n"
+        pretty += f"Time allotted for training: {self.training_time}\n"
+        pretty += f"Number of grammatical test strings: {self.test_strings_grammatical}\n"
+        pretty += f"Number of ungrammatical test strings: {self.test_strings_ungrammatical}\n"
+        pretty += f"Minimum string length: {self.minimum_string_length}\n"
+        pretty += f"Maximum string length: {self.maximum_string_length}\n"
+        pretty += f"Letters to use in strings: {self.string_letters}\n"
+        pretty += f"Logfile to record session in: {self.logfile_filename}\n"
+        pretty += f"Skip pre and post session questionnaire: {self.skip_questionnaire}\n"
+        return pretty
 
     def load_all(self, filename=_DEFAULT_SETTINGS_FILENAME):
         """Read and set our settings values from a settings file if it exists."""
@@ -49,8 +64,8 @@ class Settings:
         """Write the current values of all our member variables to a config file."""
         config = configparser.ConfigParser()
         for field in dataclasses.fields(self):
-            # the letters variable needs special treatment
-            if ('string_letters' == field.name):
+            # the string_letters variable needs special treatment
+            if 'string_letters' == field.name:
                 config['DEFAULT'][field.name] = ''.join(self.string_letters)
             else:
                 config['DEFAULT'][field.name] = str(getattr(self, field.name))

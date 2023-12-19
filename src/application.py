@@ -62,7 +62,7 @@ class Application:
             print(string)
         with open(self.settings.logfile_filename, 'a', encoding='UTF-8') as logfile:
             # prepend timestamp
-            stamped_list = ['[' + str(datetime.datetime.now().replace(microsecond=0)) + '] ' + line for line in string.split('\n')]
+            stamped_list = ['[' + str(datetime.datetime.now().replace(microsecond=0)) + '] ' + line.strip() for line in string.split('\n')]
             stamped_string = '\n'.join(stamped_list)
             logfile.write(stamped_string + '\n')
 
@@ -201,7 +201,7 @@ class Application:
         clear()
         self.duplicate_print('=' * 120, log_only=True)
         self.duplicate_print('agl-solitaire session started with the following settings:')
-        self.duplicate_print(str(self.settings))
+        self.duplicate_print(self.settings.pretty_print())
         self.duplicate_print('Looking for a suitable random grammar...')
         gmr = grammar.Grammar(self.settings.string_letters)
         aut = automaton.Automaton(gmr)
@@ -225,8 +225,8 @@ class Application:
         if required_strings != len(grammatical_strings):
             self.duplicate_print('Sorry, no grammar found that would satisfy the current settings. Try relaxing some of your preferences.')
             return
-        self.duplicate_print('Grammar selected. The rules of the grammar will be printed after the session.')
-        self.duplicate_print('Generating training strings and test strings...')
+        self.duplicate_print('Grammar selected. The rules of the grammar will be revealed after the session.')
+        self.duplicate_print('Generating training strings and test strings based on the grammar...')
         # partition grammatical_strings into two subsets
         picked_for_training = random.sample(range(0,required_strings), k=self.settings.training_strings)
         training_set = [grammatical_strings[i] for i in picked_for_training]
@@ -256,8 +256,9 @@ class Application:
         self.duplicate_print(f"You may add any {'further ' if not self.settings.skip_questionnaire else ''}notes or comments for the record before the training phase begins (optional). Please enter an empty line when you're done:")
         comments = '\n'.join(iter(input, ''))
         self.duplicate_print(comments, log_only=True)
-        self.duplicate_print(f"The training phase will now begin. You will have {self.settings.training_time} seconds to study a list of {self.settings.training_strings} exemplars.")
-        self.duplicate_print('Please press return when you are ready.')
+        clear()
+        self.duplicate_print(f"The training phase will now begin. You will have {self.settings.training_time} seconds to study a list of {self.settings.training_strings} exemplars of the hidden grammar.")
+        self.duplicate_print('Please make sure your screen and terminal font are comfortable to read. Press return when you are ready.')
         input()
         self.duplicate_print('Training phase started. Please study the following list of strings:')
         self.duplicate_print('\n'.join(training_set))
@@ -273,8 +274,7 @@ class Application:
         self.duplicate_print('Training phase finished.', log_only=True)
         clear()
         self.duplicate_print(f"The test phase will now begin. You will be shown {len(test_set)} new strings one at a time and prompted to judge the grammaticality of each.")
-        self.duplicate_print("You may type 'y' for yes and 'n' for no, or 'g' for grammatical and 'u' for ungrammatical.")
-        self.duplicate_print('Please press return when you are ready.')
+        self.duplicate_print("You may type 'y' for yes (i.e. grammatical) and 'n' for no (ungrammatical). Press return when you are ready.")
         # recycle input_thread if it's still running...
         if input_thread.is_alive():
             input_thread.join()
@@ -284,7 +284,7 @@ class Application:
         #for i, item in enumerate(test_set):
         for i in range(len(test_set)):
             clear()
-            self.duplicate_print(f"Test item #{i+1} out of {len(test_set)}. Is the following string grammatical? (y/n/g/u)")
+            self.duplicate_print(f"Test item #{i+1} out of {len(test_set)}. Is the following string grammatical? (y/n)")
             self.duplicate_print(test_set[i][0])
             answer = '_'
             while answer[0] not in ['y', 'n']:
@@ -299,7 +299,7 @@ class Application:
             self.duplicate_print(answer, log_only=True)
             test_set[i] = (test_set[i][0], test_set[i][1], answer)
         clear()
-        self.duplicate_print('Test phase finished. Hope you had fun!')
+        self.duplicate_print('Test phase finished. Hope you had fun! A few more questions if you feel like it:')
         if not self.settings.skip_questionnaire:
             self.duplicate_print('How did you feel during the session?')
             answer = input()
@@ -310,6 +310,7 @@ class Application:
             self.duplicate_print('Did you seem to find any concrete or giveaways or hints in the strings?')
             answer = input()
             self.duplicate_print(answer, log_only=True)
+        clear()
         self.duplicate_print('And now for the big reveal... Strings were generated using the following regular grammar:')
         self.duplicate_print(str(gmr))
         correct = sum(item[1] == item[2] for item in test_set)
@@ -319,7 +320,7 @@ class Application:
         self.duplicate_print(f"{'Test string':<{width}}{'Correct answer':<16}{'Your answer':<16}")
         for item in test_set:
             self.duplicate_print(f"{item[0]:<{width}}{'yes' if 'y' == item[1] else 'no':<16}{'yes' if 'y' == item[2] else 'no':<16}")
-        self.duplicate_print('You may now add any post hoc notes or comments for the record if you wish. Please enter an empty line when you\'re done:')
+        self.duplicate_print('You now have a chance to add any other post hoc notes or comments for the record if you wish. Please enter an empty line when you\'re done:')
         comments = '\n'.join(iter(input, ''))
         self.duplicate_print(comments, log_only=True)
 
