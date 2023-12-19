@@ -20,6 +20,7 @@ class Settings:
     string_letters:             list[str] = dataclasses.field(default_factory = lambda: ['M', 'R', 'S', 'V', 'X'])
     # idea: test_strings_reuse_from_training?
     logfile_filename:           str = 'agl_sessions.log'
+    skip_questionnaire:         bool = False
 
     def __str__(self):
         """Print all settings in a human-readable format."""
@@ -37,6 +38,8 @@ class Settings:
                 try:
                     # parse attribute from string
                     value = type(getattr(self, attr_name))(config[section][attr_name])
+                    if 'skip_questionnaire' == attr_name:
+                        value = config[section][attr_name].lower() in ['true', 'yes', '1']
                     setattr(self, attr_name, value)
                 except AttributeError:
                     pass  # doesn't matter

@@ -101,6 +101,7 @@ class Application:
             print(f"7: ma[x]imum string length:\t\t\t{self.settings.maximum_string_length}")
             print(f"8: [l]etters to use in strings:\t\t{self.settings.string_letters}")
             print(f"9: log[f]ile to record sessions in:\t\t{self.settings.logfile_filename}")
+            print(f"   skip pre and post session [q]uestionnaire:\t{self.settings.skip_questionnaire}")
             print('0: [b]ack to main menu')
             while not choice:
                 choice = input('what to change> ')
@@ -163,6 +164,8 @@ class Application:
                             choice = choice[0].lower()
                 if choice in ['9', 'f', 'y']:
                     self.settings.logfile_filename = new_filename
+            elif choice in ['q']:
+                self.settings.skip_questionnaire = not self.settings.skip_questionnaire
             elif choice in ['0', 'b']:
                 break
             else:
@@ -235,7 +238,22 @@ class Application:
         # permute test_set
         random.shuffle(test_set)
         self.duplicate_print('Done.')
-        self.duplicate_print('You may add any notes or comments for the record before the training phase begins (optional). Please enter an empty line when you\'re done:')
+        if not self.settings.skip_questionnaire:
+            self.duplicate_print('A few questions before we begin. Feel free to answer as briefly or in as much detail as you like.')
+            self.duplicate_print('Your answers are going to be stored in the log file.')
+            self.duplicate_print('Have you heard about artificial grammar learning experiments before?')
+            answer = input()
+            self.duplicate_print(answer, log_only=True)
+            self.duplicate_print('What languages do you speak?')
+            answer = input()
+            self.duplicate_print(answer, log_only=True)
+            self.duplicate_print('What is your profession if you care to share?')
+            answer = input()
+            self.duplicate_print(answer, log_only=True)
+            self.duplicate_print(f"Out of {len(test_set)} questions what do you expect your score to be in this session?")
+            answer = input()
+            self.duplicate_print(answer, log_only=True)
+        self.duplicate_print(f"You may add any {'further ' if not self.settings.skip_questionnaire else ''}notes or comments for the record before the training phase begins (optional). Please enter an empty line when you're done:")
         comments = '\n'.join(iter(input, ''))
         self.duplicate_print(comments, log_only=True)
         self.duplicate_print(f"The training phase will now begin. You will have {self.settings.training_time} seconds to study a list of {self.settings.training_strings} exemplars.")
@@ -282,7 +300,17 @@ class Application:
             test_set[i] = (test_set[i][0], test_set[i][1], answer)
         clear()
         self.duplicate_print('Test phase finished. Hope you had fun!')
-        self.duplicate_print('Strings were generated using the following regular grammar:')
+        if not self.settings.skip_questionnaire:
+            self.duplicate_print('How did you feel during the session?')
+            answer = input()
+            self.duplicate_print(answer, log_only=True)
+            self.duplicate_print('Do you feel like you did well in this session?')
+            answer = input()
+            self.duplicate_print(answer, log_only=True)
+            self.duplicate_print('Did you seem to find any concrete or giveaways or hints in the strings?')
+            answer = input()
+            self.duplicate_print(answer, log_only=True)
+        self.duplicate_print('And now for the big reveal... Strings were generated using the following regular grammar:')
         self.duplicate_print(str(gmr))
         correct = sum(item[1] == item[2] for item in test_set)
         self.duplicate_print(f"You gave {correct} correct answers out of {len(test_set)} ({100 * correct/len(test_set):.3}%). The answers were the following:")
