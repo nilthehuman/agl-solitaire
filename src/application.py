@@ -13,6 +13,28 @@ from src import automaton
 from src import settings
 
 
+_builtin_print = print
+
+def print(string='', end='\n'):
+    """Smarter print function, wraps long lines automatically."""
+    max_width = os.get_terminal_size().columns
+    wrapped_string = ''
+    for line in string.split('\n'):
+        while max_width < len(line):
+            stop_at = max_width - 1
+            # back up to the nearest word boundary
+            while 0 <= stop_at and not string[stop_at].isspace():
+                stop_at -= 1
+            if -1 == stop_at:
+                # one giant word, we give up and leave it unwrapped
+                stop_at = len(line)
+            wrapped_string += line[:stop_at] + '\n'
+            line = line[stop_at+1:]
+        wrapped_string += line + '\n'
+    # leave off the last newline
+    _builtin_print(wrapped_string[:-1], end=end)
+
+
 class Application:
     """The main class responsible for basic user interactions."""
 
