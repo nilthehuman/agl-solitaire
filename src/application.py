@@ -29,7 +29,7 @@ class Application:
     """The main class responsible for basic user interactions."""
 
     def __init__(self):
-        self.settings = Settings
+        self.settings = Settings()
 
     def duplicate_print(self, string, log_only=False):
         """Output the string on the screen and log it in a text file at the same time."""
