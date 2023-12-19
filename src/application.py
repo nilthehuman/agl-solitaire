@@ -5,6 +5,7 @@ import datetime
 import os
 import random
 import re
+import readline
 import threading
 import time
 
