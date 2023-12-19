@@ -10,6 +10,7 @@ _DEFAULT_SETTINGS_FILENAME = 'settings.ini'
 @dataclasses.dataclass
 class Settings:
     """User options for controlling the details of the experimental paradigm."""
+    username:                   str = 'anonymous'
     training_strings:           int = 20
     training_time:              int = 300
     test_strings_grammatical:   int = 20

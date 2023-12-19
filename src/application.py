@@ -59,7 +59,7 @@ class Application:
             print('\n--------  MAIN MENU  --------')
             print('1: [s]tart experiment session')
             print('2: [c]onfigure settings')
-            print('3: [q]uit')
+            print('0: [q]uit')
             choice = ''
             while not choice:
                 choice = input('> ')
@@ -68,7 +68,7 @@ class Application:
                 self.run_experiment()
             elif choice in ['2', 'c']:
                 self.settings_menu()
-            elif choice in ['3', 'q']:
+            elif choice in ['0', 'q']:
                 break
             else:
                 print('no such option')
@@ -78,38 +78,44 @@ class Application:
         while True:
             choice = ''
             print('\n--------  SETTINGS  --------')
-            print(f"1: number of training [s]trings:\t\t{self.settings.training_strings}")
-            print(f"2: [t]ime allotted for training:\t\t{self.settings.training_time} seconds")
-            print(f"3: number of [g]rammatical test strings:\t{self.settings.test_strings_grammatical}")
-            print(f"4: number of [u]ngrammatical test strings:\t{self.settings.test_strings_ungrammatical}")
-            print(f"5: mi[n]imum string length:\t\t\t{self.settings.minimum_string_length}")
-            print(f"6: ma[x]imum string length:\t\t\t{self.settings.maximum_string_length}")
-            print(f"7: [l]etters to use in strings:\t\t\t{self.settings.string_letters}")
-            print(f"8: log[f]ile to record sessions in:\t\t{self.settings.logfile_filename}")
-            print('9: [b]ack to main menu')
+            print(f"1: [u]sername (for the record):\t\t\t{self.settings.username}")
+            print(f"2: number of training [s]trings:\t\t{self.settings.training_strings}")
+            print(f"3: [t]ime allotted for training:\t\t{self.settings.training_time} seconds")
+            print(f"4: number of [g]rammatical test strings:\t{self.settings.test_strings_grammatical}")
+            print(f"5: number of [u]ngrammatical test strings:\t{self.settings.test_strings_ungrammatical}")
+            print(f"6: mi[n]imum string length:\t\t\t{self.settings.minimum_string_length}")
+            print(f"7: ma[x]imum string length:\t\t\t{self.settings.maximum_string_length}")
+            print(f"8: [l]etters to use in strings:\t\t\t{self.settings.string_letters}")
+            print(f"9: log[f]ile to record sessions in:\t\t{self.settings.logfile_filename}")
+            print('0: [b]ack to main menu')
             while not choice:
                 choice = input('what to change> ')
             choice = choice[0].lower()
             attr_to_change = None
-            if choice in ['1', 's']:
+            if choice in ['1', 'u']:
+                self.settings.username = input('username: ')
+                if not self.settings.username:
+                    self.settings.username = 'anonymous'
+                print(f"good to see you, {self.settings.username}")
+            elif choice in ['2', 's']:
                 prompt = 'number of training strings: '
                 attr_to_change = 'training_strings'
-            elif choice in ['2', 't']:
+            elif choice in ['3', 't']:
                 prompt = 'time allotted for training: '
                 attr_to_change = 'training_time'
-            elif choice in ['3', 'g']:
+            elif choice in ['4', 'g']:
                 prompt = 'number of grammatical test strings: '
                 attr_to_change = 'test_strings_grammatical'
-            elif choice in ['4', 'u']:
+            elif choice in ['5', 'u']:
                 prompt = 'number of ungrammatical test strings: '
                 attr_to_change = 'test_strings_ungrammatical'
-            elif choice in ['5', 'n']:
+            elif choice in ['6', 'n']:
                 prompt = 'minimum string length: '
                 attr_to_change = 'minimum_string_length'
-            elif choice in ['6', 'x']:
+            elif choice in ['7', 'x']:
                 prompt = 'maximum string length: '
                 attr_to_change = 'maximum_string_length'
-            elif choice in ['7', 'l']:
+            elif choice in ['8', 'l']:
                 new_letters = input('letters to use in strings: ')
                 if not new_letters:
                     print('no letters provided')
@@ -123,7 +129,7 @@ class Application:
                     if re.search(r"[A-Z]", new_letters) and re.search(r"[a-z]", new_letters):
                         print('warning: mixing uppercase and lowercase letters is not recommended')
                     self.settings.string_letters = sorted(list(set([*new_letters])))
-            elif choice in ['8', 'f']:
+            elif choice in ['9', 'f']:
                 new_filename = input('logfile name: ')
                 if os.path.exists(new_filename):
                     if not os.path.isfile(new_filename):
@@ -141,9 +147,9 @@ class Application:
                         choice = input('file does not exist, create it? (y/n)> ')
                         if choice:
                             choice = choice[0].lower()
-                if choice in ['8', 'f', 'y']:
+                if choice in ['9', 'f', 'y']:
                     self.settings.logfile_filename = new_filename
-            elif choice in ['9', 'b']:
+            elif choice in ['0', 'b']:
                 break
             else:
                 print('no such setting')
