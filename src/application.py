@@ -1,4 +1,4 @@
-"""The application's user interface including the main menu and the experimental procedure itself."""
+"""The application's user interface including the terminal-based menu and the experimental procedure itself."""
 
 import datetime
 import os
@@ -36,7 +36,7 @@ def print(string='', end='\n'):
 
 
 class Application:
-    """The main class responsible for basic user interactions."""
+    """The main class responsible for basic user interactions and driving the procedure of the experiment."""
 
     def __init__(self):
         self.settings = settings.Settings()
@@ -74,7 +74,7 @@ class Application:
                 print('no such option')
 
     def settings_menu(self):
-        """Enable user to configure and adjust the experiment's protocol."""
+        """Enable user to configure and adjust the experimental protocol."""
         while True:
             choice = ''
             print('\n--------  SETTINGS  --------')

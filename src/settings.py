@@ -1,4 +1,4 @@
-"""Save, load and configure persistent user options for the AGL experiment paradigm."""
+"""Save, load and configure persistent user preferences for the AGL experiment paradigm."""
 
 import configparser
 import dataclasses
@@ -21,6 +21,7 @@ class Settings:
     logfile_filename:           str = 'agl_sessions.log'
 
     def __str__(self):
+        """Print all settings in a human-readable format."""
         str_repr = ''
         for field in dataclasses.fields(self):
             str_repr += f"{field.name}: {getattr(self, field.name)}\n"
@@ -41,7 +42,7 @@ class Settings:
         self.loaded = True
 
     def save_all(self, filename=_DEFAULT_SETTINGS_FILENAME):
-        """Write the current values of all our member variables to an .ini file."""
+        """Write the current values of all our member variables to a config file."""
         config = configparser.ConfigParser()
         for field in dataclasses.fields(self):
             # the letters variable needs special treatment
