@@ -260,7 +260,7 @@ class Application:
         self.duplicate_print('Strings were generated using the following regular grammar:')
         self.duplicate_print(str(gmr))
         correct = sum(item[1] == item[2] for item in test_set)
-        self.duplicate_print(f"You gave {correct} correct answers out of {len(test_set)} ({100 * correct/len(test_set)}%). The answers were the following:")
+        self.duplicate_print(f"You gave {correct} correct answers out of {len(test_set)} ({100 * correct/len(test_set):.3}%). The answers were the following:")
         # make table columns wider if needed
         width = max(16, 2 + max(len(item[0]) for item in test_set))
         self.duplicate_print(f"{'Test string':<{width}}{'Correct answer':<16}{'Your answer':<16}")
