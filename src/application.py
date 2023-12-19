@@ -21,6 +21,7 @@ class Settings:
     test_strings_ungrammatical: int = 20
     minimum_string_length:      int = 2
     maximum_string_length:      int = 8
+    string_letters:             list[str] = dataclasses.field(default_factory = lambda: ['M', 'R', 'S', 'V', 'X'])
     # idea: test_strings_reuse_from_training?
     logfile_filename:           str = 'agl_sessions.log'
 
@@ -73,8 +74,9 @@ class Application:
             print(f"4: number of [u]ngrammatical test strings:\t{self.settings.test_strings_ungrammatical}")
             print(f"5: mi[n]imum string length:\t\t\t{self.settings.minimum_string_length}")
             print(f"6: ma[x]imum string length:\t\t\t{self.settings.maximum_string_length}")
-            print(f"7: [l]ogfile to record sessions in:\t\t{self.settings.logfile_filename}")
-            print('8: [b]ack to main menu')
+            print(f"7: [l]etters to use in strings:\t\t\t{self.settings.string_letters}")
+            print(f"8: log[f]ile to record sessions in:\t\t{self.settings.logfile_filename}")
+            print('9: [b]ack to main menu')
             while not choice:
                 choice = input('what to change> ')
             choice = choice[0].lower()
@@ -98,6 +100,20 @@ class Application:
                 prompt = 'maximum string length: '
                 attr_to_change = 'maximum_string_length'
             elif choice in ['7', 'l']:
+                new_letters = input('letters to use in strings: ')
+                if not new_letters:
+                    print('no letters provided')
+                elif not re.match(r"^\w+$", new_letters):
+                    print('error: please type letters only')
+                elif len(set([*new_letters])) < 2:
+                    print('error: at least two different letters required')
+                else:
+                    if re.search(r"\d", new_letters):
+                        print('warning: using numbers in stimuli is not recommended')
+                    if re.search(r"[A-Z]", new_letters) and re.search(r"[a-z]", new_letters):
+                        print('warning: mixing uppercase and lowercase letters is not recommended')
+                    self.settings.string_letters = sorted(list(set([*new_letters])))
+            elif choice in ['8', 'f']:
                 new_filename = input('logfile name: ')
                 if os.path.exists(new_filename):
                     if not os.path.isfile(new_filename):
@@ -115,9 +131,9 @@ class Application:
                         choice = input('file does not exist, create it? (y/n)> ')
                         if choice:
                             choice = choice[0].lower()
-                if choice in ['7', 'l', 'y']:
+                if choice in ['8', 'f', 'y']:
                     self.settings.logfile_filename = new_filename
-            elif choice in ['8', 'b']:
+            elif choice in ['9', 'b']:
                 break
             else:
                 print('no such setting')
@@ -154,7 +170,7 @@ class Application:
         for field in dataclasses.fields(self.settings):
             self.duplicate_print(f"{field.name}: {getattr(self.settings, field.name)}")
         self.duplicate_print('Looking for a suitable random grammar...')
-        gmr = grammar.Grammar()
+        gmr = grammar.Grammar(self.settings.string_letters)
         aut = automaton.Automaton(gmr)
         required_strings = self.settings.training_strings + self.settings.test_strings_grammatical
         grammatical_strings = []

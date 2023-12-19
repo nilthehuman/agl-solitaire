@@ -19,8 +19,10 @@ class Grammar:
     MAX_STATES = 7
     MIN_PATH_LENGTH = 2
 
-    def __init__(self):
-        self.symbols = ['M', 'R', 'S', 'V', 'X']
+    def __init__(self, symbols=None):
+        self.symbols = symbols
+        if not symbols:
+            self.symbols = ['M', 'R', 'S', 'V', 'X']
         self.transitions = []
 
     def __repr__(self):
