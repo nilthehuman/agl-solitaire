@@ -1,6 +1,5 @@
 """The application's user interface including the main menu and the experimental procedure itself."""
 
-import dataclasses
 import datetime
 import os
 import random
@@ -11,27 +10,15 @@ import time
 
 from src import grammar
 from src import automaton
-
-
-@dataclasses.dataclass
-class Settings:
-    """User options for controlling the details of the experimental paradigm."""
-    training_strings:           int = 20
-    training_time:              int = 300
-    test_strings_grammatical:   int = 20
-    test_strings_ungrammatical: int = 20
-    minimum_string_length:      int = 2
-    maximum_string_length:      int = 8
-    string_letters:             list[str] = dataclasses.field(default_factory = lambda: ['M', 'R', 'S', 'V', 'X'])
-    # idea: test_strings_reuse_from_training?
-    logfile_filename:           str = 'agl_sessions.log'
+from src import settings
 
 
 class Application:
     """The main class responsible for basic user interactions."""
 
     def __init__(self):
-        self.settings = Settings()
+        self.settings = settings.Settings()
+        self.settings.load_all()
 
     def duplicate_print(self, string, log_only=False):
         """Output the string on the screen and log it in a text file at the same time."""
@@ -168,8 +155,7 @@ class Application:
                 os.system('clear')
         clear()
         self.duplicate_print('agl-solitaire session started with the following settings:')
-        for field in dataclasses.fields(self.settings):
-            self.duplicate_print(f"{field.name}: {getattr(self.settings, field.name)}")
+        self.duplicate_print(str(self.settings))
         self.duplicate_print('Looking for a suitable random grammar...')
         gmr = grammar.Grammar(self.settings.string_letters)
         aut = automaton.Automaton(gmr)
