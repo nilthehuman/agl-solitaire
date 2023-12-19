@@ -13,27 +13,41 @@ from src import automaton
 from src import settings
 
 
+_LEFT_MARGIN_WIDTH = 2
+
 _builtin_print = print
 
 def print(string='', end='\n'):
-    """Smarter print function, wraps long lines automatically."""
+    """Smarter print function, adds left margin and wraps long lines automatically."""
     max_width = os.get_terminal_size().columns
     wrapped_string = ''
     for line in string.split('\n'):
+        carriage_return = re.match(r'\r', line)
+        if carriage_return:
+            line = line[1:]
+        line = ' ' * _LEFT_MARGIN_WIDTH + line
+        if carriage_return:
+            line = '\r' + line
         while max_width < len(line):
             stop_at = max_width - 1
             # back up to the nearest word boundary
-            while 0 <= stop_at and not string[stop_at].isspace():
+            while 0 <= stop_at and not line[stop_at].isspace():
                 stop_at -= 1
             if -1 == stop_at:
                 # one giant word, we give up and leave it unwrapped
                 stop_at = len(line)
             wrapped_string += line[:stop_at] + '\n'
             line = line[stop_at+1:]
+            line = ' ' * _LEFT_MARGIN_WIDTH + line
         wrapped_string += line + '\n'
     # leave off the last newline
     _builtin_print(wrapped_string[:-1], end=end)
 
+_builtin_input = input
+
+def input(prompt=''):
+    """input function with constant left margin for improved readability."""
+    return _builtin_input(' ' * _LEFT_MARGIN_WIDTH + prompt)
 
 class Application:
     """The main class responsible for basic user interactions and driving the procedure of the experiment."""
@@ -78,14 +92,14 @@ class Application:
         while True:
             choice = ''
             print('\n--------  SETTINGS  --------')
-            print(f"1: [u]sername (for the record):\t\t\t{self.settings.username}")
+            print(f"1: [u]sername (for the record):\t\t{self.settings.username}")
             print(f"2: number of training [s]trings:\t\t{self.settings.training_strings}")
             print(f"3: [t]ime allotted for training:\t\t{self.settings.training_time} seconds")
             print(f"4: number of [g]rammatical test strings:\t{self.settings.test_strings_grammatical}")
             print(f"5: number of [u]ngrammatical test strings:\t{self.settings.test_strings_ungrammatical}")
             print(f"6: mi[n]imum string length:\t\t\t{self.settings.minimum_string_length}")
             print(f"7: ma[x]imum string length:\t\t\t{self.settings.maximum_string_length}")
-            print(f"8: [l]etters to use in strings:\t\t\t{self.settings.string_letters}")
+            print(f"8: [l]etters to use in strings:\t\t{self.settings.string_letters}")
             print(f"9: log[f]ile to record sessions in:\t\t{self.settings.logfile_filename}")
             print('0: [b]ack to main menu')
             while not choice:
