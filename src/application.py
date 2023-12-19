@@ -47,7 +47,7 @@ class Application:
         while True:
             print('\n--- main menu ---')
             print('1: [s]tart experiment session')
-            print('2: [c]hange settings')
+            print('2: [c]onfigure settings')
             print('3: [q]uit')
             choice = ''
             while not choice:
@@ -63,7 +63,7 @@ class Application:
                 print('no such option')
 
     def settings_menu(self):
-        """Enable user to adjust game options."""
+        """Enable user to configure and adjust the experiment's protocol."""
         while True:
             choice = ''
             print('\n--- settings ---')
@@ -150,7 +150,7 @@ class Application:
                 # non-zero exit code, try the other command
                 os.system('clear')
         clear()
-        self.duplicate_print(f"agl-solitaire session started with the following settings:")
+        self.duplicate_print('agl-solitaire session started with the following settings:')
         for field in dataclasses.fields(self.settings):
             self.duplicate_print(f"{field.name}: {getattr(self.settings, field.name)}")
         self.duplicate_print('Looking for a suitable random grammar...')
@@ -188,7 +188,7 @@ class Application:
         self.duplicate_print(f"The training phase will now begin. You will have {self.settings.training_time} seconds to study a list of {self.settings.training_strings} exemplars.")
         self.duplicate_print('Please press return when you are ready.')
         input()
-        self.duplicate_print(f"Training phase started. Please study the following list of strings:")
+        self.duplicate_print('Training phase started. Please study the following list of strings:')
         self.duplicate_print('\n'.join(training_set))
         print()
         input_thread = threading.Thread(target=input)
@@ -205,6 +205,8 @@ class Application:
         self.duplicate_print("You may type 'y' for yes and 'n' for no, or 'g' for grammatical and 'u' for ungrammatical.")
         self.duplicate_print('Please press return when you are ready.')
         input()
+        # N.B. you can't do the following because you want to update the original test_set
+        #for i, item in enumerate(test_set):
         for i in range(len(test_set)):
             clear()
             print(f"Test item #{i}. Is the following string grammatical? (y/n/g/u)")

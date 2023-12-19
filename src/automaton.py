@@ -4,8 +4,6 @@ as a graph in order to generate or check strings for Artificial Grammar Learning
 import enum
 import random
 
-from src import grammar
-
 
 class Automaton:
     """A finite-state machine that outputs or recognizes valid or invalid strings according
@@ -46,6 +44,7 @@ class Automaton:
     def produce_ungrammatical(self, num_strings=1, min_length=MIN_STRING_LENGTH, max_length=MAX_STRING_LENGTH):
         """Generate unacceptable strings loosely following Reber & Allen 1978's procedure."""
         class ErrorType(enum.Enum):
+            """List of the different kinds of anomalies we can introduce to make a string ungrammatical."""
             WRONG_FIRST = 1
             WRONG_SECOND = 2
             WRONG_PENULTIMATE = 3
