@@ -241,8 +241,8 @@ class Application:
         #for i, item in enumerate(test_set):
         for i in range(len(test_set)):
             clear()
-            print(f"Test item #{i+1} out of {len(test_set)}. Is the following string grammatical? (y/n/g/u)")
-            print(test_set[i][0])
+            self.duplicate_print(f"Test item #{i+1} out of {len(test_set)}. Is the following string grammatical? (y/n/g/u)")
+            self.duplicate_print(test_set[i][0])
             answer = '_'
             while answer[0] not in ['y', 'n']:
                 answer = None
@@ -253,6 +253,7 @@ class Application:
                     answer = 'y'
                 elif answer == 'u':
                     answer = 'n'
+            self.duplicate_print(answer, log_only=True)
             test_set[i] = (test_set[i][0], test_set[i][1], answer)
         clear()
         self.duplicate_print('Test phase finished. Hope you had fun!')
