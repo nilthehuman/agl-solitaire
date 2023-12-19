@@ -171,7 +171,7 @@ class Application:
                         print('warning: you are advised to keep the total number of training items plus test items under 100')
                 except ValueError as err:
                     if err:
-                        print(err)
+                        print(str(err))
                     else:
                         print('error: invalid number')
 
