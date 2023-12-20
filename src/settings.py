@@ -44,6 +44,18 @@ class Settings:
         pretty += f"Skip pre and post session questionnaire: {self.skip_questionnaire}\n"
         return pretty
 
+    def pretty_short(self):
+        """Only print settings relevant with a grammar loaded from file."""
+        pretty = ''
+        pretty += f"Username: {self.username}\n"
+        pretty += f"Number of training strings: {self.training_strings}\n"
+        pretty += f"Time allotted for training: {self.training_time}\n"
+        pretty += f"Number of grammatical test strings: {self.test_strings_grammatical}\n"
+        pretty += f"Number of ungrammatical test strings: {self.test_strings_ungrammatical}\n"
+        pretty += f"Logfile to record session in: {self.logfile_filename}\n"
+        pretty += f"Skip pre and post session questionnaire: {self.skip_questionnaire}\n"
+        return pretty
+
     def load_all(self, filename=_DEFAULT_SETTINGS_FILENAME):
         """Read and set our settings values from a settings file if it exists."""
         config = configparser.ConfigParser()

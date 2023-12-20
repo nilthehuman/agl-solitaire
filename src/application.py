@@ -71,8 +71,10 @@ class Application:
         print('agl-solitaire\n-------------\n\n(a terminal-based tool for Artificial Grammar Learning experiments)')
         while True:
             print('\n--------  MAIN MENU  --------')
-            print('1: [s]tart experiment session')
-            print('2: [c]onfigure settings')
+            print('1: [s]tart new experiment session')
+            print('2: [r]epeat experiment with previously used grammar')
+            print('3: [g]enerate and save grammar for repeat sessions')
+            print('4: [c]onfigure settings')
             print('0: [q]uit')
             choice = ''
             while not choice:
@@ -80,12 +82,109 @@ class Application:
             choice = choice[0].lower()
             if choice in ['1', 's']:
                 self.run_experiment()
-            elif choice in ['2', 'c']:
+            elif choice in ['2', 'r']:
+                self.load_grammar()
+            elif choice in ['3', 'g']:
+                self.save_grammar()
+            elif choice in ['4', 'c']:
                 self.settings_menu()
             elif choice in ['0', 'q']:
                 break
             else:
                 print('no such option')
+
+    def generate_grammar(self):
+        """Find a regular grammar that satisfies the protocol's requirements as defined by the user."""
+        gmr = grammar.Grammar(self.settings.string_letters)
+        aut = automaton.Automaton(gmr)
+        num_required_strings = self.settings.training_strings + self.settings.test_strings_grammatical
+        grammatical_strings = []
+        max_grammar_attempts = 64
+        max_oversize_attempts = 5
+        oversize_grammar = 0
+        self.duplicate_print('Looking for a suitable random grammar...')
+        while num_required_strings != len(grammatical_strings) and oversize_grammar <= max_oversize_attempts:
+            grammar_attempts = 0
+            while num_required_strings != len(grammatical_strings) and grammar_attempts < max_grammar_attempts:
+                grammar_attempts += 1
+                gmr.randomize(min_states=gmr.MIN_STATES + oversize_grammar,
+                              max_states=gmr.MAX_STATES + oversize_grammar)
+                grammatical_strings = list(aut.produce_grammatical(num_strings=num_required_strings,
+                                                                   min_length=self.settings.minimum_string_length,
+                                                                   max_length=self.settings.maximum_string_length))
+            oversize_grammar += 1
+            if num_required_strings != len(grammatical_strings):
+                self.duplicate_print(f"None found, expanding search to between {gmr.MIN_STATES+oversize_grammar} and {gmr.MAX_STATES+oversize_grammar} states...")
+        if num_required_strings != len(grammatical_strings):
+            self.duplicate_print('Sorry, no grammar found that would satisfy the current settings. Try relaxing some of your preferences.')
+            return None, None
+        self.duplicate_print('Grammar selected. The rules of the grammar will be revealed after the session.')
+        return gmr, grammatical_strings
+
+    def save_grammar(self):
+        """Generate and serialize a suitable regular grammar to file for later use."""
+        gmr, _ = self.generate_grammar()
+        if not gmr:
+            return
+        while True:
+            filename = input('save to filename (leave empty to cancel): ')
+            if not filename:
+                return
+            go_ahead = True
+            if os.path.exists(filename) or os.path.exists(filename + '.ini'):
+                go_ahead = False
+                choice = input('warning: file exists, overwrite? (y/n)> ')
+                if choice and choice[0].lower() == 'y':
+                    go_ahead = True
+            if go_ahead:
+                with open(filename, 'w', encoding='UTF-8') as gmr_file:
+                    gmr_file.write(gmr.obfuscated_repr())
+                self.settings.save_all(filename + '.ini')
+                return
+
+    def load_grammar(self):
+        """Restore a previously generated grammar from a file of the user's choice
+        and (re)run the experiment with the same grammar."""
+        filename = input('file to load grammar from (leave empty to go back): ')
+        if not filename:
+            return
+        if not os.path.exists(filename):
+            print('error: file not found')
+            return
+        if not os.path.isfile(filename):
+            print('error: not a file (maybe a folder?)')
+            return
+        with open(filename, 'r', encoding='UTF-8') as file:
+            obfuscated_string_repr = file.read()
+        try:
+            gmr = grammar.Grammar.from_obfuscated_repr(obfuscated_string_repr)
+        except (IndexError, SyntaxError):
+            print('error: loading grammar from file failed')
+            return
+        # grammar loaded successfully, now see about the settings
+        current_settings = False
+        if not os.path.isfile(filename + '.ini'):
+            print('warning: the loaded grammar has no corresponding .ini file')
+            choice = ''
+            while not choice:
+                choice = input('use the current settings? (y/n)> ')
+            if choice[0].lower() != 'y':
+                return
+        else:
+            saved_settings = settings.Settings()
+            saved_settings.load_all(filename + '.ini')
+            if self.settings != saved_settings:
+                print('warning: your current settings differ from those loaded from the .ini file:\n')
+                print(f"settings in {filename}.ini:\n" + saved_settings.pretty_print())
+                print(f"current settings:\n" + self.settings.pretty_print())
+                choice = ''
+                while not choice:
+                    choice = input('use the current settings instead? (y/n)> ')
+                if choice[0].lower() != 'y':
+                    self.settings.load_all(filename + '.ini')
+        # don't forget to reset letters as well
+        gmr.symbols = self.settings.string_letters
+        self.run_experiment(filename, gmr)
 
     def settings_menu(self):
         """Enable user to configure and adjust the experimental protocol."""
@@ -192,45 +291,34 @@ class Application:
                     else:
                         print('error: invalid number')
 
-    def run_experiment(self):
+    def run_experiment(self, filename=None, gmr=None):
         """Run one session of training and testing with a random regular grammar and record everything in the log file."""
         def clear():
             if os.system('cls'):
                 # non-zero exit code, try the other command
                 os.system('clear')
         clear()
+        num_required_grammatical = self.settings.training_strings + self.settings.test_strings_grammatical
         self.duplicate_print('=' * 120, log_only=True)
-        self.duplicate_print('agl-solitaire session started with the following settings:')
-        self.duplicate_print(self.settings.pretty_print())
-        self.duplicate_print('Looking for a suitable random grammar...')
-        gmr = grammar.Grammar(self.settings.string_letters)
-        aut = automaton.Automaton(gmr)
-        required_strings = self.settings.training_strings + self.settings.test_strings_grammatical
-        grammatical_strings = []
-        max_grammar_attempts = 64
-        max_oversize_attempts = 5
-        oversize_grammar = 0
-        while required_strings != len(grammatical_strings) and oversize_grammar <= max_oversize_attempts:
-            grammar_attempts = 0
-            while required_strings != len(grammatical_strings) and grammar_attempts < max_grammar_attempts:
-                grammar_attempts += 1
-                gmr.randomize(min_states=gmr.MIN_STATES + oversize_grammar,
-                              max_states=gmr.MAX_STATES + oversize_grammar)
-                grammatical_strings = list(aut.produce_grammatical(num_strings=required_strings,
-                                                                   min_length=self.settings.minimum_string_length,
-                                                                   max_length=self.settings.maximum_string_length))
-            oversize_grammar += 1
-            if required_strings != len(grammatical_strings):
-                self.duplicate_print(f"None found, expanding search to between {gmr.MIN_STATES+oversize_grammar} and {gmr.MAX_STATES+oversize_grammar} states...")
-        if required_strings != len(grammatical_strings):
-            self.duplicate_print('Sorry, no grammar found that would satisfy the current settings. Try relaxing some of your preferences.')
-            return
-        self.duplicate_print('Grammar selected. The rules of the grammar will be revealed after the session.')
-        self.duplicate_print('Generating training strings and test strings based on the grammar...')
+        grammatical_strings = None
+        if gmr is not None:
+            self.duplicate_print('agl-solitaire session started with a pregenerated grammar:')
+            self.duplicate_print(self.settings.pretty_short())
+            self.duplicate_print('Generating training strings and test strings based on the grammar...')
+            aut = automaton.Automaton(gmr)
+            grammatical_strings = list(aut.produce_grammatical(num_required_grammatical))
+        else:
+            self.duplicate_print('agl-solitaire session started with the following settings:')
+            self.duplicate_print(self.settings.pretty_print())
+            gmr, grammatical_strings = self.generate_grammar()
+            if gmr is None:
+                return
+            aut = automaton.Automaton(gmr)
+            self.duplicate_print('Generating training strings and test strings based on the grammar...')
         # partition grammatical_strings into two subsets
-        picked_for_training = random.sample(range(0,required_strings), k=self.settings.training_strings)
+        picked_for_training = random.sample(range(0,num_required_grammatical), k=self.settings.training_strings)
         training_set = [grammatical_strings[i] for i in picked_for_training]
-        test_set = [(grammatical_strings[i], 'y') for i in set(range(0,required_strings)) - set(picked_for_training)]
+        test_set = [(grammatical_strings[i], 'y') for i in set(range(0,num_required_grammatical)) - set(picked_for_training)]
         test_set += [(string, 'n') for string in aut.produce_ungrammatical(num_strings=self.settings.test_strings_ungrammatical,
                                                                            min_length=self.settings.minimum_string_length,
                                                                            max_length=self.settings.maximum_string_length)]
@@ -267,7 +355,7 @@ class Application:
         input_thread.start()
         remaining_time = self.settings.training_time
         while input_thread.is_alive() and 0 < remaining_time:
-            print(f"\r{remaining_time} seconds remaining (press return to finish early)...", end='')
+            print(f"\r{remaining_time} seconds remaining (press return to finish early)...  ", end='')
             time.sleep(1)
             remaining_time -= 1
         print('\rTraining phase finished.' + ' ' * 30)
