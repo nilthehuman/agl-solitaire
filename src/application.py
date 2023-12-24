@@ -102,7 +102,7 @@ class Application:
         max_grammar_attempts = 64
         max_oversize_attempts = 5
         oversize_grammar = 0
-        self.duplicate_print('Looking for a suitable random grammar...')
+        print('Looking for a suitable random grammar...')
         while num_required_strings != len(grammatical_strings) and oversize_grammar <= max_oversize_attempts:
             grammar_attempts = 0
             while num_required_strings != len(grammatical_strings) and grammar_attempts < max_grammar_attempts:
@@ -114,11 +114,11 @@ class Application:
                                                                    max_length=self.settings.maximum_string_length))
             oversize_grammar += 1
             if num_required_strings != len(grammatical_strings):
-                self.duplicate_print(f"None found, expanding search to between {gmr.MIN_STATES+oversize_grammar} and {gmr.MAX_STATES+oversize_grammar} states...")
+                print(f"None found, expanding search to between {gmr.MIN_STATES+oversize_grammar} and {gmr.MAX_STATES+oversize_grammar} states...")
         if num_required_strings != len(grammatical_strings):
-            self.duplicate_print('Sorry, no grammar found that would satisfy the current settings. Try relaxing some of your preferences.')
+            print('Sorry, no grammar found that would satisfy the current settings. Try relaxing some of your preferences.')
             return None, None
-        self.duplicate_print('Grammar selected. The rules of the grammar will be revealed after the session.')
+        print('Grammar selected. The rules of the grammar will be revealed after the session.')
         return gmr, grammatical_strings
 
     def save_grammar(self):
