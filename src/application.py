@@ -387,8 +387,9 @@ class Application:
             self.duplicate_print(answer, log_only=True)
             test_set[i] = (test_set[i][0], test_set[i][1], answer)
         clear()
-        self.duplicate_print('Test phase finished. Hope you had fun! A few more questions if you feel like it:')
+        self.duplicate_print('Test phase finished. Hope you had fun!')
         if not self.settings.skip_questionnaire:
+            self.duplicate_print('A few more questions if you feel like it:')
             self.duplicate_print('How did you feel during the session?')
             answer = input()
             self.duplicate_print(answer, log_only=True)
