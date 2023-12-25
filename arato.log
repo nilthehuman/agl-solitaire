@@ -1,0 +1,2020 @@
+[2023-12-24 15:26:21] ========================================================================================================================
+[2023-12-24 15:26:21] agl-solitaire session started with a pregenerated grammar:
+[2023-12-24 15:26:21] Username: Daniel Arato
+[2023-12-24 15:26:21] Number of training strings: 20
+[2023-12-24 15:26:21] Time allotted for training: 180
+[2023-12-24 15:26:21] Number of grammatical test strings: 20
+[2023-12-24 15:26:21] Number of ungrammatical test strings: 20
+[2023-12-24 15:26:21] Logfile to record session in: arato.log
+[2023-12-24 15:26:21] Skip pre and post session questionnaire: True
+[2023-12-24 15:26:21] 
+[2023-12-24 15:26:21] Generating training strings and test strings based on the grammar...
+[2023-12-24 15:26:21] Done.
+[2023-12-24 15:26:21] You may add any notes or comments for the record before the training phase begins (optional). Please enter an empty line when you're done:
+[2023-12-24 15:34:45] fr1St!!!
+[2023-12-24 15:34:45] Yo it's the captain speaking. For this script's maiden voyage I'm going to perform a sequence of the same experiment with three different strategies, repeating each one three times. First I'll try to tune out any conscious thought processes and just look at the list of training strings in zen mode as if taking in a modern piece of art. I will do this twice more. Second I'm going to try to work out the underlying regular grammar in my head without external aids, again repeat twice more. In the final round of experiments I will attempt to reconstruct the underlying grammar with pencil and paper. All other parameters of the experimental procedure shall be kept the same throughout.
+[2023-12-24 15:34:45] I feel adequately well rested and only a little thristy. I'm on the highway with my mom driving, it's quiet and my ability to concentrate is not impaired in any way.
+[2023-12-24 15:34:45] Let's go!
+[2023-12-24 15:34:45] The training phase will now begin. You will have 180 seconds to study a list of 20 exemplars of the hidden grammar.
+[2023-12-24 15:34:45] Please make sure your screen and terminal font are comfortable to read. Press return when you are ready.
+[2023-12-24 15:34:52] Training phase started. Please study the following list of strings:
+[2023-12-24 15:34:52] VXSVMVVV
+[2023-12-24 15:34:52] SRS
+[2023-12-24 15:34:52] XVXRVV
+[2023-12-24 15:34:52] SSXSM
+[2023-12-24 15:34:52] VRVVVVV
+[2023-12-24 15:34:52] VXMRV
+[2023-12-24 15:34:52] XSSRV
+[2023-12-24 15:34:52] SSRV
+[2023-12-24 15:34:52] XXVXMXSV
+[2023-12-24 15:34:52] VXRV
+[2023-12-24 15:34:52] MXMVXVSS
+[2023-12-24 15:34:52] MSRV
+[2023-12-24 15:34:52] SVVR
+[2023-12-24 15:34:52] XXMXM
+[2023-12-24 15:34:52] VR
+[2023-12-24 15:34:52] MSSVS
+[2023-12-24 15:34:52] SRM
+[2023-12-24 15:34:52] MM
+[2023-12-24 15:34:52] MSR
+[2023-12-24 15:34:52] XSVVXMXR
+[2023-12-24 15:37:52] Training phase finished.
+[2023-12-24 15:37:52] The test phase will now begin. You will be shown 40 new strings one at a time and prompted to judge the grammaticality of each.
+[2023-12-24 15:37:52] You may type 'y' for yes (i.e. grammatical) and 'n' for no (ungrammatical). Press return when you are ready.
+[2023-12-24 15:37:57] Test item #1 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:37:57] VXSMVM
+[2023-12-24 15:38:00] y
+[2023-12-24 15:38:00] Test item #2 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:38:00] VRV
+[2023-12-24 15:38:02] y
+[2023-12-24 15:38:02] Test item #3 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:38:02] MS
+[2023-12-24 15:38:04] y
+[2023-12-24 15:38:04] Test item #4 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:38:04] VRVV
+[2023-12-24 15:38:06] y
+[2023-12-24 15:38:06] Test item #5 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:38:06] XMSMR
+[2023-12-24 15:38:09] n
+[2023-12-24 15:38:09] Test item #6 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:38:09] SVSSRV
+[2023-12-24 15:38:14] n
+[2023-12-24 15:38:14] Test item #7 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:38:14] SMSSRV
+[2023-12-24 15:38:19] n
+[2023-12-24 15:38:19] Test item #8 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:38:19] XVXMX
+[2023-12-24 15:38:22] n
+[2023-12-24 15:38:22] Test item #9 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:38:22] MMVV
+[2023-12-24 15:38:23] y
+[2023-12-24 15:38:23] Test item #10 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:38:23] XXM
+[2023-12-24 15:38:25] n
+[2023-12-24 15:38:25] Test item #11 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:38:25] XVSV
+[2023-12-24 15:38:28] n
+[2023-12-24 15:38:28] Test item #12 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:38:28] VX
+[2023-12-24 15:38:29] y
+[2023-12-24 15:38:29] Test item #13 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:38:29] SSXS
+[2023-12-24 15:38:32] n
+[2023-12-24 15:38:32] Test item #14 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:38:32] XXVXS
+[2023-12-24 15:38:34] y
+[2023-12-24 15:38:34] Test item #15 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:38:34] MRRRS
+[2023-12-24 15:38:36] y
+[2023-12-24 15:38:36] Test item #16 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:38:36] SRXXX
+[2023-12-24 15:38:37] y
+[2023-12-24 15:38:37] Test item #17 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:38:37] XVXS
+[2023-12-24 15:38:43] y
+[2023-12-24 15:38:43] Test item #18 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:38:43] MSVV
+[2023-12-24 15:38:45] n
+[2023-12-24 15:38:45] Test item #19 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:38:45] SSXRVV
+[2023-12-24 15:38:48] y
+[2023-12-24 15:38:48] Test item #20 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:38:48] SXRV
+[2023-12-24 15:38:50] y
+[2023-12-24 15:38:50] Test item #21 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:38:50] XSRXVMVV
+[2023-12-24 15:38:55] y
+[2023-12-24 15:38:55] Test item #22 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:38:55] VXMXMRV
+[2023-12-24 15:38:59] y
+[2023-12-24 15:38:59] Test item #23 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:38:59] VXMR
+[2023-12-24 15:39:01] y
+[2023-12-24 15:39:01] Test item #24 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:39:01] VXM
+[2023-12-24 15:39:02] y
+[2023-12-24 15:39:02] Test item #25 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:39:02] XRSSRVVV
+[2023-12-24 15:39:05] y
+[2023-12-24 15:39:05] Test item #26 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:39:05] MVVVV
+[2023-12-24 15:39:08] n
+[2023-12-24 15:39:08] Test item #27 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:39:08] SSR
+[2023-12-24 15:39:09] n
+[2023-12-24 15:39:09] Test item #28 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:39:09] XXMXV
+[2023-12-24 15:39:11] y
+[2023-12-24 15:39:11] Test item #29 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:39:11] XXVRV
+[2023-12-24 15:39:14] y
+[2023-12-24 15:39:14] Test item #30 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:39:14] SR
+[2023-12-24 15:39:16] n
+[2023-12-24 15:39:16] Test item #31 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:39:16] SVSVMXV
+[2023-12-24 15:39:17] n
+[2023-12-24 15:39:17] Test item #32 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:39:17] VMSVXMVS
+[2023-12-24 15:39:21] y
+[2023-12-24 15:39:21] Test item #33 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:39:21] VRVVVV
+[2023-12-24 15:39:23] y
+[2023-12-24 15:39:23] Test item #34 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:39:23] MMV
+[2023-12-24 15:39:24] y
+[2023-12-24 15:39:24] Test item #35 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:39:24] VVVVVVRV
+[2023-12-24 15:39:27] n
+[2023-12-24 15:39:27] Test item #36 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:39:27] XX
+[2023-12-24 15:39:29] n
+[2023-12-24 15:39:29] Test item #37 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:39:29] VXMMVM
+[2023-12-24 15:39:31] y
+[2023-12-24 15:39:31] Test item #38 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:39:31] MXR
+[2023-12-24 15:39:32] y
+[2023-12-24 15:39:32] Test item #39 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:39:32] SXM
+[2023-12-24 15:39:34] y
+[2023-12-24 15:39:34] Test item #40 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:39:34] SM
+[2023-12-24 15:39:37] y
+[2023-12-24 15:39:37] Test phase finished. Hope you had fun! A few more questions if you feel like it:
+[2023-12-24 15:39:37] And now for the big reveal... Strings were generated using the following regular grammar:
+[2023-12-24 15:39:37] 0 -V-> 5
+[2023-12-24 15:39:37] 0 -M-> 4
+[2023-12-24 15:39:37] 0 -X-> 0
+[2023-12-24 15:39:37] 0 -S-> 6
+[2023-12-24 15:39:37] 1 ---> OUT
+[2023-12-24 15:39:37] 1 -V-> 1
+[2023-12-24 15:39:37] 2 -S-> 3
+[2023-12-24 15:39:37] 2 ---> OUT
+[2023-12-24 15:39:37] 2 -M-> 5
+[2023-12-24 15:39:37] 2 -R-> 1
+[2023-12-24 15:39:37] 3 ---> OUT
+[2023-12-24 15:39:37] 3 -V-> 4
+[2023-12-24 15:39:37] 3 -M-> 3
+[2023-12-24 15:39:37] 4 -M-> 1
+[2023-12-24 15:39:37] 4 -S-> 2
+[2023-12-24 15:39:37] 4 -X-> 3
+[2023-12-24 15:39:37] 5 -R-> 1
+[2023-12-24 15:39:37] 5 -X-> 2
+[2023-12-24 15:39:37] 6 -R-> 4
+[2023-12-24 15:39:37] 6 -V-> 0
+[2023-12-24 15:39:37] 6 -S-> 5
+[2023-12-24 15:39:37] You gave 24 correct answers out of 40 (60.0%). The answers were the following:
+[2023-12-24 15:39:37] Test string     Correct answer  Your answer
+[2023-12-24 15:39:37] VXSMVM          yes             yes
+[2023-12-24 15:39:37] VRV             yes             yes
+[2023-12-24 15:39:37] MS              yes             yes
+[2023-12-24 15:39:37] VRVV            yes             yes
+[2023-12-24 15:39:37] XMSMR           yes             no
+[2023-12-24 15:39:37] SVSSRV          yes             no
+[2023-12-24 15:39:37] SMSSRV          no              no
+[2023-12-24 15:39:37] XVXMX           yes             no
+[2023-12-24 15:39:37] MMVV            yes             yes
+[2023-12-24 15:39:37] XXM             no              no
+[2023-12-24 15:39:37] XVSV            no              no
+[2023-12-24 15:39:37] VX              yes             yes
+[2023-12-24 15:39:37] SSXS            yes             no
+[2023-12-24 15:39:37] XXVXS           yes             yes
+[2023-12-24 15:39:37] MRRRS           no              yes
+[2023-12-24 15:39:37] SRXXX           no              yes
+[2023-12-24 15:39:37] XVXS            yes             yes
+[2023-12-24 15:39:37] MSVV            no              no
+[2023-12-24 15:39:37] SSXRVV          yes             yes
+[2023-12-24 15:39:37] SXRV            no              yes
+[2023-12-24 15:39:37] XSRXVMVV        yes             yes
+[2023-12-24 15:39:37] VXMXMRV         yes             yes
+[2023-12-24 15:39:37] VXMR            yes             yes
+[2023-12-24 15:39:37] VXM             no              yes
+[2023-12-24 15:39:37] XRSSRVVV        no              yes
+[2023-12-24 15:39:37] MVVVV           no              no
+[2023-12-24 15:39:37] SSR             yes             no
+[2023-12-24 15:39:37] XXMXV           no              yes
+[2023-12-24 15:39:37] XXVRV           yes             yes
+[2023-12-24 15:39:37] SR              no              no
+[2023-12-24 15:39:37] SVSVMXV         no              no
+[2023-12-24 15:39:37] VMSVXMVS        no              yes
+[2023-12-24 15:39:37] VRVVVV          yes             yes
+[2023-12-24 15:39:37] MMV             yes             yes
+[2023-12-24 15:39:37] VVVVVVRV        no              no
+[2023-12-24 15:39:37] XX              no              no
+[2023-12-24 15:39:37] VXMMVM          no              yes
+[2023-12-24 15:39:37] MXR             no              yes
+[2023-12-24 15:39:37] SXM             no              yes
+[2023-12-24 15:39:37] SM              no              yes
+[2023-12-24 15:39:37] You now have a chance to add any other post hoc notes or comments for the record if you wish. Please enter an empty line when you're done:
+[2023-12-24 15:41:50] Honestly I'm a little surprised that I performed above chance, I felt like I had no idea what I was doing. Is this what implicit learning is supposed to feel like?
+[2023-12-24 15:43:44] ========================================================================================================================
+[2023-12-24 15:43:44] agl-solitaire session started with a pregenerated grammar:
+[2023-12-24 15:43:44] Username: Daniel Arato
+[2023-12-24 15:43:44] Number of training strings: 20
+[2023-12-24 15:43:44] Time allotted for training: 180
+[2023-12-24 15:43:44] Number of grammatical test strings: 20
+[2023-12-24 15:43:44] Number of ungrammatical test strings: 20
+[2023-12-24 15:43:44] Logfile to record session in: arato.log
+[2023-12-24 15:43:44] Skip pre and post session questionnaire: True
+[2023-12-24 15:43:44] 
+[2023-12-24 15:43:44] Generating training strings and test strings based on the grammar...
+[2023-12-24 15:43:44] Done.
+[2023-12-24 15:43:44] You may add any notes or comments for the record before the training phase begins (optional). Please enter an empty line when you're done:
+[2023-12-24 15:44:05] Second try, same setting and same circumstances as before.
+[2023-12-24 15:44:05] The training phase will now begin. You will have 180 seconds to study a list of 20 exemplars of the hidden grammar.
+[2023-12-24 15:44:05] Please make sure your screen and terminal font are comfortable to read. Press return when you are ready.
+[2023-12-24 15:44:10] Training phase started. Please study the following list of strings:
+[2023-12-24 15:44:10] MSRRRMSR
+[2023-12-24 15:44:10] MMMSRSRS
+[2023-12-24 15:44:10] MSRMMMMM
+[2023-12-24 15:44:10] MMSRRRSR
+[2023-12-24 15:44:10] MMMSRMSR
+[2023-12-24 15:44:10] MSRSRSR
+[2023-12-24 15:44:10] MMMSRMMM
+[2023-12-24 15:44:10] MSRMMMSR
+[2023-12-24 15:44:10] MMMMSRMS
+[2023-12-24 15:44:10] MSRSRMMS
+[2023-12-24 15:44:10] MMMSR
+[2023-12-24 15:44:10] MMMMSRSR
+[2023-12-24 15:44:10] MMMSRRRM
+[2023-12-24 15:44:10] MMSRRRMS
+[2023-12-24 15:44:10] MMMMMSRM
+[2023-12-24 15:44:10] MMSR
+[2023-12-24 15:44:10] MMMMMMSR
+[2023-12-24 15:44:10] MSRMMSRM
+[2023-12-24 15:44:10] MSRRR
+[2023-12-24 15:44:10] MMSRSRMM
+[2023-12-24 15:47:10] Training phase finished.
+[2023-12-24 15:47:10] The test phase will now begin. You will be shown 40 new strings one at a time and prompted to judge the grammaticality of each.
+[2023-12-24 15:47:10] You may type 'y' for yes (i.e. grammatical) and 'n' for no (ungrammatical). Press return when you are ready.
+[2023-12-24 15:47:16] Test item #1 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:47:16] MMSRMMMS
+[2023-12-24 15:47:21] y
+[2023-12-24 15:47:21] Test item #2 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:47:21] MSRMSRRR
+[2023-12-24 15:47:25] n
+[2023-12-24 15:47:25] Test item #3 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:47:25] MSRMSRMS
+[2023-12-24 15:47:28] y
+[2023-12-24 15:47:28] Test item #4 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:47:28] MRRMSRRR
+[2023-12-24 15:47:34] n
+[2023-12-24 15:47:34] Test item #5 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:47:34] MMSRSRMS
+[2023-12-24 15:47:36] y
+[2023-12-24 15:47:36] Test item #6 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:47:36] MMSRMMSR
+[2023-12-24 15:47:39] y
+[2023-12-24 15:47:39] Test item #7 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:47:39] MMXR
+[2023-12-24 15:47:41] n
+[2023-12-24 15:47:41] Test item #8 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:47:41] MSRSRMSR
+[2023-12-24 15:47:56] y
+[2023-12-24 15:47:56] Test item #9 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:47:56] MSRSRSRS
+[2023-12-24 15:48:03] y
+[2023-12-24 15:48:03] Test item #10 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:48:03] MMR
+[2023-12-24 15:48:06] n
+[2023-12-24 15:48:06] Test item #11 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:48:06] MMMMSRVS
+[2023-12-24 15:48:08] n
+[2023-12-24 15:48:08] Test item #12 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:48:08] MSRRRMMM
+[2023-12-24 15:48:11] n
+[2023-12-24 15:48:11] Test item #13 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:48:11] MSR
+[2023-12-24 15:48:12] y
+[2023-12-24 15:48:12] Test item #14 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:48:12] MSRSRMMM
+[2023-12-24 15:48:15] y
+[2023-12-24 15:48:15] Test item #15 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:48:15] MMMMMSRR
+[2023-12-24 15:48:18] n
+[2023-12-24 15:48:18] Test item #16 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:48:18] MVRMSRSR
+[2023-12-24 15:48:20] n
+[2023-12-24 15:48:20] Test item #17 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:48:20] MMMMS
+[2023-12-24 15:48:21] y
+[2023-12-24 15:48:21] Test item #18 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:48:21] RSRMMSRR
+[2023-12-24 15:48:23] n
+[2023-12-24 15:48:23] Test item #19 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:48:23] MMSRMSRM
+[2023-12-24 15:48:29] y
+[2023-12-24 15:48:29] Test item #20 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:48:29] MMMMMSXR
+[2023-12-24 15:48:31] n
+[2023-12-24 15:48:31] Test item #21 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:48:31] MMMMSRRR
+[2023-12-24 15:48:36] n
+[2023-12-24 15:48:36] Test item #22 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:48:36] MVMMSRSR
+[2023-12-24 15:48:40] n
+[2023-12-24 15:48:40] Test item #23 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:48:40] SM
+[2023-12-24 15:48:42] n
+[2023-12-24 15:48:42] Test item #24 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:48:42] MSRSRSRR
+[2023-12-24 15:48:46] y
+[2023-12-24 15:48:46] Test item #25 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:48:46] MMRRSRMS
+[2023-12-24 15:48:53] n
+[2023-12-24 15:48:53] Test item #26 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:48:53] VRRVMMR
+[2023-12-24 15:48:55] n
+[2023-12-24 15:48:55] Test item #27 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:48:55] MSRSSRMS
+[2023-12-24 15:48:57] n
+[2023-12-24 15:48:57] Test item #28 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:48:57] MMSRSRSR
+[2023-12-24 15:48:59] y
+[2023-12-24 15:48:59] Test item #29 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:48:59] MSVXXX
+[2023-12-24 15:49:01] n
+[2023-12-24 15:49:01] Test item #30 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:49:01] MSRRRMXS
+[2023-12-24 15:49:04] n
+[2023-12-24 15:49:04] Test item #31 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:49:04] MXSRVM
+[2023-12-24 15:49:05] n
+[2023-12-24 15:49:05] Test item #32 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:49:05] MMMSRRVR
+[2023-12-24 15:49:13] n
+[2023-12-24 15:49:13] Test item #33 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:49:13] MMSRMSR
+[2023-12-24 15:49:15] y
+[2023-12-24 15:49:15] Test item #34 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:49:15] XSRRRRRM
+[2023-12-24 15:49:20] n
+[2023-12-24 15:49:20] Test item #35 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:49:20] MMMSRRR
+[2023-12-24 15:49:22] y
+[2023-12-24 15:49:22] Test item #36 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:49:22] RSM
+[2023-12-24 15:49:24] n
+[2023-12-24 15:49:24] Test item #37 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:49:24] MSRRRRRR
+[2023-12-24 15:49:26] n
+[2023-12-24 15:49:26] Test item #38 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:49:26] MMMMSR
+[2023-12-24 15:49:27] y
+[2023-12-24 15:49:27] Test item #39 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:49:27] MMS
+[2023-12-24 15:49:29] y
+[2023-12-24 15:49:29] Test item #40 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 15:49:29] MMMSRRRS
+[2023-12-24 15:49:31] n
+[2023-12-24 15:49:31] Test phase finished. Hope you had fun! A few more questions if you feel like it:
+[2023-12-24 15:49:31] And now for the big reveal... Strings were generated using the following regular grammar:
+[2023-12-24 15:49:31] 0 -M-> 2
+[2023-12-24 15:49:31] 1 ---> OUT
+[2023-12-24 15:49:31] 1 -S-> 3
+[2023-12-24 15:49:31] 1 -R-> 4
+[2023-12-24 15:49:31] 1 -M-> 2
+[2023-12-24 15:49:31] 2 -S-> 4
+[2023-12-24 15:49:31] 2 -M-> 2
+[2023-12-24 15:49:31] 3 -R-> 2
+[2023-12-24 15:49:31] 4 -R-> 1
+[2023-12-24 15:49:31] You gave 32 correct answers out of 40 (80.0%). The answers were the following:
+[2023-12-24 15:49:31] Test string     Correct answer  Your answer
+[2023-12-24 15:49:31] MMSRMMMS        yes             yes
+[2023-12-24 15:49:31] MSRMSRRR        yes             no
+[2023-12-24 15:49:31] MSRMSRMS        yes             yes
+[2023-12-24 15:49:31] MRRMSRRR        no              no
+[2023-12-24 15:49:31] MMSRSRMS        yes             yes
+[2023-12-24 15:49:31] MMSRMMSR        yes             yes
+[2023-12-24 15:49:31] MMXR            no              no
+[2023-12-24 15:49:31] MSRSRMSR        yes             yes
+[2023-12-24 15:49:31] MSRSRSRS        yes             yes
+[2023-12-24 15:49:31] MMR             no              no
+[2023-12-24 15:49:31] MMMMSRVS        no              no
+[2023-12-24 15:49:31] MSRRRMMM        yes             no
+[2023-12-24 15:49:31] MSR             yes             yes
+[2023-12-24 15:49:31] MSRSRMMM        yes             yes
+[2023-12-24 15:49:31] MMMMMSRR        yes             no
+[2023-12-24 15:49:31] MVRMSRSR        no              no
+[2023-12-24 15:49:31] MMMMS           no              yes
+[2023-12-24 15:49:31] RSRMMSRR        no              no
+[2023-12-24 15:49:31] MMSRMSRM        yes             yes
+[2023-12-24 15:49:31] MMMMMSXR        no              no
+[2023-12-24 15:49:31] MMMMSRRR        yes             no
+[2023-12-24 15:49:31] MVMMSRSR        no              no
+[2023-12-24 15:49:31] SM              no              no
+[2023-12-24 15:49:31] MSRSRSRR        yes             yes
+[2023-12-24 15:49:31] MMRRSRMS        no              no
+[2023-12-24 15:49:31] VRRVMMR         no              no
+[2023-12-24 15:49:31] MSRSSRMS        no              no
+[2023-12-24 15:49:31] MMSRSRSR        yes             yes
+[2023-12-24 15:49:31] MSVXXX          no              no
+[2023-12-24 15:49:31] MSRRRMXS        no              no
+[2023-12-24 15:49:31] MXSRVM          no              no
+[2023-12-24 15:49:31] MMMSRRVR        no              no
+[2023-12-24 15:49:31] MMSRMSR         yes             yes
+[2023-12-24 15:49:31] XSRRRRRM        no              no
+[2023-12-24 15:49:31] MMMSRRR         yes             yes
+[2023-12-24 15:49:31] RSM             no              no
+[2023-12-24 15:49:31] MSRRRRRR        yes             no
+[2023-12-24 15:49:31] MMMMSR          yes             yes
+[2023-12-24 15:49:31] MMS             no              yes
+[2023-12-24 15:49:31] MMMSRRRS        yes             no
+[2023-12-24 15:49:31] You now have a chance to add any other post hoc notes or comments for the record if you wish. Please enter an empty line when you're done:
+[2023-12-24 15:54:25] I forgot to declare in the first session that I'm not looking at the correct answers because I want to try to figure out the exact same grammars in the latter two phases.
+[2023-12-24 15:54:25] That said this particular grammar feels pretty deficient or perverted, the training set featured no V's or X's and most strings seemed to have a length of eight.
+[2023-12-24 15:54:25] Btw I'm finding it a bit hard to fully shut down all conscious analysis, it goes to show how much the human mind loves to latch onto patterns and try to squeeze conjectures from them. Every time I feel like I'm falling into a rhythm of comparing similar training strings or noting what seem like obvious loops in the grammar I tell myself to stop, but it does not feel like I'm fully in control of the process.
+[2023-12-24 19:10:25] ========================================================================================================================
+[2023-12-24 19:10:25] agl-solitaire session started with a pregenerated grammar:
+[2023-12-24 19:10:25] Username: Daniel Arato
+[2023-12-24 19:10:25] Number of training strings: 20
+[2023-12-24 19:10:25] Time allotted for training: 180
+[2023-12-24 19:10:25] Number of grammatical test strings: 20
+[2023-12-24 19:10:25] Number of ungrammatical test strings: 20
+[2023-12-24 19:10:25] Logfile to record session in: arato.log
+[2023-12-24 19:10:25] Skip pre and post session questionnaire: True
+[2023-12-24 19:10:25] 
+[2023-12-24 19:10:25] Generating training strings and test strings based on the grammar...
+[2023-12-24 19:10:25] Done.
+[2023-12-24 19:10:25] You may add any notes or comments for the record before the training phase begins (optional). Please enter an empty line when you're done:
+[2023-12-24 19:11:46] Last "no thinking" session. Sitting in a stationary car now a few hours later. No distractions at the moment.
+[2023-12-24 19:11:46] I gotta go to the john soon though.
+[2023-12-24 19:11:46] The training phase will now begin. You will have 180 seconds to study a list of 20 exemplars of the hidden grammar.
+[2023-12-24 19:11:46] Please make sure your screen and terminal font are comfortable to read. Press return when you are ready.
+[2023-12-24 19:11:48] Training phase started. Please study the following list of strings:
+[2023-12-24 19:11:48] RRRXR
+[2023-12-24 19:11:48] VVRRSVX
+[2023-12-24 19:11:48] VVRXR
+[2023-12-24 19:11:48] VSVRRSR
+[2023-12-24 19:11:48] VVRRSVVR
+[2023-12-24 19:11:48] RVRRXX
+[2023-12-24 19:11:48] RX
+[2023-12-24 19:11:48] VSVRRSRR
+[2023-12-24 19:11:48] VVRR
+[2023-12-24 19:11:48] VVRXRRR
+[2023-12-24 19:11:48] VSSSSSSS
+[2023-12-24 19:11:48] RVX
+[2023-12-24 19:11:48] RVR
+[2023-12-24 19:11:48] RVVVVVRR
+[2023-12-24 19:11:48] VVRXX
+[2023-12-24 19:11:48] VSVRRSVR
+[2023-12-24 19:11:48] RRRXX
+[2023-12-24 19:11:48] VSSSVRRS
+[2023-12-24 19:11:48] VVRXRRXV
+[2023-12-24 19:11:48] RVRRR
+[2023-12-24 19:14:48] Training phase finished.
+[2023-12-24 19:14:48] The test phase will now begin. You will be shown 40 new strings one at a time and prompted to judge the grammaticality of each.
+[2023-12-24 19:14:48] You may type 'y' for yes (i.e. grammatical) and 'n' for no (ungrammatical). Press return when you are ready.
+[2023-12-24 19:15:04] Test item #1 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:04] VVRRS
+[2023-12-24 19:15:07] y
+[2023-12-24 19:15:07] Test item #2 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:07] RVVR
+[2023-12-24 19:15:10] n
+[2023-12-24 19:15:10] Test item #3 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:10] XXRVSSV
+[2023-12-24 19:15:11] n
+[2023-12-24 19:15:11] Test item #4 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:11] VSVRXX
+[2023-12-24 19:15:12] y
+[2023-12-24 19:15:12] Test item #5 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:12] VVRRSX
+[2023-12-24 19:15:13] y
+[2023-12-24 19:15:13] Test item #6 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:13] XX
+[2023-12-24 19:15:15] n
+[2023-12-24 19:15:15] Test item #7 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:15] VSSV
+[2023-12-24 19:15:16] y
+[2023-12-24 19:15:16] Test item #8 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:16] VMV
+[2023-12-24 19:15:17] n
+[2023-12-24 19:15:17] Test item #9 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:17] VVRXVVVX
+[2023-12-24 19:15:19] y
+[2023-12-24 19:15:19] Test item #10 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:19] VV
+[2023-12-24 19:15:22] n
+[2023-12-24 19:15:22] Test item #11 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:22] XVVR
+[2023-12-24 19:15:25] n
+[2023-12-24 19:15:25] Test item #12 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:25] VSVRR
+[2023-12-24 19:15:26] y
+[2023-12-24 19:15:26] Test item #13 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:26] VX
+[2023-12-24 19:15:27] y
+[2023-12-24 19:15:27] Test item #14 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:27] RRXXX
+[2023-12-24 19:15:29] n
+[2023-12-24 19:15:29] Test item #15 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:29] VVRXVX
+[2023-12-24 19:15:30] y
+[2023-12-24 19:15:30] Test item #16 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:30] VVRRSVRR
+[2023-12-24 19:15:31] y
+[2023-12-24 19:15:31] Test item #17 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:31] MX
+[2023-12-24 19:15:33] n
+[2023-12-24 19:15:33] Test item #18 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:33] VRRXX
+[2023-12-24 19:15:34] y
+[2023-12-24 19:15:34] Test item #19 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:34] VSV
+[2023-12-24 19:15:36] y
+[2023-12-24 19:15:36] Test item #20 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:36] SX
+[2023-12-24 19:15:37] n
+[2023-12-24 19:15:37] Test item #21 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:37] VVR
+[2023-12-24 19:15:39] y
+[2023-12-24 19:15:39] Test item #22 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:39] RVRRXVX
+[2023-12-24 19:15:41] y
+[2023-12-24 19:15:41] Test item #23 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:41] RVVX
+[2023-12-24 19:15:42] y
+[2023-12-24 19:15:42] Test item #24 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:42] VVRX
+[2023-12-24 19:15:45] y
+[2023-12-24 19:15:45] Test item #25 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:45] RRRRVX
+[2023-12-24 19:15:47] n
+[2023-12-24 19:15:47] Test item #26 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:47] RRRRSX
+[2023-12-24 19:15:50] n
+[2023-12-24 19:15:50] Test item #27 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:50] VVRRSR
+[2023-12-24 19:15:51] y
+[2023-12-24 19:15:51] Test item #28 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:51] RVVVX
+[2023-12-24 19:15:53] y
+[2023-12-24 19:15:53] Test item #29 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:53] RRR
+[2023-12-24 19:15:55] n
+[2023-12-24 19:15:55] Test item #30 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:55] RRRR
+[2023-12-24 19:15:58] n
+[2023-12-24 19:15:58] Test item #31 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:58] VVRXRRRS
+[2023-12-24 19:15:59] y
+[2023-12-24 19:15:59] Test item #32 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:15:59] XVSRRRR
+[2023-12-24 19:16:02] n
+[2023-12-24 19:16:02] Test item #33 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:16:02] VR
+[2023-12-24 19:16:04] y
+[2023-12-24 19:16:04] Test item #34 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:16:04] XR
+[2023-12-24 19:16:05] n
+[2023-12-24 19:16:05] Test item #35 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:16:05] VSVRSSX
+[2023-12-24 19:16:06] y
+[2023-12-24 19:16:06] Test item #36 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:16:06] VSVRX
+[2023-12-24 19:16:07] y
+[2023-12-24 19:16:07] Test item #37 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:16:07] RRRRSVX
+[2023-12-24 19:16:10] n
+[2023-12-24 19:16:10] Test item #38 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:16:10] RV
+[2023-12-24 19:16:13] y
+[2023-12-24 19:16:13] Test item #39 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:16:13] VSVRXR
+[2023-12-24 19:16:15] y
+[2023-12-24 19:16:15] Test item #40 out of 40. Is the following string grammatical? (y/n)
+[2023-12-24 19:16:15] RR
+[2023-12-24 19:16:17] y
+[2023-12-24 19:16:17] Test phase finished. Hope you had fun! A few more questions if you feel like it:
+[2023-12-24 19:16:17] And now for the big reveal... Strings were generated using the following regular grammar:
+[2023-12-24 19:16:17] 0 -V-> 6
+[2023-12-24 19:16:17] 0 -R-> 3
+[2023-12-24 19:16:17] 1 ---> OUT
+[2023-12-24 19:16:17] 1 -S-> 3
+[2023-12-24 19:16:17] 2 -R-> 4
+[2023-12-24 19:16:17] 2 ---> OUT
+[2023-12-24 19:16:17] 3 -X-> 5
+[2023-12-24 19:16:17] 3 -V-> 3
+[2023-12-24 19:16:17] 3 -R-> 2
+[2023-12-24 19:16:17] 4 -R-> 1
+[2023-12-24 19:16:17] 4 -X-> 3
+[2023-12-24 19:16:17] 5 ---> OUT
+[2023-12-24 19:16:17] 6 -V-> 2
+[2023-12-24 19:16:17] 6 -S-> 6
+[2023-12-24 19:16:17] You gave 26 correct answers out of 40 (65.0%). The answers were the following:
+[2023-12-24 19:16:17] Test string     Correct answer  Your answer
+[2023-12-24 19:16:17] VVRRS           no              yes
+[2023-12-24 19:16:17] RVVR            yes             no
+[2023-12-24 19:16:17] XXRVSSV         no              no
+[2023-12-24 19:16:17] VSVRXX          yes             yes
+[2023-12-24 19:16:17] VVRRSX          yes             yes
+[2023-12-24 19:16:17] XX              no              no
+[2023-12-24 19:16:17] VSSV            yes             yes
+[2023-12-24 19:16:17] VMV             no              no
+[2023-12-24 19:16:17] VVRXVVVX        yes             yes
+[2023-12-24 19:16:17] VV              yes             no
+[2023-12-24 19:16:17] XVVR            no              no
+[2023-12-24 19:16:17] VSVRR           yes             yes
+[2023-12-24 19:16:17] VX              no              yes
+[2023-12-24 19:16:17] RRXXX           no              no
+[2023-12-24 19:16:17] VVRXVX          yes             yes
+[2023-12-24 19:16:17] VVRRSVRR        yes             yes
+[2023-12-24 19:16:17] MX              no              no
+[2023-12-24 19:16:17] VRRXX           no              yes
+[2023-12-24 19:16:17] VSV             yes             yes
+[2023-12-24 19:16:17] SX              no              no
+[2023-12-24 19:16:17] VVR             no              yes
+[2023-12-24 19:16:17] RVRRXVX         yes             yes
+[2023-12-24 19:16:17] RVVX            yes             yes
+[2023-12-24 19:16:17] VVRX            no              yes
+[2023-12-24 19:16:17] RRRRVX          no              no
+[2023-12-24 19:16:17] RRRRSX          yes             no
+[2023-12-24 19:16:17] VVRRSR          yes             yes
+[2023-12-24 19:16:17] RVVVX           yes             yes
+[2023-12-24 19:16:17] RRR             no              no
+[2023-12-24 19:16:17] RRRR            yes             no
+[2023-12-24 19:16:17] VVRXRRRS        yes             yes
+[2023-12-24 19:16:17] XVSRRRR         no              no
+[2023-12-24 19:16:17] VR              no              yes
+[2023-12-24 19:16:17] XR              no              no
+[2023-12-24 19:16:17] VSVRSSX         no              yes
+[2023-12-24 19:16:17] VSVRX           no              yes
+[2023-12-24 19:16:17] RRRRSVX         yes             no
+[2023-12-24 19:16:17] RV              no              yes
+[2023-12-24 19:16:17] VSVRXR          yes             yes
+[2023-12-24 19:16:17] RR              yes             yes
+[2023-12-24 19:16:17] You now have a chance to add any other post hoc notes or comments for the record if you wish. Please enter an empty line when you're done:
+[2023-12-24 19:17:37] Distracted by a phone call during training but it looks like I did okay anyway. Three minutes seems like plenty.
+[2023-12-25 20:37:25] ========================================================================================================================
+[2023-12-25 20:37:25] agl-solitaire session started with a pregenerated grammar:
+[2023-12-25 20:37:25] Username: Daniel Arato
+[2023-12-25 20:37:25] Number of training strings: 20
+[2023-12-25 20:37:25] Time allotted for training: 180
+[2023-12-25 20:37:25] Number of grammatical test strings: 20
+[2023-12-25 20:37:25] Number of ungrammatical test strings: 20
+[2023-12-25 20:37:25] Logfile to record session in: arato.log
+[2023-12-25 20:37:25] Skip pre and post session questionnaire: True
+[2023-12-25 20:37:25] 
+[2023-12-25 20:37:25] Generating training strings and test strings based on the grammar...
+[2023-12-25 20:37:25] Done.
+[2023-12-25 20:37:25] You may add any notes or comments for the record before the training phase begins (optional). Please enter an empty line when you're done:
+[2023-12-25 20:42:16] Okay, time for the second batch of tests with the same three grammars as before. I had a good night's sleep and a glass of wine earlier in the day, about three hours ago.
+[2023-12-25 20:42:16] I remember the second grammar producing mostly strings of length 8 and some letters were missing. The last grammar excluded M's if I'm not mistaken. I don't seem to recall much else about them.
+[2023-12-25 20:42:16] I am home alone (yes, it's Christmas), a tiny bit tired, free of distractions.
+[2023-12-25 20:42:16] I expect my performance to improve considerably compared to the "no thinking" phase.
+[2023-12-25 20:42:16] The training phase will now begin. You will have 180 seconds to study a list of 20 exemplars of the hidden grammar.
+[2023-12-25 20:42:16] Please make sure your screen and terminal font are comfortable to read. Press return when you are ready.
+[2023-12-25 20:42:27] Training phase started. Please study the following list of strings:
+[2023-12-25 20:42:27] VRVV
+[2023-12-25 20:42:27] SVSSRVVV
+[2023-12-25 20:42:27] MM
+[2023-12-25 20:42:27] MXVS
+[2023-12-25 20:42:27] SSXSVM
+[2023-12-25 20:42:27] SSR
+[2023-12-25 20:42:27] VR
+[2023-12-25 20:42:27] XVRV
+[2023-12-25 20:42:27] XXXMMVV
+[2023-12-25 20:42:27] SVSVXXMS
+[2023-12-25 20:42:27] VRV
+[2023-12-25 20:42:27] VX
+[2023-12-25 20:42:27] XXSRSSVM
+[2023-12-25 20:42:27] SRMV
+[2023-12-25 20:42:27] XVXR
+[2023-12-25 20:42:27] SSX
+[2023-12-25 20:42:27] SVXSRM
+[2023-12-25 20:42:27] SRXVSSM
+[2023-12-25 20:42:27] XSSXMXRV
+[2023-12-25 20:42:27] XVR
+[2023-12-25 20:45:27] Training phase finished.
+[2023-12-25 20:45:27] The test phase will now begin. You will be shown 40 new strings one at a time and prompted to judge the grammaticality of each.
+[2023-12-25 20:45:27] You may type 'y' for yes (i.e. grammatical) and 'n' for no (ungrammatical). Press return when you are ready.
+[2023-12-25 20:45:29] Test item #1 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:45:29] XXSRXMVS
+[2023-12-25 20:45:37] n
+[2023-12-25 20:45:37] Test item #2 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:45:37] VVVVMM
+[2023-12-25 20:45:43] y
+[2023-12-25 20:45:43] Test item #3 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:45:43] SS
+[2023-12-25 20:45:45] n
+[2023-12-25 20:45:45] Test item #4 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:45:45] SVXVSSM
+[2023-12-25 20:45:51] n
+[2023-12-25 20:45:51] Test item #5 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:45:51] SSXRVV
+[2023-12-25 20:46:17] y
+[2023-12-25 20:46:17] Test item #6 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:46:17] VXMRVV
+[2023-12-25 20:46:32] n
+[2023-12-25 20:46:32] Test item #7 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:46:32] SVXM
+[2023-12-25 20:46:35] n
+[2023-12-25 20:46:35] Test item #8 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:46:35] SR
+[2023-12-25 20:46:37] n
+[2023-12-25 20:46:37] Test item #9 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:46:37] MSSM
+[2023-12-25 20:46:43] y
+[2023-12-25 20:46:43] Test item #10 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:46:43] MXVM
+[2023-12-25 20:46:47] n
+[2023-12-25 20:46:47] Test item #11 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:46:47] MMV
+[2023-12-25 20:46:50] y
+[2023-12-25 20:46:50] Test item #12 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:46:50] MRV
+[2023-12-25 20:46:53] n
+[2023-12-25 20:46:53] Test item #13 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:46:53] RXRSVRS
+[2023-12-25 20:47:09] n
+[2023-12-25 20:47:09] Test item #14 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:47:09] XMM
+[2023-12-25 20:47:33] y
+[2023-12-25 20:47:33] Test item #15 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:47:33] XVXMR
+[2023-12-25 20:47:41] n
+[2023-12-25 20:47:41] Test item #16 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:47:41] XVX
+[2023-12-25 20:47:43] y
+[2023-12-25 20:47:43] Test item #17 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:47:43] XSVVXMXM
+[2023-12-25 20:47:47] n
+[2023-12-25 20:47:47] Test item #18 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:47:47] SSXSM
+[2023-12-25 20:47:49] y
+[2023-12-25 20:47:49] Test item #19 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:47:49] RR
+[2023-12-25 20:47:51] n
+[2023-12-25 20:47:51] Test item #20 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:47:51] VS
+[2023-12-25 20:47:52] y
+[2023-12-25 20:47:52] Test item #21 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:47:52] XMXMMSX
+[2023-12-25 20:47:55] n
+[2023-12-25 20:47:55] Test item #22 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:47:55] MMR
+[2023-12-25 20:47:57] y
+[2023-12-25 20:47:57] Test item #23 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:47:57] XV
+[2023-12-25 20:47:59] n
+[2023-12-25 20:47:59] Test item #24 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:47:59] SRX
+[2023-12-25 20:48:22] y
+[2023-12-25 20:48:22] Test item #25 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:48:22] SVVXR
+[2023-12-25 20:48:25] n
+[2023-12-25 20:48:25] Test item #26 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:48:25] SSRV
+[2023-12-25 20:48:29] n
+[2023-12-25 20:48:29] Test item #27 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:48:29] VXSVMVV
+[2023-12-25 20:48:33] y
+[2023-12-25 20:48:33] Test item #28 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:48:33] XSMSR
+[2023-12-25 20:49:05] y
+[2023-12-25 20:49:05] Test item #29 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:49:05] XSVXVR
+[2023-12-25 20:49:09] y
+[2023-12-25 20:49:09] Test item #30 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:49:09] MXV
+[2023-12-25 20:49:11] n
+[2023-12-25 20:49:11] Test item #31 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:49:11] MVXSSXRV
+[2023-12-25 20:49:15] n
+[2023-12-25 20:49:15] Test item #32 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:49:15] MXVX
+[2023-12-25 20:49:17] y
+[2023-12-25 20:49:17] Test item #33 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:49:17] MMMSV
+[2023-12-25 20:49:19] y
+[2023-12-25 20:49:19] Test item #34 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:49:19] MSR
+[2023-12-25 20:49:22] y
+[2023-12-25 20:49:22] Test item #35 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:49:22] XXRV
+[2023-12-25 20:49:26] y
+[2023-12-25 20:49:26] Test item #36 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:49:26] MXXM
+[2023-12-25 20:49:29] y
+[2023-12-25 20:49:29] Test item #37 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:49:29] MSRVVVVV
+[2023-12-25 20:49:33] n
+[2023-12-25 20:49:33] Test item #38 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:49:33] MVR
+[2023-12-25 20:49:36] n
+[2023-12-25 20:49:36] Test item #39 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:49:36] MMVXVVV
+[2023-12-25 20:49:39] y
+[2023-12-25 20:49:39] Test item #40 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:49:39] XXVXSVM
+[2023-12-25 20:49:41] n
+[2023-12-25 20:49:41] Test phase finished. Hope you had fun! A few more questions if you feel like it:
+[2023-12-25 20:49:41] And now for the big reveal... Strings were generated using the following regular grammar:
+[2023-12-25 20:49:41] 0 -V-> 5
+[2023-12-25 20:49:41] 0 -M-> 4
+[2023-12-25 20:49:41] 0 -X-> 0
+[2023-12-25 20:49:41] 0 -S-> 6
+[2023-12-25 20:49:41] 1 ---> OUT
+[2023-12-25 20:49:41] 1 -V-> 1
+[2023-12-25 20:49:41] 2 -S-> 3
+[2023-12-25 20:49:41] 2 ---> OUT
+[2023-12-25 20:49:41] 2 -M-> 5
+[2023-12-25 20:49:41] 2 -R-> 1
+[2023-12-25 20:49:41] 3 ---> OUT
+[2023-12-25 20:49:41] 3 -V-> 4
+[2023-12-25 20:49:41] 3 -M-> 3
+[2023-12-25 20:49:41] 4 -M-> 1
+[2023-12-25 20:49:41] 4 -S-> 2
+[2023-12-25 20:49:41] 4 -X-> 3
+[2023-12-25 20:49:41] 5 -R-> 1
+[2023-12-25 20:49:41] 5 -X-> 2
+[2023-12-25 20:49:41] 6 -R-> 4
+[2023-12-25 20:49:41] 6 -V-> 0
+[2023-12-25 20:49:41] 6 -S-> 5
+[2023-12-25 20:49:41] You gave 23 correct answers out of 40 (57.5%). The answers were the following:
+[2023-12-25 20:49:41] Test string     Correct answer  Your answer
+[2023-12-25 20:49:41] XXSRXMVS        yes             no
+[2023-12-25 20:49:41] VVVVMM          no              yes
+[2023-12-25 20:49:41] SS              no              no
+[2023-12-25 20:49:41] SVXVSSM         no              no
+[2023-12-25 20:49:41] SSXRVV          yes             yes
+[2023-12-25 20:49:41] VXMRVV          yes             no
+[2023-12-25 20:49:41] SVXM            no              no
+[2023-12-25 20:49:41] SR              no              no
+[2023-12-25 20:49:41] MSSM            yes             yes
+[2023-12-25 20:49:41] MXVM            yes             no
+[2023-12-25 20:49:41] MMV             yes             yes
+[2023-12-25 20:49:41] MRV             no              no
+[2023-12-25 20:49:41] RXRSVRS         no              no
+[2023-12-25 20:49:41] XMM             yes             yes
+[2023-12-25 20:49:41] XVXMR           yes             no
+[2023-12-25 20:49:41] XVX             yes             yes
+[2023-12-25 20:49:41] XSVVXMXM        yes             no
+[2023-12-25 20:49:41] SSXSM           yes             yes
+[2023-12-25 20:49:41] RR              no              no
+[2023-12-25 20:49:41] VS              no              yes
+[2023-12-25 20:49:41] XMXMMSX         no              no
+[2023-12-25 20:49:41] MMR             no              yes
+[2023-12-25 20:49:41] XV              no              no
+[2023-12-25 20:49:41] SRX             yes             yes
+[2023-12-25 20:49:41] SVVXR           yes             no
+[2023-12-25 20:49:41] SSRV            yes             no
+[2023-12-25 20:49:41] VXSVMVV         yes             yes
+[2023-12-25 20:49:41] XSMSR           no              yes
+[2023-12-25 20:49:41] XSVXVR          yes             yes
+[2023-12-25 20:49:41] MXV             no              no
+[2023-12-25 20:49:41] MVXSSXRV        no              no
+[2023-12-25 20:49:41] MXVX            yes             yes
+[2023-12-25 20:49:41] MMMSV           no              yes
+[2023-12-25 20:49:41] MSR             yes             yes
+[2023-12-25 20:49:41] XXRV            no              yes
+[2023-12-25 20:49:41] MXXM            no              yes
+[2023-12-25 20:49:41] MSRVVVVV        yes             no
+[2023-12-25 20:49:41] MVR             no              no
+[2023-12-25 20:49:41] MMVXVVV         no              yes
+[2023-12-25 20:49:41] XXVXSVM         yes             no
+[2023-12-25 20:49:41] You now have a chance to add any other post hoc notes or comments for the record if you wish. Please enter an empty line when you're done:
+[2023-12-25 20:50:47] Reconstructing the grammar from the stimuli is proving to be much harder than anticipated. I wonder if the next grammar will be any easier.
+[2023-12-25 20:50:59] ========================================================================================================================
+[2023-12-25 20:50:59] agl-solitaire session started with a pregenerated grammar:
+[2023-12-25 20:50:59] Username: Daniel Arato
+[2023-12-25 20:50:59] Number of training strings: 20
+[2023-12-25 20:50:59] Time allotted for training: 180
+[2023-12-25 20:50:59] Number of grammatical test strings: 20
+[2023-12-25 20:50:59] Number of ungrammatical test strings: 20
+[2023-12-25 20:50:59] Logfile to record session in: arato.log
+[2023-12-25 20:50:59] Skip pre and post session questionnaire: True
+[2023-12-25 20:50:59] 
+[2023-12-25 20:50:59] Generating training strings and test strings based on the grammar...
+[2023-12-25 20:50:59] Done.
+[2023-12-25 20:50:59] You may add any notes or comments for the record before the training phase begins (optional). Please enter an empty line when you're done:
+[2023-12-25 20:51:38] Out of the three pregenerated grammars this one should be the easiest to figure out. Let's see if I'm right.
+[2023-12-25 20:51:38] The training phase will now begin. You will have 180 seconds to study a list of 20 exemplars of the hidden grammar.
+[2023-12-25 20:51:38] Please make sure your screen and terminal font are comfortable to read. Press return when you are ready.
+[2023-12-25 20:51:40] Training phase started. Please study the following list of strings:
+[2023-12-25 20:51:40] MSRMSR
+[2023-12-25 20:51:40] MMSRRR
+[2023-12-25 20:51:40] MSRRR
+[2023-12-25 20:51:40] MMSRSRSR
+[2023-12-25 20:51:40] MMSR
+[2023-12-25 20:51:40] MMMSRSRS
+[2023-12-25 20:51:40] MMMMMSR
+[2023-12-25 20:51:40] MMMSR
+[2023-12-25 20:51:40] MSRRRRRR
+[2023-12-25 20:51:40] MMSRRRRR
+[2023-12-25 20:51:40] MMSRMSRS
+[2023-12-25 20:51:40] MSRRRMMM
+[2023-12-25 20:51:40] MSRMMSRM
+[2023-12-25 20:51:40] MMMSRMMS
+[2023-12-25 20:51:40] MMSRRRMM
+[2023-12-25 20:51:40] MSRMMSRS
+[2023-12-25 20:51:40] MSRRRSRS
+[2023-12-25 20:51:40] MSRMMMMS
+[2023-12-25 20:51:40] MMMSRSRM
+[2023-12-25 20:51:40] MMMMMSRS
+[2023-12-25 20:54:40] Training phase finished.
+[2023-12-25 20:54:40] The test phase will now begin. You will be shown 40 new strings one at a time and prompted to judge the grammaticality of each.
+[2023-12-25 20:54:40] You may type 'y' for yes (i.e. grammatical) and 'n' for no (ungrammatical). Press return when you are ready.
+[2023-12-25 20:54:42] Test item #1 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:54:42] XSR
+[2023-12-25 20:54:44] n
+[2023-12-25 20:54:44] Test item #2 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:54:44] SSR
+[2023-12-25 20:54:46] n
+[2023-12-25 20:54:46] Test item #3 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:54:46] MSRMMMS
+[2023-12-25 20:54:49] y
+[2023-12-25 20:54:49] Test item #4 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:54:49] MMSRMSVS
+[2023-12-25 20:54:52] n
+[2023-12-25 20:54:52] Test item #5 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:54:52] MSR
+[2023-12-25 20:54:54] y
+[2023-12-25 20:54:54] Test item #6 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:54:54] MMMSRRR
+[2023-12-25 20:54:55] y
+[2023-12-25 20:54:55] Test item #7 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:54:55] MSRMSRMS
+[2023-12-25 20:54:59] y
+[2023-12-25 20:54:59] Test item #8 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:54:59] MMRSRSRM
+[2023-12-25 20:55:04] n
+[2023-12-25 20:55:04] Test item #9 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:55:04] MMMMSRSR
+[2023-12-25 20:55:08] n
+[2023-12-25 20:55:08] Test item #10 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:55:08] MSRSRMSR
+[2023-12-25 20:55:14] n
+[2023-12-25 20:55:14] Test item #11 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:55:14] MRSRSRSR
+[2023-12-25 20:55:18] n
+[2023-12-25 20:55:18] Test item #12 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:55:18] VMSRMSRS
+[2023-12-25 20:55:20] n
+[2023-12-25 20:55:20] Test item #13 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:55:20] MSRRSRRR
+[2023-12-25 20:55:26] n
+[2023-12-25 20:55:26] Test item #14 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:55:26] MMMMRSMM
+[2023-12-25 20:55:28] y
+[2023-12-25 20:55:28] Test item #15 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:55:28] RRRSMM
+[2023-12-25 20:55:30] n
+[2023-12-25 20:55:30] Test item #16 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:55:30] MMMMSRVR
+[2023-12-25 20:55:32] n
+[2023-12-25 20:55:32] Test item #17 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:55:32] MSRMMMSR
+[2023-12-25 20:55:34] y
+[2023-12-25 20:55:34] Test item #18 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:55:34] MSRMSRM
+[2023-12-25 20:55:36] y
+[2023-12-25 20:55:36] Test item #19 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:55:36] MSSRRRRR
+[2023-12-25 20:55:40] n
+[2023-12-25 20:55:40] Test item #20 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:55:40] MSRSRSRS
+[2023-12-25 20:55:43] n
+[2023-12-25 20:55:43] Test item #21 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:55:43] VSRRRMMS
+[2023-12-25 20:55:46] n
+[2023-12-25 20:55:46] Test item #22 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:55:46] MSRRRRR
+[2023-12-25 20:55:48] y
+[2023-12-25 20:55:48] Test item #23 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:55:48] MMMMSRRR
+[2023-12-25 20:55:49] y
+[2023-12-25 20:55:49] Test item #24 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:55:49] MMMMMSRR
+[2023-12-25 20:55:50] y
+[2023-12-25 20:55:50] Test item #25 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:55:50] SSV
+[2023-12-25 20:55:52] n
+[2023-12-25 20:55:52] Test item #26 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:55:52] MMR
+[2023-12-25 20:55:57] n
+[2023-12-25 20:55:57] Test item #27 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:55:57] MSRSRSRM
+[2023-12-25 20:56:06] n
+[2023-12-25 20:56:06] Test item #28 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:56:06] MXSRSRS
+[2023-12-25 20:56:08] n
+[2023-12-25 20:56:08] Test item #29 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:56:08] MMSRMMMS
+[2023-12-25 20:56:11] y
+[2023-12-25 20:56:11] Test item #30 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:56:11] MSRSRMMS
+[2023-12-25 20:56:13] n
+[2023-12-25 20:56:13] Test item #31 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:56:13] MMSRRRSR
+[2023-12-25 20:56:16] y
+[2023-12-25 20:56:16] Test item #32 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:56:16] MMSRSRRS
+[2023-12-25 20:56:22] n
+[2023-12-25 20:56:22] Test item #33 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:56:22] MSRRRRRM
+[2023-12-25 20:56:24] y
+[2023-12-25 20:56:24] Test item #34 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:56:24] MMMMSR
+[2023-12-25 20:56:25] y
+[2023-12-25 20:56:25] Test item #35 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:56:25] MRRSRSRS
+[2023-12-25 20:56:29] n
+[2023-12-25 20:56:29] Test item #36 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:56:29] MSRRRSRM
+[2023-12-25 20:56:34] y
+[2023-12-25 20:56:34] Test item #37 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:56:34] MSRMMSR
+[2023-12-25 20:56:37] y
+[2023-12-25 20:56:37] Test item #38 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:56:37] MSRRM
+[2023-12-25 20:56:38] y
+[2023-12-25 20:56:38] Test item #39 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:56:38] MMSRSRMM
+[2023-12-25 20:56:42] n
+[2023-12-25 20:56:42] Test item #40 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 20:56:42] MMSRSRMS
+[2023-12-25 20:56:45] n
+[2023-12-25 20:56:45] Test phase finished. Hope you had fun! A few more questions if you feel like it:
+[2023-12-25 20:56:45] And now for the big reveal... Strings were generated using the following regular grammar:
+[2023-12-25 20:56:45] 0 -M-> 2
+[2023-12-25 20:56:45] 1 ---> OUT
+[2023-12-25 20:56:45] 1 -S-> 3
+[2023-12-25 20:56:45] 1 -R-> 4
+[2023-12-25 20:56:45] 1 -M-> 2
+[2023-12-25 20:56:45] 2 -S-> 4
+[2023-12-25 20:56:45] 2 -M-> 2
+[2023-12-25 20:56:45] 3 -R-> 2
+[2023-12-25 20:56:45] 4 -R-> 1
+[2023-12-25 20:56:45] You gave 29 correct answers out of 40 (72.5%). The answers were the following:
+[2023-12-25 20:56:45] Test string     Correct answer  Your answer
+[2023-12-25 20:56:45] XSR             no              no
+[2023-12-25 20:56:45] SSR             no              no
+[2023-12-25 20:56:45] MSRMMMS         no              yes
+[2023-12-25 20:56:45] MMSRMSVS        no              no
+[2023-12-25 20:56:45] MSR             yes             yes
+[2023-12-25 20:56:45] MMMSRRR         yes             yes
+[2023-12-25 20:56:45] MSRMSRMS        yes             yes
+[2023-12-25 20:56:45] MMRSRSRM        no              no
+[2023-12-25 20:56:45] MMMMSRSR        yes             no
+[2023-12-25 20:56:45] MSRSRMSR        yes             no
+[2023-12-25 20:56:45] MRSRSRSR        no              no
+[2023-12-25 20:56:45] VMSRMSRS        no              no
+[2023-12-25 20:56:45] MSRRSRRR        no              no
+[2023-12-25 20:56:45] MMMMRSMM        no              yes
+[2023-12-25 20:56:45] RRRSMM          no              no
+[2023-12-25 20:56:45] MMMMSRVR        no              no
+[2023-12-25 20:56:45] MSRMMMSR        yes             yes
+[2023-12-25 20:56:45] MSRMSRM         no              yes
+[2023-12-25 20:56:45] MSSRRRRR        no              no
+[2023-12-25 20:56:45] MSRSRSRS        yes             no
+[2023-12-25 20:56:45] VSRRRMMS        no              no
+[2023-12-25 20:56:45] MSRRRRR         yes             yes
+[2023-12-25 20:56:45] MMMMSRRR        yes             yes
+[2023-12-25 20:56:45] MMMMMSRR        yes             yes
+[2023-12-25 20:56:45] SSV             no              no
+[2023-12-25 20:56:45] MMR             no              no
+[2023-12-25 20:56:45] MSRSRSRM        yes             no
+[2023-12-25 20:56:45] MXSRSRS         no              no
+[2023-12-25 20:56:45] MMSRMMMS        yes             yes
+[2023-12-25 20:56:45] MSRSRMMS        yes             no
+[2023-12-25 20:56:45] MMSRRRSR        yes             yes
+[2023-12-25 20:56:45] MMSRSRRS        no              no
+[2023-12-25 20:56:45] MSRRRRRM        yes             yes
+[2023-12-25 20:56:45] MMMMSR          yes             yes
+[2023-12-25 20:56:45] MRRSRSRS        no              no
+[2023-12-25 20:56:45] MSRRRSRM        yes             yes
+[2023-12-25 20:56:45] MSRMMSR         yes             yes
+[2023-12-25 20:56:45] MSRRM           no              yes
+[2023-12-25 20:56:45] MMSRSRMM        yes             no
+[2023-12-25 20:56:45] MMSRSRMS        yes             no
+[2023-12-25 20:56:45] You now have a chance to add any other post hoc notes or comments for the record if you wish. Please enter an empty line when you're done:
+[2023-12-25 21:00:21] I have an inkling that something might be off with the part of the script sorting the stimuli into training and test sets because the training set seemed much more strict than the test set.
+[2023-12-25 21:00:21] I arrived at the grammar (M*(SR*))* in less than a minute but it seemed strange that no MMMM or similar output was included in the training set. I might be wrong about the solution though -- which is likely looking at my final score.
+[2023-12-25 21:00:30] ========================================================================================================================
+[2023-12-25 21:00:30] agl-solitaire session started with a pregenerated grammar:
+[2023-12-25 21:00:30] Username: Daniel Arato
+[2023-12-25 21:00:30] Number of training strings: 20
+[2023-12-25 21:00:30] Time allotted for training: 180
+[2023-12-25 21:00:30] Number of grammatical test strings: 20
+[2023-12-25 21:00:30] Number of ungrammatical test strings: 20
+[2023-12-25 21:00:30] Logfile to record session in: arato.log
+[2023-12-25 21:00:30] Skip pre and post session questionnaire: True
+[2023-12-25 21:00:30] 
+[2023-12-25 21:00:30] Generating training strings and test strings based on the grammar...
+[2023-12-25 21:00:30] Done.
+[2023-12-25 21:00:30] You may add any notes or comments for the record before the training phase begins (optional). Please enter an empty line when you're done:
+[2023-12-25 21:00:55] Okay, last round with the "piece it together in your head" strategy.
+[2023-12-25 21:00:55] The training phase will now begin. You will have 180 seconds to study a list of 20 exemplars of the hidden grammar.
+[2023-12-25 21:00:55] Please make sure your screen and terminal font are comfortable to read. Press return when you are ready.
+[2023-12-25 21:00:57] Training phase started. Please study the following list of strings:
+[2023-12-25 21:00:57] RVRRRSRR
+[2023-12-25 21:00:57] RX
+[2023-12-25 21:00:57] RVRRR
+[2023-12-25 21:00:57] VSSSVRXV
+[2023-12-25 21:00:57] RVR
+[2023-12-25 21:00:57] RVVRRR
+[2023-12-25 21:00:57] VSVRXR
+[2023-12-25 21:00:57] VVRXR
+[2023-12-25 21:00:57] RVRRXR
+[2023-12-25 21:00:57] VSSSSVRX
+[2023-12-25 21:00:57] VSSVRRSV
+[2023-12-25 21:00:57] VSVRRSR
+[2023-12-25 21:00:57] RRRR
+[2023-12-25 21:00:57] VSVRR
+[2023-12-25 21:00:57] VVRRSRRX
+[2023-12-25 21:00:57] RVVR
+[2023-12-25 21:00:57] VVRRSX
+[2023-12-25 21:00:57] VVRXVX
+[2023-12-25 21:00:57] RRRXRRR
+[2023-12-25 21:00:57] VSV
+[2023-12-25 21:03:57] Training phase finished.
+[2023-12-25 21:03:57] The test phase will now begin. You will be shown 40 new strings one at a time and prompted to judge the grammaticality of each.
+[2023-12-25 21:03:57] You may type 'y' for yes (i.e. grammatical) and 'n' for no (ungrammatical). Press return when you are ready.
+[2023-12-25 21:03:58] Test item #1 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:03:58] VVVR
+[2023-12-25 21:04:04] n
+[2023-12-25 21:04:04] Test item #2 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:04:04] VXV
+[2023-12-25 21:04:08] y
+[2023-12-25 21:04:08] Test item #3 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:04:08] RSRXR
+[2023-12-25 21:04:12] n
+[2023-12-25 21:04:12] Test item #4 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:04:12] RVRX
+[2023-12-25 21:04:15] y
+[2023-12-25 21:04:15] Test item #5 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:04:15] MX
+[2023-12-25 21:04:17] n
+[2023-12-25 21:04:17] Test item #6 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:04:17] RRRXVX
+[2023-12-25 21:04:21] y
+[2023-12-25 21:04:21] Test item #7 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:04:21] VSSSV
+[2023-12-25 21:04:24] y
+[2023-12-25 21:04:24] Test item #8 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:04:24] RR
+[2023-12-25 21:04:28] y
+[2023-12-25 21:04:28] Test item #9 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:04:28] VSSSSVRR
+[2023-12-25 21:04:39] n
+[2023-12-25 21:04:39] Test item #10 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:04:39] VSSVRXX
+[2023-12-25 21:04:43] y
+[2023-12-25 21:04:43] Test item #11 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:04:43] SVRRXVRR
+[2023-12-25 21:04:45] n
+[2023-12-25 21:04:45] Test item #12 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:04:45] VSSV
+[2023-12-25 21:04:47] y
+[2023-12-25 21:04:47] Test item #13 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:04:47] RVRRRSR
+[2023-12-25 21:04:49] y
+[2023-12-25 21:04:49] Test item #14 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:04:49] VSVRXVVV
+[2023-12-25 21:04:54] n
+[2023-12-25 21:04:54] Test item #15 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:04:54] VSSVRXR
+[2023-12-25 21:05:08] y
+[2023-12-25 21:05:08] Test item #16 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:05:08] MSRVV
+[2023-12-25 21:05:28] n
+[2023-12-25 21:05:28] Test item #17 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:05:28] SR
+[2023-12-25 21:05:32] n
+[2023-12-25 21:05:32] Test item #18 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:05:32] RVRRXX
+[2023-12-25 21:05:37] y
+[2023-12-25 21:05:37] Test item #19 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:05:37] RVVRRRSV
+[2023-12-25 21:05:38] y
+[2023-12-25 21:05:38] Test item #20 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:05:38] VMVRR
+[2023-12-25 21:05:40] n
+[2023-12-25 21:05:40] Test item #21 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:05:40] SRVVMSRS
+[2023-12-25 21:05:42] n
+[2023-12-25 21:05:42] Test item #22 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:05:42] VVRX
+[2023-12-25 21:05:44] y
+[2023-12-25 21:05:44] Test item #23 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:05:44] VV
+[2023-12-25 21:05:44] y
+[2023-12-25 21:05:44] Test item #24 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:05:44] VRV
+[2023-12-25 21:05:46] y
+[2023-12-25 21:05:46] Test item #25 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:05:46] RRRXR
+[2023-12-25 21:05:47] y
+[2023-12-25 21:05:47] Test item #26 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:05:47] SRSSS
+[2023-12-25 21:05:49] n
+[2023-12-25 21:05:49] Test item #27 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:05:49] MR
+[2023-12-25 21:05:51] y
+[2023-12-25 21:05:51] Test item #28 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:05:51] VVRR
+[2023-12-25 21:05:54] y
+[2023-12-25 21:05:54] Test item #29 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:05:54] RMXRS
+[2023-12-25 21:05:55] n
+[2023-12-25 21:05:55] Test item #30 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:05:55] SSVRR
+[2023-12-25 21:05:57] n
+[2023-12-25 21:05:57] Test item #31 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:05:57] RVX
+[2023-12-25 21:05:59] y
+[2023-12-25 21:05:59] Test item #32 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:05:59] VSSSSSSV
+[2023-12-25 21:06:01] y
+[2023-12-25 21:06:01] Test item #33 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:06:01] RSMRVXVR
+[2023-12-25 21:06:08] y
+[2023-12-25 21:06:08] Test item #34 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:06:08] VSVRRSVX
+[2023-12-25 21:06:11] n
+[2023-12-25 21:06:11] Test item #35 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:06:11] RVVX
+[2023-12-25 21:06:15] n
+[2023-12-25 21:06:15] Test item #36 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:06:15] VSVRXVRR
+[2023-12-25 21:06:17] y
+[2023-12-25 21:06:17] Test item #37 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:06:17] XRMRSVR
+[2023-12-25 21:06:19] n
+[2023-12-25 21:06:19] Test item #38 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:06:19] RV
+[2023-12-25 21:06:21] y
+[2023-12-25 21:06:21] Test item #39 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:06:21] MVRRSRRR
+[2023-12-25 21:06:22] n
+[2023-12-25 21:06:22] Test item #40 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 21:06:22] RRRXVR
+[2023-12-25 21:06:24] y
+[2023-12-25 21:06:24] Test phase finished. Hope you had fun! A few more questions if you feel like it:
+[2023-12-25 21:06:24] And now for the big reveal... Strings were generated using the following regular grammar:
+[2023-12-25 21:06:24] 0 -V-> 6
+[2023-12-25 21:06:24] 0 -R-> 3
+[2023-12-25 21:06:24] 1 ---> OUT
+[2023-12-25 21:06:24] 1 -S-> 3
+[2023-12-25 21:06:24] 2 -R-> 4
+[2023-12-25 21:06:24] 2 ---> OUT
+[2023-12-25 21:06:24] 3 -X-> 5
+[2023-12-25 21:06:24] 3 -V-> 3
+[2023-12-25 21:06:24] 3 -R-> 2
+[2023-12-25 21:06:24] 4 -R-> 1
+[2023-12-25 21:06:24] 4 -X-> 3
+[2023-12-25 21:06:24] 5 ---> OUT
+[2023-12-25 21:06:24] 6 -V-> 2
+[2023-12-25 21:06:24] 6 -S-> 6
+[2023-12-25 21:06:24] You gave 29 correct answers out of 40 (72.5%). The answers were the following:
+[2023-12-25 21:06:24] Test string     Correct answer  Your answer
+[2023-12-25 21:06:24] VVVR            no              no
+[2023-12-25 21:06:24] VXV             no              yes
+[2023-12-25 21:06:24] RSRXR           no              no
+[2023-12-25 21:06:24] RVRX            no              yes
+[2023-12-25 21:06:24] MX              no              no
+[2023-12-25 21:06:24] RRRXVX          yes             yes
+[2023-12-25 21:06:24] VSSSV           yes             yes
+[2023-12-25 21:06:24] RR              yes             yes
+[2023-12-25 21:06:24] VSSSSVRR        yes             no
+[2023-12-25 21:06:24] VSSVRXX         yes             yes
+[2023-12-25 21:06:24] SVRRXVRR        no              no
+[2023-12-25 21:06:24] VSSV            yes             yes
+[2023-12-25 21:06:24] RVRRRSR         yes             yes
+[2023-12-25 21:06:24] VSVRXVVV        yes             no
+[2023-12-25 21:06:24] VSSVRXR         yes             yes
+[2023-12-25 21:06:24] MSRVV           no              no
+[2023-12-25 21:06:24] SR              no              no
+[2023-12-25 21:06:24] RVRRXX          yes             yes
+[2023-12-25 21:06:24] RVVRRRSV        yes             yes
+[2023-12-25 21:06:24] VMVRR           no              no
+[2023-12-25 21:06:24] SRVVMSRS        no              no
+[2023-12-25 21:06:24] VVRX            no              yes
+[2023-12-25 21:06:24] VV              yes             yes
+[2023-12-25 21:06:24] VRV             no              yes
+[2023-12-25 21:06:24] RRRXR           yes             yes
+[2023-12-25 21:06:24] SRSSS           no              no
+[2023-12-25 21:06:24] MR              no              yes
+[2023-12-25 21:06:24] VVRR            yes             yes
+[2023-12-25 21:06:24] RMXRS           no              no
+[2023-12-25 21:06:24] SSVRR           no              no
+[2023-12-25 21:06:24] RVX             yes             yes
+[2023-12-25 21:06:24] VSSSSSSV        yes             yes
+[2023-12-25 21:06:24] RSMRVXVR        no              yes
+[2023-12-25 21:06:24] VSVRRSVX        yes             no
+[2023-12-25 21:06:24] RVVX            yes             no
+[2023-12-25 21:06:24] VSVRXVRR        yes             yes
+[2023-12-25 21:06:24] XRMRSVR         no              no
+[2023-12-25 21:06:24] RV              no              yes
+[2023-12-25 21:06:24] MVRRSRRR        no              no
+[2023-12-25 21:06:24] RRRXVR          yes             yes
+[2023-12-25 21:06:24] You now have a chance to add any other post hoc notes or comments for the record if you wish. Please enter an empty line when you're done:
+[2023-12-25 21:12:47] I'm starting to think that maybe the only reason I seem to be performing above chance is because I know that the number of bad test stimuli is exactly half, which obviously gives me a small statistical edge compared to a truly arbitrary test set. Maybe I should hide the exact number of grammatical and ungrammatical test strings from the user, that would be more fair.
+[2023-12-25 21:12:47] I suspect that people tacitly suppose that they are getting a (close to) 50-50 mix of good and bad test strings and therefore unintentionally exploit this statistical "knowledge" to beat the 50% baseline.
+[2023-12-25 22:12:14] ========================================================================================================================
+[2023-12-25 22:12:14] agl-solitaire session started with a pregenerated grammar:
+[2023-12-25 22:12:14] Username: Daniel Arato
+[2023-12-25 22:12:14] Number of training strings: 20
+[2023-12-25 22:12:14] Time allotted for training: 180
+[2023-12-25 22:12:14] Number of grammatical test strings: 20
+[2023-12-25 22:12:14] Number of ungrammatical test strings: 20
+[2023-12-25 22:12:14] Logfile to record session in: arato.log
+[2023-12-25 22:12:14] Skip pre and post session questionnaire: True
+[2023-12-25 22:12:14] 
+[2023-12-25 22:12:14] Generating training strings and test strings based on the grammar...
+[2023-12-25 22:12:14] Done.
+[2023-12-25 22:12:14] You may add any notes or comments for the record before the training phase begins (optional). Please enter an empty line when you're done:
+[2023-12-25 22:17:18] Okay, I checked and it turns out you get no statistical edge from knowing or assuming an equal 50-50 distribution of good and bad test items whatsoever. So it looks like I am picking up on something after all.
+[2023-12-25 22:17:18] Doing the last batch of experiments tonight because I need to look after some pets tomorrow. I still feel relatively comfortable, same setting as before: at home, no one to distract me. I have paper and pencil ready.
+[2023-12-25 22:17:18] Before the previous batch of experiments (try to work the grammar out but no aids) my expectation for this last phase would have been to crush the game with a score of 90% or better. Now that I have a little bit of actual experience with the task I expect to perform somewhere around 80%.
+[2023-12-25 22:17:18] The training phase will now begin. You will have 180 seconds to study a list of 20 exemplars of the hidden grammar.
+[2023-12-25 22:17:18] Please make sure your screen and terminal font are comfortable to read. Press return when you are ready.
+[2023-12-25 22:17:26] Training phase started. Please study the following list of strings:
+[2023-12-25 22:17:26] MSMXRV
+[2023-12-25 22:17:26] SSXR
+[2023-12-25 22:17:26] MSR
+[2023-12-25 22:17:26] MMVVV
+[2023-12-25 22:17:26] SRSR
+[2023-12-25 22:17:26] MXVXVXVS
+[2023-12-25 22:17:26] VX
+[2023-12-25 22:17:26] VR
+[2023-12-25 22:17:26] VRV
+[2023-12-25 22:17:26] VXMRVV
+[2023-12-25 22:17:26] MXVSR
+[2023-12-25 22:17:26] MM
+[2023-12-25 22:17:26] MXVX
+[2023-12-25 22:17:26] SVSSR
+[2023-12-25 22:17:26] XMSMR
+[2023-12-25 22:17:26] SRXVMV
+[2023-12-25 22:17:26] XVX
+[2023-12-25 22:17:26] SSXMXRVV
+[2023-12-25 22:17:26] SSXMXSVM
+[2023-12-25 22:17:26] XXVXR
+[2023-12-25 22:20:26] Training phase finished.
+[2023-12-25 22:20:26] The test phase will now begin. You will be shown 40 new strings one at a time and prompted to judge the grammaticality of each.
+[2023-12-25 22:20:26] You may type 'y' for yes (i.e. grammatical) and 'n' for no (ungrammatical). Press return when you are ready.
+[2023-12-25 22:20:28] Test item #1 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:20:28] XVRV
+[2023-12-25 22:20:36] n
+[2023-12-25 22:20:36] Test item #2 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:20:36] VRVV
+[2023-12-25 22:20:43] y
+[2023-12-25 22:20:43] Test item #3 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:20:43] MX
+[2023-12-25 22:20:45] y
+[2023-12-25 22:20:45] Test item #4 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:20:45] MS
+[2023-12-25 22:20:50] y
+[2023-12-25 22:20:50] Test item #5 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:20:50] XMSR
+[2023-12-25 22:20:55] n
+[2023-12-25 22:20:55] Test item #6 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:20:55] XVRVV
+[2023-12-25 22:20:58] n
+[2023-12-25 22:20:58] Test item #7 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:20:58] SXMMVSR
+[2023-12-25 22:21:39] n
+[2023-12-25 22:21:39] Test item #8 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:21:39] SXXVMV
+[2023-12-25 22:21:44] n
+[2023-12-25 22:21:44] Test item #9 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:21:44] MSS
+[2023-12-25 22:21:47] n
+[2023-12-25 22:21:47] Test item #10 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:21:47] SVR
+[2023-12-25 22:21:50] y
+[2023-12-25 22:21:50] Test item #11 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:21:50] SSSVSRVV
+[2023-12-25 22:21:54] y
+[2023-12-25 22:21:54] Test item #12 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:21:54] XXVX
+[2023-12-25 22:21:56] n
+[2023-12-25 22:21:56] Test item #13 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:21:56] XMR
+[2023-12-25 22:21:59] y
+[2023-12-25 22:21:59] Test item #14 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:21:59] MMS
+[2023-12-25 22:22:02] y
+[2023-12-25 22:22:02] Test item #15 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:22:02] XXMM
+[2023-12-25 22:22:04] n
+[2023-12-25 22:22:04] Test item #16 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:22:04] XVRVVSVV
+[2023-12-25 22:22:05] n
+[2023-12-25 22:22:05] Test item #17 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:22:05] SXRVRS
+[2023-12-25 22:22:10] y
+[2023-12-25 22:22:10] Test item #18 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:22:10] MXVXVS
+[2023-12-25 22:22:15] y
+[2023-12-25 22:22:15] Test item #19 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:22:15] MSMRVVV
+[2023-12-25 22:22:17] n
+[2023-12-25 22:22:17] Test item #20 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:22:17] SSXMR
+[2023-12-25 22:22:20] y
+[2023-12-25 22:22:20] Test item #21 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:22:20] XXMMV
+[2023-12-25 22:22:22] n
+[2023-12-25 22:22:22] Test item #22 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:22:22] XV
+[2023-12-25 22:22:23] n
+[2023-12-25 22:22:23] Test item #23 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:22:23] SRXM
+[2023-12-25 22:22:26] y
+[2023-12-25 22:22:26] Test item #24 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:22:26] RV
+[2023-12-25 22:22:28] n
+[2023-12-25 22:22:28] Test item #25 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:22:28] MSSVMMRV
+[2023-12-25 22:22:31] n
+[2023-12-25 22:22:31] Test item #26 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:22:31] MMVXMVX
+[2023-12-25 22:22:33] n
+[2023-12-25 22:22:33] Test item #27 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:22:33] SSXSVX
+[2023-12-25 22:22:36] y
+[2023-12-25 22:22:36] Test item #28 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:22:36] RVXMRVVV
+[2023-12-25 22:22:38] n
+[2023-12-25 22:22:38] Test item #29 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:22:38] MMM
+[2023-12-25 22:22:45] n
+[2023-12-25 22:22:45] Test item #30 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:22:45] VXS
+[2023-12-25 22:22:47] y
+[2023-12-25 22:22:47] Test item #31 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:22:47] MRMV
+[2023-12-25 22:22:50] y
+[2023-12-25 22:22:50] Test item #32 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:22:50] VVXSVXMM
+[2023-12-25 22:22:51] n
+[2023-12-25 22:22:51] Test item #33 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:22:51] XSS
+[2023-12-25 22:22:54] n
+[2023-12-25 22:22:54] Test item #34 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:22:54] MSRV
+[2023-12-25 22:22:59] n
+[2023-12-25 22:22:59] Test item #35 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:22:59] MMVVVV
+[2023-12-25 22:23:01] y
+[2023-12-25 22:23:01] Test item #36 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:23:01] VXMR
+[2023-12-25 22:23:04] y
+[2023-12-25 22:23:04] Test item #37 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:23:04] MVXRV
+[2023-12-25 22:23:08] n
+[2023-12-25 22:23:08] Test item #38 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:23:08] VVR
+[2023-12-25 22:23:11] n
+[2023-12-25 22:23:11] Test item #39 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:23:11] XXMS
+[2023-12-25 22:23:13] n
+[2023-12-25 22:23:13] Test item #40 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:23:13] SSXM
+[2023-12-25 22:23:16] y
+[2023-12-25 22:23:16] Test phase finished. Hope you had fun! A few more questions if you feel like it:
+[2023-12-25 22:23:16] And now for the big reveal... Strings were generated using the following regular grammar:
+[2023-12-25 22:23:16] 0 -V-> 5
+[2023-12-25 22:23:16] 0 -M-> 4
+[2023-12-25 22:23:16] 0 -X-> 0
+[2023-12-25 22:23:16] 0 -S-> 6
+[2023-12-25 22:23:16] 1 ---> OUT
+[2023-12-25 22:23:16] 1 -V-> 1
+[2023-12-25 22:23:16] 2 -S-> 3
+[2023-12-25 22:23:16] 2 ---> OUT
+[2023-12-25 22:23:16] 2 -M-> 5
+[2023-12-25 22:23:16] 2 -R-> 1
+[2023-12-25 22:23:16] 3 ---> OUT
+[2023-12-25 22:23:16] 3 -V-> 4
+[2023-12-25 22:23:16] 3 -M-> 3
+[2023-12-25 22:23:16] 4 -M-> 1
+[2023-12-25 22:23:16] 4 -S-> 2
+[2023-12-25 22:23:16] 4 -X-> 3
+[2023-12-25 22:23:16] 5 -R-> 1
+[2023-12-25 22:23:16] 5 -X-> 2
+[2023-12-25 22:23:16] 6 -R-> 4
+[2023-12-25 22:23:16] 6 -V-> 0
+[2023-12-25 22:23:16] 6 -S-> 5
+[2023-12-25 22:23:16] You gave 23 correct answers out of 40 (57.5%). The answers were the following:
+[2023-12-25 22:23:16] Test string     Correct answer  Your answer
+[2023-12-25 22:23:16] XVRV            yes             no
+[2023-12-25 22:23:16] VRVV            yes             yes
+[2023-12-25 22:23:16] MX              yes             yes
+[2023-12-25 22:23:16] MS              yes             yes
+[2023-12-25 22:23:16] XMSR            yes             no
+[2023-12-25 22:23:16] XVRVV           yes             no
+[2023-12-25 22:23:16] SXMMVSR         no              no
+[2023-12-25 22:23:16] SXXVMV          no              no
+[2023-12-25 22:23:16] MSS             yes             no
+[2023-12-25 22:23:16] SVR             no              yes
+[2023-12-25 22:23:16] SSSVSRVV        no              yes
+[2023-12-25 22:23:16] XXVX            yes             no
+[2023-12-25 22:23:16] XMR             no              yes
+[2023-12-25 22:23:16] MMS             no              yes
+[2023-12-25 22:23:16] XXMM            yes             no
+[2023-12-25 22:23:16] XVRVVSVV        no              no
+[2023-12-25 22:23:16] SXRVRS          no              yes
+[2023-12-25 22:23:16] MXVXVS          yes             yes
+[2023-12-25 22:23:16] MSMRVVV         yes             no
+[2023-12-25 22:23:16] SSXMR           yes             yes
+[2023-12-25 22:23:16] XXMMV           yes             no
+[2023-12-25 22:23:16] XV              no              no
+[2023-12-25 22:23:16] SRXM            yes             yes
+[2023-12-25 22:23:16] RV              no              no
+[2023-12-25 22:23:16] MSSVMMRV        no              no
+[2023-12-25 22:23:16] MMVXMVX         no              no
+[2023-12-25 22:23:16] SSXSVX          yes             yes
+[2023-12-25 22:23:16] RVXMRVVV        no              no
+[2023-12-25 22:23:16] MMM             no              no
+[2023-12-25 22:23:16] VXS             yes             yes
+[2023-12-25 22:23:16] MRMV            no              yes
+[2023-12-25 22:23:16] VVXSVXMM        no              no
+[2023-12-25 22:23:16] XSS             no              no
+[2023-12-25 22:23:16] MSRV            yes             no
+[2023-12-25 22:23:16] MMVVVV          yes             yes
+[2023-12-25 22:23:16] VXMR            yes             yes
+[2023-12-25 22:23:16] MVXRV           no              no
+[2023-12-25 22:23:16] VVR             no              no
+[2023-12-25 22:23:16] XXMS            yes             no
+[2023-12-25 22:23:16] SSXM            no              yes
+[2023-12-25 22:23:16] You now have a chance to add any other post hoc notes or comments for the record if you wish. Please enter an empty line when you're done:
+[2023-12-25 22:27:08] It's pretty clear that I have no idea what I'm doing. I got six states in my doodle but I'm pretty sure some of them should be merged and I may well have missed one or two more. Basically I got an M(XV) path, an SSX path that leads back to the starting state and an S(RS) path but I have very low confidence in all of it.
+[2023-12-25 22:27:26] ========================================================================================================================
+[2023-12-25 22:27:26] agl-solitaire session started with a pregenerated grammar:
+[2023-12-25 22:27:26] Username: Daniel Arato
+[2023-12-25 22:27:26] Number of training strings: 20
+[2023-12-25 22:27:26] Time allotted for training: 180
+[2023-12-25 22:27:26] Number of grammatical test strings: 20
+[2023-12-25 22:27:26] Number of ungrammatical test strings: 20
+[2023-12-25 22:27:26] Logfile to record session in: arato.log
+[2023-12-25 22:27:26] Skip pre and post session questionnaire: True
+[2023-12-25 22:27:26] 
+[2023-12-25 22:27:26] Generating training strings and test strings based on the grammar...
+[2023-12-25 22:27:26] Done.
+[2023-12-25 22:27:26] You may add any notes or comments for the record before the training phase begins (optional). Please enter an empty line when you're done:
+[2023-12-25 22:28:11] Round two. After the miserable results of the previous test I'm feeling even less confident than before.
+[2023-12-25 22:28:11] The training phase will now begin. You will have 180 seconds to study a list of 20 exemplars of the hidden grammar.
+[2023-12-25 22:28:11] Please make sure your screen and terminal font are comfortable to read. Press return when you are ready.
+[2023-12-25 22:28:15] Training phase started. Please study the following list of strings:
+[2023-12-25 22:28:15] MSRMMMSR
+[2023-12-25 22:28:15] MMMMMSRR
+[2023-12-25 22:28:15] MSRRRRR
+[2023-12-25 22:28:15] MSRRRRRM
+[2023-12-25 22:28:15] MMSRRRSR
+[2023-12-25 22:28:15] MMMMMMSR
+[2023-12-25 22:28:15] MMMSRRRS
+[2023-12-25 22:28:15] MSRRRSRS
+[2023-12-25 22:28:15] MSRSRSRM
+[2023-12-25 22:28:15] MSRRRSRM
+[2023-12-25 22:28:15] MMMSRSRS
+[2023-12-25 22:28:15] MMMMMMMM
+[2023-12-25 22:28:15] MMSRRRMS
+[2023-12-25 22:28:15] MMMSRRRM
+[2023-12-25 22:28:15] MMMSRMSR
+[2023-12-25 22:28:15] MMSR
+[2023-12-25 22:28:15] MMSRMMSR
+[2023-12-25 22:28:15] MMMMSRMM
+[2023-12-25 22:28:15] MMMMMSRM
+[2023-12-25 22:28:15] MSRSRSRS
+[2023-12-25 22:31:15] Training phase finished.
+[2023-12-25 22:31:15] The test phase will now begin. You will be shown 40 new strings one at a time and prompted to judge the grammaticality of each.
+[2023-12-25 22:31:15] You may type 'y' for yes (i.e. grammatical) and 'n' for no (ungrammatical). Press return when you are ready.
+[2023-12-25 22:31:17] Test item #1 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:31:17] MSRMSRRR
+[2023-12-25 22:31:25] y
+[2023-12-25 22:31:25] Test item #2 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:31:25] MMSRMSRM
+[2023-12-25 22:31:40] y
+[2023-12-25 22:31:40] Test item #3 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:31:40] MMSRMSRR
+[2023-12-25 22:31:49] y
+[2023-12-25 22:31:49] Test item #4 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:31:49] MSRSRMMM
+[2023-12-25 22:31:59] y
+[2023-12-25 22:31:59] Test item #5 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:31:59] XXVSXXVM
+[2023-12-25 22:32:02] n
+[2023-12-25 22:32:02] Test item #6 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:32:02] RRSRSRSM
+[2023-12-25 22:32:04] n
+[2023-12-25 22:32:04] Test item #7 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:32:04] MSRMMSMR
+[2023-12-25 22:32:41] n
+[2023-12-25 22:32:41] Test item #8 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:32:41] MMMSRRR
+[2023-12-25 22:32:45] y
+[2023-12-25 22:32:45] Test item #9 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:32:45] VXSMM
+[2023-12-25 22:32:47] n
+[2023-12-25 22:32:47] Test item #10 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:32:47] MMS
+[2023-12-25 22:32:51] y
+[2023-12-25 22:32:51] Test item #11 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:32:51] MMMMSRMS
+[2023-12-25 22:33:04] y
+[2023-12-25 22:33:04] Test item #12 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:33:04] MSRSRSR
+[2023-12-25 22:33:10] y
+[2023-12-25 22:33:10] Test item #13 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:33:10] MMMSRMMR
+[2023-12-25 22:33:19] n
+[2023-12-25 22:33:19] Test item #14 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:33:19] MMMSR
+[2023-12-25 22:33:22] y
+[2023-12-25 22:33:22] Test item #15 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:33:22] MSRMMSRS
+[2023-12-25 22:33:37] n
+[2023-12-25 22:33:37] Test item #16 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:33:37] MMR
+[2023-12-25 22:33:40] n
+[2023-12-25 22:33:40] Test item #17 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:33:40] SSRRRRRM
+[2023-12-25 22:33:42] n
+[2023-12-25 22:33:42] Test item #18 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:33:42] MSRMMMMM
+[2023-12-25 22:33:46] y
+[2023-12-25 22:33:46] Test item #19 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:33:46] MSRRR
+[2023-12-25 22:33:47] y
+[2023-12-25 22:33:47] Test item #20 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:33:47] MMMMSR
+[2023-12-25 22:33:49] y
+[2023-12-25 22:33:49] Test item #21 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:33:49] SSRSRSRS
+[2023-12-25 22:33:51] n
+[2023-12-25 22:33:51] Test item #22 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:33:51] MMSRRRRR
+[2023-12-25 22:33:58] y
+[2023-12-25 22:33:58] Test item #23 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:33:58] MSRSRMSR
+[2023-12-25 22:34:04] y
+[2023-12-25 22:34:04] Test item #24 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:34:04] MMMMSRRR
+[2023-12-25 22:34:05] y
+[2023-12-25 22:34:05] Test item #25 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:34:05] SMMMSRMS
+[2023-12-25 22:34:09] n
+[2023-12-25 22:34:09] Test item #26 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:34:09] RRRSM
+[2023-12-25 22:34:11] n
+[2023-12-25 22:34:11] Test item #27 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:34:11] RSMMMM
+[2023-12-25 22:34:12] n
+[2023-12-25 22:34:12] Test item #28 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:34:12] MMMMSRR
+[2023-12-25 22:34:16] y
+[2023-12-25 22:34:16] Test item #29 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:34:16] MSRXR
+[2023-12-25 22:34:19] n
+[2023-12-25 22:34:19] Test item #30 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:34:19] MRR
+[2023-12-25 22:34:21] n
+[2023-12-25 22:34:21] Test item #31 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:34:21] RRRSMM
+[2023-12-25 22:34:23] n
+[2023-12-25 22:34:23] Test item #32 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:34:23] MMSRRR
+[2023-12-25 22:34:25] y
+[2023-12-25 22:34:25] Test item #33 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:34:25] MSR
+[2023-12-25 22:34:27] y
+[2023-12-25 22:34:27] Test item #34 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:34:27] MSRSRMMS
+[2023-12-25 22:34:31] y
+[2023-12-25 22:34:31] Test item #35 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:34:31] MSRRRVMM
+[2023-12-25 22:34:34] n
+[2023-12-25 22:34:34] Test item #36 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:34:34] MMSRRRVR
+[2023-12-25 22:34:39] n
+[2023-12-25 22:34:39] Test item #37 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:34:39] MMMSRR
+[2023-12-25 22:34:41] y
+[2023-12-25 22:34:41] Test item #38 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:34:41] MMSRSRSR
+[2023-12-25 22:34:47] y
+[2023-12-25 22:34:47] Test item #39 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:34:47] SMMRSMMM
+[2023-12-25 22:34:51] n
+[2023-12-25 22:34:51] Test item #40 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:34:51] MMSRSRMM
+[2023-12-25 22:35:00] y
+[2023-12-25 22:35:00] Test phase finished. Hope you had fun! A few more questions if you feel like it:
+[2023-12-25 22:35:00] And now for the big reveal... Strings were generated using the following regular grammar:
+[2023-12-25 22:35:00] 0 -M-> 2
+[2023-12-25 22:35:00] 1 ---> OUT
+[2023-12-25 22:35:00] 1 -S-> 3
+[2023-12-25 22:35:00] 1 -R-> 4
+[2023-12-25 22:35:00] 1 -M-> 2
+[2023-12-25 22:35:00] 2 -S-> 4
+[2023-12-25 22:35:00] 2 -M-> 2
+[2023-12-25 22:35:00] 3 -R-> 2
+[2023-12-25 22:35:00] 4 -R-> 1
+[2023-12-25 22:35:00] You gave 36 correct answers out of 40 (90.0%). The answers were the following:
+[2023-12-25 22:35:00] Test string     Correct answer  Your answer
+[2023-12-25 22:35:00] MSRMSRRR        yes             yes
+[2023-12-25 22:35:00] MMSRMSRM        yes             yes
+[2023-12-25 22:35:00] MMSRMSRR        yes             yes
+[2023-12-25 22:35:00] MSRSRMMM        yes             yes
+[2023-12-25 22:35:00] XXVSXXVM        no              no
+[2023-12-25 22:35:00] RRSRSRSM        no              no
+[2023-12-25 22:35:00] MSRMMSMR        no              no
+[2023-12-25 22:35:00] MMMSRRR         yes             yes
+[2023-12-25 22:35:00] VXSMM           no              no
+[2023-12-25 22:35:00] MMS             no              yes
+[2023-12-25 22:35:00] MMMMSRMS        yes             yes
+[2023-12-25 22:35:00] MSRSRSR         yes             yes
+[2023-12-25 22:35:00] MMMSRMMR        no              no
+[2023-12-25 22:35:00] MMMSR           yes             yes
+[2023-12-25 22:35:00] MSRMMSRS        yes             no
+[2023-12-25 22:35:00] MMR             no              no
+[2023-12-25 22:35:00] SSRRRRRM        no              no
+[2023-12-25 22:35:00] MSRMMMMM        yes             yes
+[2023-12-25 22:35:00] MSRRR           yes             yes
+[2023-12-25 22:35:00] MMMMSR          yes             yes
+[2023-12-25 22:35:00] SSRSRSRS        no              no
+[2023-12-25 22:35:00] MMSRRRRR        yes             yes
+[2023-12-25 22:35:00] MSRSRMSR        yes             yes
+[2023-12-25 22:35:00] MMMMSRRR        yes             yes
+[2023-12-25 22:35:00] SMMMSRMS        no              no
+[2023-12-25 22:35:00] RRRSM           no              no
+[2023-12-25 22:35:00] RSMMMM          no              no
+[2023-12-25 22:35:00] MMMMSRR         no              yes
+[2023-12-25 22:35:00] MSRXR           no              no
+[2023-12-25 22:35:00] MRR             no              no
+[2023-12-25 22:35:00] RRRSMM          no              no
+[2023-12-25 22:35:00] MMSRRR          yes             yes
+[2023-12-25 22:35:00] MSR             yes             yes
+[2023-12-25 22:35:00] MSRSRMMS        yes             yes
+[2023-12-25 22:35:00] MSRRRVMM        no              no
+[2023-12-25 22:35:00] MMSRRRVR        no              no
+[2023-12-25 22:35:00] MMMSRR          no              yes
+[2023-12-25 22:35:00] MMSRSRSR        yes             yes
+[2023-12-25 22:35:00] SMMRSMMM        no              no
+[2023-12-25 22:35:00] MMSRSRMM        yes             yes
+[2023-12-25 22:35:00] You now have a chance to add any other post hoc notes or comments for the record if you wish. Please enter an empty line when you're done:
+[2023-12-25 22:37:16] Finally a decent round, courtesy of what seems like a fairly simply grammar. I got the following rules:
+[2023-12-25 22:37:16] 1 -M-> 2
+[2023-12-25 22:37:16] 2 -M-> 2
+[2023-12-25 22:37:16] 2 -S-> 3
+[2023-12-25 22:37:16] 3 -M-> 2
+[2023-12-25 22:37:16] 3 -R-> 3
+[2023-12-25 22:37:16] 3 -S-> 4
+[2023-12-25 22:37:16] 4 -R-> 3
+[2023-12-25 22:37:16] 2 ---> OUT ?
+[2023-12-25 22:37:16] 3 ---> OUT ?
+[2023-12-25 22:37:24] ========================================================================================================================
+[2023-12-25 22:37:24] agl-solitaire session started with a pregenerated grammar:
+[2023-12-25 22:37:24] Username: Daniel Arato
+[2023-12-25 22:37:24] Number of training strings: 20
+[2023-12-25 22:37:24] Time allotted for training: 180
+[2023-12-25 22:37:24] Number of grammatical test strings: 20
+[2023-12-25 22:37:24] Number of ungrammatical test strings: 20
+[2023-12-25 22:37:24] Logfile to record session in: arato.log
+[2023-12-25 22:37:24] Skip pre and post session questionnaire: True
+[2023-12-25 22:37:24] 
+[2023-12-25 22:37:24] Generating training strings and test strings based on the grammar...
+[2023-12-25 22:37:24] Done.
+[2023-12-25 22:37:24] You may add any notes or comments for the record before the training phase begins (optional). Please enter an empty line when you're done:
+[2023-12-25 22:38:11] Final round. I expect to perform somewhere between the first two rounds in this one.
+[2023-12-25 22:38:11] The training phase will now begin. You will have 180 seconds to study a list of 20 exemplars of the hidden grammar.
+[2023-12-25 22:38:11] Please make sure your screen and terminal font are comfortable to read. Press return when you are ready.
+[2023-12-25 22:38:13] Training phase started. Please study the following list of strings:
+[2023-12-25 22:38:13] RVRRR
+[2023-12-25 22:38:13] VVRXVRRX
+[2023-12-25 22:38:13] RRRXRRRS
+[2023-12-25 22:38:13] VSSSV
+[2023-12-25 22:38:13] VSV
+[2023-12-25 22:38:13] RVVR
+[2023-12-25 22:38:13] VSSSVRXX
+[2023-12-25 22:38:13] VSSSVRRS
+[2023-12-25 22:38:13] VVRXRRR
+[2023-12-25 22:38:13] RVVX
+[2023-12-25 22:38:13] RVVVR
+[2023-12-25 22:38:13] RR
+[2023-12-25 22:38:13] VVRXVX
+[2023-12-25 22:38:13] VSVRR
+[2023-12-25 22:38:13] VSSVRRSV
+[2023-12-25 22:38:13] VSSSSSV
+[2023-12-25 22:38:13] RRRRSVRR
+[2023-12-25 22:38:13] VVRXX
+[2023-12-25 22:38:13] VSVRXX
+[2023-12-25 22:38:13] VVRXRRRS
+[2023-12-25 22:41:13] Training phase finished.
+[2023-12-25 22:41:13] The test phase will now begin. You will be shown 40 new strings one at a time and prompted to judge the grammaticality of each.
+[2023-12-25 22:41:13] You may type 'y' for yes (i.e. grammatical) and 'n' for no (ungrammatical). Press return when you are ready.
+[2023-12-25 22:41:32] Test item #1 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:41:32] MVVR
+[2023-12-25 22:41:35] n
+[2023-12-25 22:41:35] Test item #2 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:41:35] RRRXVRRX
+[2023-12-25 22:41:42] n
+[2023-12-25 22:41:42] Test item #3 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:41:42] VVRR
+[2023-12-25 22:41:46] y
+[2023-12-25 22:41:46] Test item #4 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:41:46] RSRMMMV
+[2023-12-25 22:41:50] n
+[2023-12-25 22:41:50] Test item #5 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:41:50] VVRRSR
+[2023-12-25 22:41:58] n
+[2023-12-25 22:41:58] Test item #6 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:41:58] VSVRXRRX
+[2023-12-25 22:42:10] y
+[2023-12-25 22:42:10] Test item #7 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:42:10] VVRXSVR
+[2023-12-25 22:42:24] y
+[2023-12-25 22:42:24] Test item #8 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:42:24] RRRX
+[2023-12-25 22:42:27] n
+[2023-12-25 22:42:27] Test item #9 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:42:27] VVRRSX
+[2023-12-25 22:42:39] n
+[2023-12-25 22:42:39] Test item #10 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:42:39] SSSVRR
+[2023-12-25 22:42:41] n
+[2023-12-25 22:42:41] Test item #11 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:42:41] RVR
+[2023-12-25 22:42:46] y
+[2023-12-25 22:42:46] Test item #12 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:42:46] MRRR
+[2023-12-25 22:42:48] n
+[2023-12-25 22:42:48] Test item #13 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:42:48] VSSV
+[2023-12-25 22:42:53] y
+[2023-12-25 22:42:53] Test item #14 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:42:53] MVRXVR
+[2023-12-25 22:42:56] n
+[2023-12-25 22:42:56] Test item #15 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:42:56] RVRRXVVX
+[2023-12-25 22:43:11] n
+[2023-12-25 22:43:11] Test item #16 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:43:11] VSSSSV
+[2023-12-25 22:43:16] y
+[2023-12-25 22:43:16] Test item #17 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:43:16] VVRRSVX
+[2023-12-25 22:43:29] n
+[2023-12-25 22:43:29] Test item #18 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:43:29] RMMXSVXR
+[2023-12-25 22:43:32] n
+[2023-12-25 22:43:32] Test item #19 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:43:32] VSSSVRR
+[2023-12-25 22:43:38] y
+[2023-12-25 22:43:38] Test item #20 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:43:38] VSVRXR
+[2023-12-25 22:43:46] y
+[2023-12-25 22:43:46] Test item #21 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:43:46] RRRRSVX
+[2023-12-25 22:43:51] n
+[2023-12-25 22:43:51] Test item #22 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:43:51] RX
+[2023-12-25 22:43:53] n
+[2023-12-25 22:43:53] Test item #23 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:43:53] RRMR
+[2023-12-25 22:43:55] n
+[2023-12-25 22:43:55] Test item #24 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:43:55] VR
+[2023-12-25 22:43:57] y
+[2023-12-25 22:43:57] Test item #25 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:43:57] RRRXVR
+[2023-12-25 22:44:01] n
+[2023-12-25 22:44:01] Test item #26 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:44:01] RRVSSSSV
+[2023-12-25 22:44:07] y
+[2023-12-25 22:44:07] Test item #27 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:44:07] XVMRXRMX
+[2023-12-25 22:44:10] n
+[2023-12-25 22:44:10] Test item #28 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:44:10] VSSVRRSR
+[2023-12-25 22:44:18] n
+[2023-12-25 22:44:18] Test item #29 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:44:18] RVX
+[2023-12-25 22:44:20] n
+[2023-12-25 22:44:20] Test item #30 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:44:20] VV
+[2023-12-25 22:44:22] y
+[2023-12-25 22:44:22] Test item #31 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:44:22] SSVRR
+[2023-12-25 22:44:25] n
+[2023-12-25 22:44:25] Test item #32 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:44:25] VVRRSRRR
+[2023-12-25 22:44:32] n
+[2023-12-25 22:44:32] Test item #33 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:44:32] RMRR
+[2023-12-25 22:44:34] n
+[2023-12-25 22:44:34] Test item #34 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:44:34] RRRRSX
+[2023-12-25 22:44:37] n
+[2023-12-25 22:44:37] Test item #35 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:44:37] VMSVRRSV
+[2023-12-25 22:44:39] n
+[2023-12-25 22:44:39] Test item #36 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:44:39] VSS
+[2023-12-25 22:44:43] y
+[2023-12-25 22:44:43] Test item #37 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:44:43] VMX
+[2023-12-25 22:44:45] n
+[2023-12-25 22:44:45] Test item #38 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:44:45] VVVVVVXV
+[2023-12-25 22:44:50] n
+[2023-12-25 22:44:50] Test item #39 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:44:50] VRRXX
+[2023-12-25 22:44:57] n
+[2023-12-25 22:44:57] Test item #40 out of 40. Is the following string grammatical? (y/n)
+[2023-12-25 22:44:57] XX
+[2023-12-25 22:44:58] n
+[2023-12-25 22:44:58] Test phase finished. Hope you had fun! A few more questions if you feel like it:
+[2023-12-25 22:44:58] And now for the big reveal... Strings were generated using the following regular grammar:
+[2023-12-25 22:44:58] 0 -V-> 6
+[2023-12-25 22:44:58] 0 -R-> 3
+[2023-12-25 22:44:58] 1 ---> OUT
+[2023-12-25 22:44:58] 1 -S-> 3
+[2023-12-25 22:44:58] 2 -R-> 4
+[2023-12-25 22:44:58] 2 ---> OUT
+[2023-12-25 22:44:58] 3 -X-> 5
+[2023-12-25 22:44:58] 3 -V-> 3
+[2023-12-25 22:44:58] 3 -R-> 2
+[2023-12-25 22:44:58] 4 -R-> 1
+[2023-12-25 22:44:58] 4 -X-> 3
+[2023-12-25 22:44:58] 5 ---> OUT
+[2023-12-25 22:44:58] 6 -V-> 2
+[2023-12-25 22:44:58] 6 -S-> 6
+[2023-12-25 22:44:58] You gave 24 correct answers out of 40 (60.0%). The answers were the following:
+[2023-12-25 22:44:58] Test string     Correct answer  Your answer
+[2023-12-25 22:44:58] MVVR            no              no
+[2023-12-25 22:44:58] RRRXVRRX        yes             no
+[2023-12-25 22:44:58] VVRR            yes             yes
+[2023-12-25 22:44:58] RSRMMMV         no              no
+[2023-12-25 22:44:58] VVRRSR          yes             no
+[2023-12-25 22:44:58] VSVRXRRX        yes             yes
+[2023-12-25 22:44:58] VVRXSVR         no              yes
+[2023-12-25 22:44:58] RRRX            no              no
+[2023-12-25 22:44:58] VVRRSX          yes             no
+[2023-12-25 22:44:58] SSSVRR          no              no
+[2023-12-25 22:44:58] RVR             yes             yes
+[2023-12-25 22:44:58] MRRR            no              no
+[2023-12-25 22:44:58] VSSV            yes             yes
+[2023-12-25 22:44:58] MVRXVR          no              no
+[2023-12-25 22:44:58] RVRRXVVX        yes             no
+[2023-12-25 22:44:58] VSSSSV          yes             yes
+[2023-12-25 22:44:58] VVRRSVX         yes             no
+[2023-12-25 22:44:58] RMMXSVXR        no              no
+[2023-12-25 22:44:58] VSSSVRR         yes             yes
+[2023-12-25 22:44:58] VSVRXR          yes             yes
+[2023-12-25 22:44:58] RRRRSVX         yes             no
+[2023-12-25 22:44:58] RX              yes             no
+[2023-12-25 22:44:58] RRMR            no              no
+[2023-12-25 22:44:58] VR              no              yes
+[2023-12-25 22:44:58] RRRXVR          yes             no
+[2023-12-25 22:44:58] RRVSSSSV        no              yes
+[2023-12-25 22:44:58] XVMRXRMX        no              no
+[2023-12-25 22:44:58] VSSVRRSR        yes             no
+[2023-12-25 22:44:58] RVX             yes             no
+[2023-12-25 22:44:58] VV              yes             yes
+[2023-12-25 22:44:58] SSVRR           no              no
+[2023-12-25 22:44:58] VVRRSRRR        yes             no
+[2023-12-25 22:44:58] RMRR            no              no
+[2023-12-25 22:44:58] RRRRSX          yes             no
+[2023-12-25 22:44:58] VMSVRRSV        no              no
+[2023-12-25 22:44:58] VSS             no              yes
+[2023-12-25 22:44:58] VMX             no              no
+[2023-12-25 22:44:58] VVVVVVXV        no              no
+[2023-12-25 22:44:58] VRRXX           no              no
+[2023-12-25 22:44:58] XX              no              no
+[2023-12-25 22:44:58] You now have a chance to add any other post hoc notes or comments for the record if you wish. Please enter an empty line when you're done:
+[2023-12-25 22:51:09] Yup, pretty bad. I scribbled down the following:
+[2023-12-25 22:51:09] 1 -R-> 1
+[2023-12-25 22:51:09] 1 -V-> 2
+[2023-12-25 22:51:09] 2 -S-> 2
+[2023-12-25 22:51:09] 2 -V-> 3
+[2023-12-25 22:51:09] 3 -V-> 3
+[2023-12-25 22:51:09] 3 -R-> 4
+[2023-12-25 22:51:09] 4 -R-> 4
+[2023-12-25 22:51:09] 2 -R-> 4
+[2023-12-25 22:51:09] 4 -X-> 2
+[2023-12-25 22:51:09] ...and all states looked fine to halt in except number 1.
+[2023-12-25 22:51:09] Overall this strategy feels like a dramatic failure and it seems obvious that one cannot expect to beat the game by a large margin even with pen and paper.
+[2023-12-25 22:51:09] I'm going to look at the actual grammars now and see if I was anywhere close. Over and out.
