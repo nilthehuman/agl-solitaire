@@ -249,8 +249,8 @@ class Application:
                     if not os.path.isfile(new_filename):
                         print('error: not a file (maybe a folder?)')
                     with open(new_filename, 'r', encoding='UTF-8') as logfile:
-                        first_line = logfile.readline()
-                    if not re.search(r'agl-solitaire', first_line):
+                        first_few_lines = logfile.readlines()[:10]
+                    if not re.search(r'agl-solitaire', '\n'.join(first_few_lines)):
                         print('file does not look like an agl-solitaire log file')
                         while choice not in ['y', 'n']:
                             choice = input('are you sure you want to use this file? (y/n)> ')
