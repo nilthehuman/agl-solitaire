@@ -11,6 +11,7 @@ import time
 from src import grammar
 from src import automaton
 from src import settings
+from src import version
 
 
 _LEFT_MARGIN_WIDTH = 2
@@ -68,7 +69,8 @@ class Application:
 
     def main_menu(self):
         """Show the starting menu screen."""
-        print('agl-solitaire\n-------------\n\n(a terminal-based tool for Artificial Grammar Learning experiments)')
+        my_version = version.get_version()
+        print('agl-solitaire ' + my_version + '\n-------------------\n\n(a terminal-based tool for Artificial Grammar Learning experiments)')
         while True:
             print('\n--------  MAIN MENU  --------')
             print('1: [s]tart new experiment session')
