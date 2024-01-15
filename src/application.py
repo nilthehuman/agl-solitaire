@@ -1,5 +1,6 @@
 """The application's user interface including the terminal-based menu and the experimental procedure itself."""
 
+import copy
 import datetime
 import os
 import random
@@ -133,15 +134,15 @@ class Application:
             if not filename:
                 return
             go_ahead = True
-            if os.path.exists(filename) or os.path.exists(filename + '.ini'):
+            if os.path.exists(filename):
                 go_ahead = False
                 choice = input('warning: file exists, overwrite? (y/n)> ')
                 if choice and choice[0].lower() == 'y':
                     go_ahead = True
             if go_ahead:
-                with open(filename, 'w', encoding='UTF-8') as gmr_file:
-                    gmr_file.write(gmr.obfuscated_repr())
-                self.settings.save_all(filename + '.ini')
+                settings_and_gmr = copy.copy(self.settings)
+                settings_and_gmr.grammar = gmr.obfuscated_repr()
+                settings_and_gmr.save_all(filename)
                 return
 
     def load_grammar(self):
@@ -156,34 +157,28 @@ class Application:
         if not os.path.isfile(filename):
             print('error: not a file (maybe a folder?)')
             return
-        with open(filename, 'r', encoding='UTF-8') as file:
-            obfuscated_string_repr = file.read()
+        settings_and_gmr = settings.Settings()
+        settings_and_gmr.load_all(filename)
+        settings_and_gmr.autosave = False
+        if settings_and_gmr.grammar is None:
+            print('error: file does not include a grammar')
+            return
         try:
-            gmr = grammar.Grammar.from_obfuscated_repr(obfuscated_string_repr)
+            gmr = grammar.Grammar.from_obfuscated_repr(settings_and_gmr.grammar)
         except (IndexError, SyntaxError):
             print('error: loading grammar from file failed')
             return
-        # grammar loaded successfully, now see about the settings
-        current_settings = False
-        if not os.path.isfile(filename + '.ini'):
-            print('warning: the loaded grammar has no corresponding .ini file')
+        settings_without_gmr = copy.copy(settings_and_gmr)
+        settings_without_gmr.grammar = None
+        if self.settings != settings_without_gmr:
+            print('warning: your current settings differ from those loaded from file:\n')
+            print(f"settings in {filename}:\n" + settings_without_gmr.pretty_print())
+            print(f"current settings:\n" + self.settings.pretty_print())
             choice = ''
             while not choice:
-                choice = input('use the current settings? (y/n)> ')
+                choice = input('keep the current settings instead? (y/n)> ')
             if choice[0].lower() != 'y':
-                return
-        else:
-            saved_settings = settings.Settings()
-            saved_settings.load_all(filename + '.ini')
-            if self.settings != saved_settings:
-                print('warning: your current settings differ from those loaded from the .ini file:\n')
-                print(f"settings in {filename}.ini:\n" + saved_settings.pretty_print())
-                print(f"current settings:\n" + self.settings.pretty_print())
-                choice = ''
-                while not choice:
-                    choice = input('use the current settings instead? (y/n)> ')
-                if choice[0].lower() != 'y':
-                    self.settings.load_all(filename + '.ini')
+                self.settings = settings_and_gmr
         # don't forget to reset letters as well
         gmr.symbols = self.settings.string_letters
         self.run_experiment(filename, gmr)

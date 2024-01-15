@@ -2,6 +2,7 @@
 
 import configparser
 import dataclasses
+import typing
 
 
 _DEFAULT_SETTINGS_FILENAME = 'settings.ini'
@@ -22,6 +23,7 @@ class Settings:
     logfile_filename:           str = 'agl_sessions.log'
     training_one_at_a_time:     bool = True
     run_questionnaire:          bool = True
+    grammar:                    typing.Optional[str] = None
 
     def __str__(self):
         """Print all settings in an .ini config file format."""
@@ -71,6 +73,10 @@ class Settings:
                     if attr_name in ['training_one_at_a_time', 'run_questionnaire']:
                         value = config[section][attr_name].lower() in ['true', 'yes', '1']
                     setattr(self, attr_name, value)
+                except TypeError:
+                    # current grammar is None which you cannot cast to
+                    assert getattr(self, attr_name) is None
+                    self.grammar = config[section][attr_name]
                 except AttributeError:
                     pass  # doesn't matter
         self.autosave = True
@@ -79,11 +85,16 @@ class Settings:
         """Write the current values of all our member variables to a config file."""
         config = configparser.ConfigParser()
         for field in dataclasses.fields(self):
+            if 'grammar' == field.name and self.grammar is None:
+                continue
             # the string_letters variable needs special treatment
             if 'string_letters' == field.name:
                 config['DEFAULT'][field.name] = ''.join(self.string_letters)
             else:
-                config['DEFAULT'][field.name] = str(getattr(self, field.name))
+                # configparser will try to interpolate the string and cry
+                # if it has a stray % character so we must escape those
+                escaped_str = str(getattr(self, field.name)).replace('%', '%%')
+                config['DEFAULT'][field.name] = escaped_str
         with open(filename, 'w', encoding='UTF-8') as configfile:
             config.write(configfile)
 
