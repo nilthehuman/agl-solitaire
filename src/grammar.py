@@ -33,11 +33,12 @@ class Grammar:
         repr_string = self.__repr__()
         coprimes = (2, 2)
         while 1 != math.gcd(*coprimes):
-            coprimes = sorted((random.randrange(128), random.randrange(128)))
+            coprimes = sorted((random.randrange(95), random.randrange(95)))
         obfuscated_repr_string = ''
         for i, char in enumerate(repr_string):
-            obfuscated_repr_string += chr(ord(char) + coprimes[0] ** i % coprimes[1])
-        return chr(coprimes[0]) + chr(coprimes[1]) + obfuscated_repr_string
+            # use the ASCII range [32, 126] only
+            obfuscated_repr_string += chr(32 + (ord(char) - 32 + coprimes[0] ** i % coprimes[1]) % 95)
+        return chr(32 + coprimes[0]) + chr(32 + coprimes[1]) + obfuscated_repr_string
 
     @classmethod
     def from_repr(cls, repr_string):
@@ -50,12 +51,12 @@ class Grammar:
     def from_obfuscated_repr(cls, obfuscated_repr_string):
         """Restore Grammar from obfuscated string representation."""
         repr_string = ''
-        coprimes = (ord(obfuscated_repr_string[0]),
-                    ord(obfuscated_repr_string[1]))
+        coprimes = (ord(obfuscated_repr_string[0]) - 32,
+                    ord(obfuscated_repr_string[1]) - 32)
         obfuscated_repr_string = obfuscated_repr_string[2:]
         repr_string = ''
         for i, char in enumerate(obfuscated_repr_string):
-            repr_string += chr(ord(char) - coprimes[0] ** i % coprimes[1])
+            repr_string += chr(32 + (ord(char) - 32 - coprimes[0] ** i % coprimes[1]) % 95)
         grammar = cls()
         grammar.transitions = eval(repr_string)
         return grammar
