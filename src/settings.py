@@ -73,7 +73,7 @@ class Settings:
                     setattr(self, attr_name, value)
                 except AttributeError:
                     pass  # doesn't matter
-        self.loaded = True
+        self.autosave = True
 
     def save_all(self, filename=_DEFAULT_SETTINGS_FILENAME):
         """Write the current values of all our member variables to a config file."""
@@ -90,9 +90,10 @@ class Settings:
     def __setattr__(self, attr, value):
         """Save any and all settings changes automatically."""
         super().__setattr__(attr, value)
-        try:
-            if self.loaded:
-                self.save_all()
-        except AttributeError:
-            pass  # that's fine
+        if attr != 'autosave':
+            try:
+                if self.autosave:
+                    self.save_all()
+            except AttributeError:
+                pass  # that's fine
 
