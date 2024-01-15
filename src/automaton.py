@@ -38,7 +38,9 @@ class Automaton:
                     # follow the edge to the next state
                     current_state = self.grammar.transitions[current_state][next_symbol]
                 attempts += 1
-            grammatical_strings.add(string)
+            # did we end up in a halting state?
+            if current_state is None:
+                grammatical_strings.add(string)
         return grammatical_strings
 
     def produce_ungrammatical(self, num_strings=1, min_length=MIN_STRING_LENGTH, max_length=MAX_STRING_LENGTH):
