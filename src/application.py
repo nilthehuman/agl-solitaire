@@ -275,8 +275,8 @@ class Application:
                 try:
                     if int(new_value) != float(new_value):
                         raise ValueError('error: please provide an integer')
-                    if int(new_value) < 0:
-                        raise ValueError('error: cannot set less than zero')
+                    if int(new_value) < 1:
+                        raise ValueError('error: cannot set less than one')
                     if (attr_to_change == 'maximum_string_length' and int(new_value) < self.settings.minimum_string_length or
                         attr_to_change == 'minimum_string_length' and int(new_value) > self.settings.maximum_string_length):
                         raise ValueError('error: minimum string length cannot be larger than maximum string length')
