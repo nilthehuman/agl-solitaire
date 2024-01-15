@@ -203,7 +203,7 @@ class Application:
             print(f" 8: [l]etters to use in strings:\t\t{self.settings.string_letters}")
             print(f" 9: log[f]ile to record sessions in:\t\t{self.settings.logfile_filename}")
             print(f"10: show training strings [o]ne at a time:\t{self.settings.training_one_at_a_time}")
-            print(f"11: skip pre and post session [q]uestionnaire:\t{self.settings.skip_questionnaire}")
+            print(f"11: run pre and post session [q]uestionnaire:\t{self.settings.run_questionnaire}")
             print(' 0: [b]ack to main menu')
             while not choice:
                 choice = input('what to change> ')
@@ -270,7 +270,7 @@ class Application:
             elif choice in ['10', 'o']:
                 self.settings.training_one_at_a_time = not self.settings.training_one_at_a_time
             elif choice in ['11', 'q']:
-                self.settings.skip_questionnaire = not self.settings.skip_questionnaire
+                self.settings.run_questionnaire = not self.settings.run_questionnaire
             elif choice in ['0', 'b']:
                 break
             else:
@@ -332,7 +332,7 @@ class Application:
         # permute test_set
         random.shuffle(test_set)
         self.duplicate_print('Done.')
-        if not self.settings.skip_questionnaire:
+        if self.settings.run_questionnaire:
             self.duplicate_print('A few questions before we begin. Feel free to answer as briefly or in as much detail as you like.')
             self.duplicate_print('Your answers are going to be stored in the log file.')
             self.duplicate_print('Have you heard about artificial grammar learning experiments before?')
@@ -347,7 +347,7 @@ class Application:
             self.duplicate_print(f"Out of {len(test_set)} questions what do you expect your score to be in this session?")
             answer = input()
             self.duplicate_print(answer, log_only=True)
-        self.duplicate_print(f"You may add any {'further ' if not self.settings.skip_questionnaire else ''}notes or comments for the record before the training phase begins (optional). Please enter an empty line when you're done:")
+        self.duplicate_print(f"You may add any {'further ' if self.settings.run_questionnaire else ''}notes or comments for the record before the training phase begins (optional). Please enter an empty line when you're done:")
         comments = '\n'.join(iter(input, ''))
         self.duplicate_print(comments, log_only=True)
         clear()
@@ -405,7 +405,7 @@ class Application:
             test_set[i] = (test_set[i][0], test_set[i][1], answer)
         clear()
         self.duplicate_print('Test phase finished. Hope you had fun!')
-        if not self.settings.skip_questionnaire:
+        if self.settings.run_questionnaire:
             self.duplicate_print('A few more questions if you feel like it:')
             self.duplicate_print('How did you feel during the session?')
             answer = input()
