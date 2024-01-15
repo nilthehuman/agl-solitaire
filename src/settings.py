@@ -20,6 +20,7 @@ class Settings:
     string_letters:             list[str] = dataclasses.field(default_factory = lambda: ['M', 'R', 'S', 'V', 'X'])
     # idea: test_strings_reuse_from_training?
     logfile_filename:           str = 'agl_sessions.log'
+    training_one_at_a_time:     bool = True
     skip_questionnaire:         bool = False
 
     def __str__(self):
@@ -41,6 +42,7 @@ class Settings:
         pretty += f"Maximum string length: {self.maximum_string_length}\n"
         pretty += f"Letters to use in strings: {self.string_letters}\n"
         pretty += f"Logfile to record session in: {self.logfile_filename}\n"
+        pretty += f"Show training strings one at a time: {self.training_one_at_a_time}\n"
         pretty += f"Skip pre and post session questionnaire: {self.skip_questionnaire}\n"
         return pretty
 
@@ -53,6 +55,7 @@ class Settings:
         pretty += f"Number of grammatical test strings: {self.test_strings_grammatical}\n"
         pretty += f"Number of ungrammatical test strings: {self.test_strings_ungrammatical}\n"
         pretty += f"Logfile to record session in: {self.logfile_filename}\n"
+        pretty += f"Show training strings one at a time: {self.training_one_at_a_time}\n"
         pretty += f"Skip pre and post session questionnaire: {self.skip_questionnaire}\n"
         return pretty
 
@@ -65,7 +68,7 @@ class Settings:
                 try:
                     # parse attribute from string
                     value = type(getattr(self, attr_name))(config[section][attr_name])
-                    if 'skip_questionnaire' == attr_name:
+                    if attr_name in ['training_one_at_a_time', 'skip_questionnaire']:
                         value = config[section][attr_name].lower() in ['true', 'yes', '1']
                     setattr(self, attr_name, value)
                 except AttributeError:

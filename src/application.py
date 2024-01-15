@@ -193,20 +193,22 @@ class Application:
         while True:
             choice = ''
             print('\n--------  SETTINGS  --------')
-            print(f"1: [u]sername (for the record):\t\t{self.settings.username}")
-            print(f"2: number of training [s]trings:\t\t{self.settings.training_strings}")
-            print(f"3: [t]ime allotted for training:\t\t{self.settings.training_time} seconds")
-            print(f"4: number of [g]rammatical test strings:\t{self.settings.test_strings_grammatical}")
-            print(f"5: number of [u]ngrammatical test strings:\t{self.settings.test_strings_ungrammatical}")
-            print(f"6: mi[n]imum string length:\t\t\t{self.settings.minimum_string_length}")
-            print(f"7: ma[x]imum string length:\t\t\t{self.settings.maximum_string_length}")
-            print(f"8: [l]etters to use in strings:\t\t{self.settings.string_letters}")
-            print(f"9: log[f]ile to record sessions in:\t\t{self.settings.logfile_filename}")
-            print(f"   skip pre and post session [q]uestionnaire:\t{self.settings.skip_questionnaire}")
-            print('0: [b]ack to main menu')
+            print(f" 1: [u]sername (for the record):\t\t{self.settings.username}")
+            print(f" 2: number of training [s]trings:\t\t{self.settings.training_strings}")
+            print(f" 3: [t]ime allotted for training:\t\t{self.settings.training_time} seconds")
+            print(f" 4: number of [g]rammatical test strings:\t{self.settings.test_strings_grammatical}")
+            print(f" 5: number of [u]ngrammatical test strings:\t{self.settings.test_strings_ungrammatical}")
+            print(f" 6: mi[n]imum string length:\t\t\t{self.settings.minimum_string_length}")
+            print(f" 7: ma[x]imum string length:\t\t\t{self.settings.maximum_string_length}")
+            print(f" 8: [l]etters to use in strings:\t\t{self.settings.string_letters}")
+            print(f" 9: log[f]ile to record sessions in:\t\t{self.settings.logfile_filename}")
+            print(f"10: show training strings [o]ne at a time:\t{self.settings.training_one_at_a_time}")
+            print(f"11: skip pre and post session [q]uestionnaire:\t{self.settings.skip_questionnaire}")
+            print(' 0: [b]ack to main menu')
             while not choice:
                 choice = input('what to change> ')
-            choice = choice[0].lower()
+            if choice.isalpha():
+                choice = choice[0].lower()
             attr_to_change = None
             if choice in ['1', 'u']:
                 self.settings.username = input('username: ')
@@ -265,7 +267,9 @@ class Application:
                             choice = choice[0].lower()
                 if choice in ['9', 'f', 'y']:
                     self.settings.logfile_filename = new_filename
-            elif choice in ['q']:
+            elif choice in ['10', 'o']:
+                self.settings.training_one_at_a_time = not self.settings.training_one_at_a_time
+            elif choice in ['11', 'q']:
                 self.settings.skip_questionnaire = not self.settings.skip_questionnaire
             elif choice in ['0', 'b']:
                 break
@@ -347,26 +351,37 @@ class Application:
         comments = '\n'.join(iter(input, ''))
         self.duplicate_print(comments, log_only=True)
         clear()
-        self.duplicate_print(f"The training phase will now begin. You will have {self.settings.training_time} seconds to study a list of {self.settings.training_strings} exemplars of the hidden grammar.")
+        if self.settings.training_one_at_a_time:
+            time_per_item = round(float(self.settings.training_time) / self.settings.training_strings, 2)
+            self.duplicate_print(f"The training phase will now begin. You will be presented with {self.settings.training_strings} exemplars of the hidden grammar for {time_per_item} seconds each.")
+        else:
+            self.duplicate_print(f"The training phase will now begin. You will have {self.settings.training_time} seconds to study a list of {self.settings.training_strings} exemplars of the hidden grammar.")
         self.duplicate_print('Please make sure your screen and terminal font are comfortable to read. Press return when you are ready.')
         input()
-        self.duplicate_print('Training phase started. Please study the following list of strings:')
-        self.duplicate_print('\n'.join(training_set))
-        print()
-        input_thread = threading.Thread(target=input, daemon=True)
-        input_thread.start()
-        remaining_time = self.settings.training_time
-        while input_thread.is_alive() and 0 < remaining_time:
-            print(f"\r{remaining_time} seconds remaining (press return to finish early)...  ", end='')
-            time.sleep(1)
-            remaining_time -= 1
+        input_thread = None
+        if self.settings.training_one_at_a_time:
+            for string in training_set:
+                clear()
+                self.duplicate_print(string)
+                time.sleep(float(self.settings.training_time) / self.settings.training_strings)
+        else:
+            self.duplicate_print('Training phase started. Please study the following list of strings:')
+            self.duplicate_print('\n'.join(training_set))
+            print()
+            input_thread = threading.Thread(target=input, daemon=True)
+            input_thread.start()
+            remaining_time = self.settings.training_time
+            while input_thread.is_alive() and 0 < remaining_time:
+                print(f"\r{remaining_time} seconds remaining (press return to finish early)...  ", end='')
+                time.sleep(1)
+                remaining_time -= 1
         print('\rTraining phase finished.' + ' ' * 30)
         self.duplicate_print('Training phase finished.', log_only=True)
         clear()
         self.duplicate_print(f"The test phase will now begin. You will be shown {len(test_set)} new strings one at a time and prompted to judge the grammaticality of each.")
         self.duplicate_print("You may type 'y' for yes (i.e. grammatical) and 'n' for no (ungrammatical). Press return when you are ready.")
         # recycle input_thread if it's still running...
-        if input_thread.is_alive():
+        if input_thread and input_thread.is_alive():
             input_thread.join()
         else:
             input()
