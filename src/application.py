@@ -56,7 +56,7 @@ class Application:
 
     def __init__(self):
         self.settings = settings.Settings()
-        self.settings.load_all()
+        self.settings.load_all_from_ini()
 
     def duplicate_print(self, string, log_only=False):
         """Output the string on the screen and log it in a text file at the same time."""
@@ -141,8 +141,9 @@ class Application:
                     go_ahead = True
             if go_ahead:
                 settings_and_gmr = copy.copy(self.settings)
+                settings_and_gmr.autosave = False
                 settings_and_gmr.grammar = gmr.obfuscated_repr()
-                settings_and_gmr.save_all(filename)
+                settings_and_gmr.save_all_to_ini(filename)
                 return
 
     def load_grammar(self):

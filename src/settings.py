@@ -2,10 +2,16 @@
 
 import configparser
 import dataclasses
+try:
+    import tomllib
+    _TOMLLIB_AVAILABLE = True
+except ImportError:
+    _TOMLLIB_AVAILABLE = False
 import typing
 
 
-_DEFAULT_SETTINGS_FILENAME = 'settings.ini'
+_DEFAULT_INI_FILENAME  = 'settings.ini'
+_DEFAULT_TOML_FILENAME = 'settings.toml'
 
 
 @dataclasses.dataclass
@@ -61,33 +67,63 @@ class Settings:
         pretty += f"Run pre and post session questionnaire: {self.run_questionnaire}\n"
         return pretty
 
-    def load_all(self, filename=_DEFAULT_SETTINGS_FILENAME):
-        """Read and set our settings values from a settings file if it exists."""
+    def process_loaded_entry(self, attr_name, value):
+        """Helper method to set a specific member variable based on the value
+        loaded from file."""
+        try:
+            # parse attribute from string
+            parsed_value = type(getattr(self, attr_name))(value)
+            if attr_name in ['training_one_at_a_time', 'run_questionnaire']:
+                parsed_value = str(value).lower() in ['true', 'yes', '1']
+            setattr(self, attr_name, parsed_value)
+        except TypeError:
+            # current grammar is None which you cannot cast to
+            assert getattr(self, attr_name) is None
+            self.grammar = value
+        except AttributeError:
+            pass  # doesn't matter
+
+    def load_all(self, filename):
+        """Read and set our settings values from file according to format based on its extension."""
+        # figure out format from the tail end of the filename
+        if _TOMLLIB_AVAILABLE and 4 < len(filename) and 'toml' == filename[-4:].lower():
+            self.load_all_from_toml(filename)
+        else:
+            # default to old format
+            self.load_all_from_ini(filename)
+
+    def load_all_from_ini(self, filename=_DEFAULT_INI_FILENAME):
+        """Read and set our settings values from an INI settings file if it exists."""
         config = configparser.ConfigParser()
         config.read(filename)
         for section in config:
             for attr_name in config[section]:
-                try:
-                    # parse attribute from string
-                    value = type(getattr(self, attr_name))(config[section][attr_name])
-                    if attr_name in ['training_one_at_a_time', 'run_questionnaire']:
-                        value = config[section][attr_name].lower() in ['true', 'yes', '1']
-                    setattr(self, attr_name, value)
-                except TypeError:
-                    # current grammar is None which you cannot cast to
-                    assert getattr(self, attr_name) is None
-                    self.grammar = config[section][attr_name]
-                except AttributeError:
-                    pass  # doesn't matter
+                self.process_loaded_entry(attr_name, config[section][attr_name])
         self.autosave = True
 
-    def save_all(self, filename=_DEFAULT_SETTINGS_FILENAME):
-        """Write the current values of all our member variables to a config file."""
+    if _TOMLLIB_AVAILABLE:
+        def load_all_from_toml(self, filename=_DEFAULT_TOML_FILENAME):
+            """Read and set our settings values from a TOML settings file if it exists."""
+            try:
+                with open(filename, 'rb') as file:
+                    settings_dict = tomllib.load(file)
+            except FileNotFoundError:
+                return  # alright
+            for key in settings_dict:
+                if type(settings_dict[key]) is dict:
+                    for subkey in settings_dict[key]:
+                        self.process_loaded_entry(subkey, settings_dict[key][subkey])
+                else:
+                    self.process_loaded_entry(key, settings_dict[key])
+            self.autosave = True
+
+    def save_all_to_ini(self, filename=_DEFAULT_INI_FILENAME):
+        """Write the current values of all our member variables to an INI config file."""
         config = configparser.ConfigParser()
         for field in dataclasses.fields(self):
             if 'grammar' == field.name and self.grammar is None:
                 continue
-            # the string_letters variable needs special treatment
+            # the string_letters variable is a list of strings internally
             if 'string_letters' == field.name:
                 config['DEFAULT'][field.name] = ''.join(self.string_letters)
             else:
@@ -98,13 +134,36 @@ class Settings:
         with open(filename, 'w', encoding='UTF-8') as configfile:
             config.write(configfile)
 
+    if _TOMLLIB_AVAILABLE:
+        def save_all_to_toml(self, filename=_DEFAULT_TOML_FILENAME):
+            """Write the current values of all our member variables to a TOML config file."""
+            with open(filename, 'w', encoding='UTF-8') as configfile:
+                for field in dataclasses.fields(self):
+                    if 'grammar' == field.name and self.grammar is None:
+                        continue
+                    value = getattr(self, field.name)
+                    # the string_letters variable is a list of strings internally
+                    if 'string_letters' == field.name:
+                        value = ''.join(self.string_letters)
+                    if type(value) is str:
+                        # N.B.: can't use repr(value) because Python and TOML treat single quotes
+                        # differently: Python interpolates inside single quotes but TOML does not
+                        value = value.replace('\\', r'\\')
+                        value = value.replace('"', r'\"')
+                        value = '"' + value + '"'
+                    # 'true' and 'false' are lowercase in TOML
+                    if type(value) is bool:
+                        value = str(value).lower()
+                    value = str(value)
+                    configfile.write(field.name + ' = ' + value + '\n')
+
     def __setattr__(self, attr, value):
-        """Save any and all settings changes automatically."""
+        """Save any and all settings changes automatically if required."""
         super().__setattr__(attr, value)
         if attr != 'autosave':
             try:
                 if self.autosave:
-                    self.save_all()
+                    self.save_all_to_ini()
             except AttributeError:
                 pass  # that's fine
 
