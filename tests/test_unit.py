@@ -25,6 +25,62 @@ def test_grammar_exit_not_too_close():
         assert grammar.Grammar.MIN_PATH_LENGTH <= g.shortest_path_through()
 
 
+def test_grammar_has_cycle():
+    """See if a cycle is found in a grammar that's not acyclic."""
+    g = grammar.Grammar()
+    g.transitions = [ {'S': 1, 'X': 2},
+                      {'M': 3},
+                      {'V': 4},
+                      {'M': 2},
+                      {'S': 5, 'X': 6},
+                      {'V': 1, 'R': 6},
+                      {None: None}
+                    ]
+    assert g.has_cycle()
+
+
+def test_grammar_has_no_cycle():
+    """See if a grammar is correctly identified as acyclic."""
+    g = grammar.Grammar()
+    g.transitions = [ {'S': 1, 'X': 2},
+                      {'M': 3},
+                      {'V': 4},
+                      {'M': 6},  # <- backward edge eliminated
+                      {'S': 5, 'X': 6},
+                      {'V': 1, 'R': 6},
+                      {None: None}
+                    ]
+    assert not g.has_cycle()
+
+
+def test_grammar_has_dead_cycle():
+    """See if a dead cycle is found in a grammar that has one."""
+    g = grammar.Grammar()
+    g.transitions = [ {'S': 1, 'X': 2},
+                      {'M': 3},
+                      {'V': 4},
+                      {'M': 5},
+                      {'S': 5, 'X': 6},
+                      {'V': 1},  # (1, 3, 5)* is a dead cycle
+                      {None: None}
+                    ]
+    assert g.has_dead_cycle()
+
+
+def test_grammar_has_no_dead_cycle():
+    """See if a grammar is correctly identified as acyclic."""
+    g = grammar.Grammar()
+    g.transitions = [ {'S': 1, 'X': 2},
+                      {'M': 3},
+                      {'V': 4},
+                      {'M': 2},
+                      {'S': 5, 'X': 6},
+                      {'V': 1, 'R': 6},
+                      {None: None}
+                    ]
+    assert not g.has_dead_cycle()
+
+
 def test_automaton_output_long_enough():
     """See if no output strings are below a minimum length."""
     g = grammar.Grammar()

@@ -112,8 +112,22 @@ class Grammar:
             visited = visited_new
         return visited == set(range(len(self.transitions)))
 
+    def has_cycle(self):
+        """Determine if the graph includes a directed cycle."""
+        # make sure we have no trap states (dead ends) left
+        assert all(self.transitions)
+        # depth-first search
+        def dfs(state, path):
+            if state is None:
+                return False
+            if state in path:
+                return True
+            return any(dfs(edge, path.union(set({state}))) for edge in self.transitions[state].values())
+        return dfs(0, set())
+
     def shortest_path_through(self, starting_state=0):
         """Calculate how many steps it takes to speedrun the graph to an accepting state."""
+        # basically a Dijkstra
         def descend(state, visited):
             if None in self.transitions[state]:
                 return 0
