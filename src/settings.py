@@ -25,6 +25,7 @@ class Settings:
     minimum_string_length:      int = 2
     maximum_string_length:      int = 8
     string_letters:             list[str] = dataclasses.field(default_factory = lambda: ['M', 'R', 'S', 'V', 'X'])
+    recursion:                  bool = True
     # idea: test_strings_reuse_from_training?
     logfile_filename:           str = 'agl_sessions.log'
     training_one_at_a_time:     bool = True
@@ -49,6 +50,7 @@ class Settings:
         pretty += f"Minimum string length: {self.minimum_string_length}\n"
         pretty += f"Maximum string length: {self.maximum_string_length}\n"
         pretty += f"Letters to use in strings: {self.string_letters}\n"
+        pretty += f"Recursion allowed in grammar: {self.recursion}\n"
         pretty += f"Logfile to record session in: {self.logfile_filename}\n"
         pretty += f"Show training strings one at a time: {self.training_one_at_a_time}\n"
         pretty += f"Run pre and post session questionnaire: {self.run_questionnaire}\n"
@@ -73,7 +75,7 @@ class Settings:
         try:
             # parse attribute from string
             parsed_value = type(getattr(self, attr_name))(value)
-            if attr_name in ['training_one_at_a_time', 'run_questionnaire']:
+            if attr_name in ['recursion', 'training_one_at_a_time', 'run_questionnaire']:
                 parsed_value = str(value).lower() in ['true', 'yes', '1']
             setattr(self, attr_name, parsed_value)
         except TypeError:

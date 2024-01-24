@@ -71,7 +71,7 @@ class Application:
     def main_menu(self):
         """Show the starting menu screen."""
         my_version = version.get_version()
-        print('agl-solitaire ' + my_version + '\n-------------------\n\n(a terminal-based tool for Artificial Grammar Learning experiments)')
+        print('agl-solitaire ' + my_version + '\n-------------------\n\n(a terminal-based tool for double-blind Artificial Grammar Learning experiments)')
         while True:
             print('\n--------  MAIN MENU  --------')
             print('1: [s]tart new experiment session')
@@ -112,6 +112,8 @@ class Application:
                 grammar_attempts += 1
                 gmr.randomize(min_states=gmr.MIN_STATES + oversize_grammar,
                               max_states=gmr.MAX_STATES + oversize_grammar)
+                if not self.settings.recursion and gmr.has_cycle():
+                    continue
                 grammatical_strings = list(aut.produce_grammatical(num_strings=num_required_strings,
                                                                    min_length=self.settings.minimum_string_length,
                                                                    max_length=self.settings.maximum_string_length))
@@ -197,9 +199,10 @@ class Application:
             print(f" 6: mi[n]imum string length:\t\t\t{self.settings.minimum_string_length}")
             print(f" 7: ma[x]imum string length:\t\t\t{self.settings.maximum_string_length}")
             print(f" 8: [l]etters to use in strings:\t\t{self.settings.string_letters}")
-            print(f" 9: log[f]ile to record sessions in:\t\t{self.settings.logfile_filename}")
-            print(f"10: show training strings [o]ne at a time:\t{self.settings.training_one_at_a_time}")
-            print(f"11: run pre and post session [q]uestionnaire:\t{self.settings.run_questionnaire}")
+            print(f" 9: allow [r]ecursion in the grammar:\t\t{self.settings.recursion}")
+            print(f"10: log[f]ile to record sessions in:\t\t{self.settings.logfile_filename}")
+            print(f"11: show training strings [o]ne at a time:\t{self.settings.training_one_at_a_time}")
+            print(f"12: run pre and post session [q]uestionnaire:\t{self.settings.run_questionnaire}")
             print(' 0: [b]ack to main menu')
             while not choice:
                 choice = input('what to change> ')
@@ -243,7 +246,9 @@ class Application:
                     if re.search(r"[A-Z]", new_letters) and re.search(r"[a-z]", new_letters):
                         print('warning: mixing uppercase and lowercase letters is not recommended')
                     self.settings.string_letters = sorted(list(set([*new_letters])))
-            elif choice in ['9', 'f']:
+            elif choice in ['9', 'r']:
+                self.settings.recursion = not self.settings.recursion
+            elif choice in ['10', 'f']:
                 new_filename = input('logfile name: ')
                 if os.path.exists(new_filename):
                     if not os.path.isfile(new_filename):
@@ -261,11 +266,11 @@ class Application:
                         choice = input('file does not exist, create it? (y/n)> ')
                         if choice:
                             choice = choice[0].lower()
-                if choice in ['9', 'f', 'y']:
+                if choice in ['10', 'f', 'y']:
                     self.settings.logfile_filename = new_filename
-            elif choice in ['10', 'o']:
+            elif choice in ['11', 'o']:
                 self.settings.training_one_at_a_time = not self.settings.training_one_at_a_time
-            elif choice in ['11', 'q']:
+            elif choice in ['12', 'q']:
                 self.settings.run_questionnaire = not self.settings.run_questionnaire
             elif choice in ['0', 'b']:
                 break
