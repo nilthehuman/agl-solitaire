@@ -53,6 +53,38 @@ def test_grammar_has_no_cycle():
     assert not g.has_cycle()
 
 
+def test_grammar_has_loop():
+    """See if a loop (a cycle of length one) is identified as a cycle as well."""
+    g = grammar.Grammar()
+    # for all states K, all edges from K point to a state K' > K,
+    # (except for the loop) so the grammar has no larger cycle
+    g.transitions = [ {'S': 1, 'X': 2},
+                      {'M': 3},
+                      {'V': 4},
+                      {'R': 5, 'M': 3},  # <- the loop
+                      {'S': 5, 'X': 6},
+                      {'R': 6},
+                      {None: None}
+                    ]
+    assert g.has_cycle()
+
+
+def test_grammar_has_no_loop():
+    """See if this grammar is correctly identified as "aloopic"."""
+    g = grammar.Grammar()
+    # for all states K, all edges from K point to a state K' > K,
+    # so the grammar has no cycles
+    g.transitions = [ {'S': 1, 'X': 2},
+                      {'M': 3},
+                      {'V': 4},
+                      {'R': 5},  # loop removed
+                      {'S': 5, 'X': 6},
+                      {'R': 6},
+                      {None: None}
+                    ]
+    assert not g.has_cycle()
+
+
 def test_grammar_has_dead_cycle():
     """See if a dead cycle is found in a grammar that has one."""
     g = grammar.Grammar()
@@ -76,6 +108,38 @@ def test_grammar_has_no_dead_cycle():
                       {'M': 2},
                       {'S': 5, 'X': 6},
                       {'V': 1, 'R': 6},
+                      {None: None}
+                    ]
+    assert not g.has_dead_cycle()
+
+
+def test_grammar_has_dead_loop():
+    """See if a dead loop (a dead cycle of length one) is found as well."""
+    g = grammar.Grammar()
+    # for all states K, all edges from K point to a state K' > K,
+    # (except for the loop) so the grammar has no larger cycle
+    g.transitions = [ {'S': 1, 'X': 2},
+                      {'M': 3},
+                      {'V': 4},
+                      {'M': 3},  # <- the dead loop
+                      {'S': 5, 'X': 6},
+                      {'R': 6},
+                      {None: None}
+                    ]
+    assert g.has_dead_cycle()
+
+
+def test_grammar_has_no_dead_loop():
+    """See if removing the loop helps (even if it creates a trap state)."""
+    g = grammar.Grammar()
+    # for all states K, all edges from K point to a state K' > K,
+    # so the grammar has no cycles
+    g.transitions = [ {'S': 1, 'X': 2},
+                      {'M': 3},
+                      {'V': 4},
+                      {'R': 5},  # loop removed
+                      {'S': 5, 'X': 6},
+                      {'R': 6},
                       {None: None}
                     ]
     assert not g.has_dead_cycle()
