@@ -310,7 +310,9 @@ class Application:
             self.duplicate_print('agl-solitaire session started with a pregenerated grammar:')
             self.duplicate_print(self.settings.pretty_short())
             self.duplicate_print('Generating training strings and test strings based on the grammar...')
-            grammatical_strings = list(gmr.produce_grammatical(num_required_grammatical))
+            grammatical_strings = list(gmr.produce_grammatical(num_strings=num_required_grammatical,
+                                                               min_length=self.settings.minimum_string_length,
+                                                               max_length=self.settings.maximum_string_length))
         else:
             self.duplicate_print('agl-solitaire session started with the following settings:')
             self.duplicate_print(self.settings.pretty_print())
