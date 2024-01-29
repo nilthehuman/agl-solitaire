@@ -10,7 +10,6 @@ import threading
 import time
 
 from src import grammar
-from src import automaton
 from src import settings
 from src import version
 
@@ -97,9 +96,8 @@ class Application:
                 print('no such option')
 
     def generate_grammar(self):
-        """Find a regular grammar that satisfies the protocol's requirements as defined by the user."""
-        gmr = grammar.Grammar(self.settings.string_letters)
-        aut = automaton.Automaton(gmr)
+        """Find a grammar that satisfies the protocol's requirements as defined by the user."""
+        gmr = grammar.RegularGrammar(self.settings.string_letters)
         num_required_strings = self.settings.training_strings + self.settings.test_strings_grammatical
         grammatical_strings = []
         max_grammar_attempts = 64
@@ -114,7 +112,7 @@ class Application:
                               max_states=gmr.MAX_STATES + oversize_grammar)
                 if not self.settings.recursion and gmr.has_cycle():
                     continue
-                grammatical_strings = list(aut.produce_grammatical(num_strings=num_required_strings,
+                grammatical_strings = list(gmr.produce_grammatical(num_strings=num_required_strings,
                                                                    min_length=self.settings.minimum_string_length,
                                                                    max_length=self.settings.maximum_string_length))
             oversize_grammar += 1
@@ -127,7 +125,7 @@ class Application:
         return gmr, grammatical_strings
 
     def save_grammar(self):
-        """Generate and serialize a suitable regular grammar to file for later use."""
+        """Generate and serialize a suitable grammar to file for later use."""
         gmr, _ = self.generate_grammar()
         if not gmr:
             return
@@ -167,7 +165,7 @@ class Application:
             print('error: file does not include a grammar')
             return
         try:
-            gmr = grammar.Grammar.from_obfuscated_repr(settings_and_gmr.grammar)
+            gmr = grammar.RegularGrammar.from_obfuscated_repr(settings_and_gmr.grammar)
         except (IndexError, SyntaxError):
             print('error: loading grammar from file failed')
             return
@@ -299,7 +297,7 @@ class Application:
                         print('error: invalid number')
 
     def run_experiment(self, filename=None, gmr=None):
-        """Run one session of training and testing with a random regular grammar and record everything in the log file."""
+        """Run one session of training and testing with a random grammar and record everything in the log file."""
         def clear():
             if os.system('cls'):
                 # non-zero exit code, try the other command
@@ -312,21 +310,19 @@ class Application:
             self.duplicate_print('agl-solitaire session started with a pregenerated grammar:')
             self.duplicate_print(self.settings.pretty_short())
             self.duplicate_print('Generating training strings and test strings based on the grammar...')
-            aut = automaton.Automaton(gmr)
-            grammatical_strings = list(aut.produce_grammatical(num_required_grammatical))
+            grammatical_strings = list(gmr.produce_grammatical(num_required_grammatical))
         else:
             self.duplicate_print('agl-solitaire session started with the following settings:')
             self.duplicate_print(self.settings.pretty_print())
             gmr, grammatical_strings = self.generate_grammar()
             if gmr is None:
                 return
-            aut = automaton.Automaton(gmr)
             self.duplicate_print('Generating training strings and test strings based on the grammar...')
         # partition grammatical_strings into two subsets
         picked_for_training = random.sample(range(0,num_required_grammatical), k=self.settings.training_strings)
         training_set = [grammatical_strings[i] for i in picked_for_training]
         test_set = [(grammatical_strings[i], 'y') for i in set(range(0,num_required_grammatical)) - set(picked_for_training)]
-        test_set += [(string, 'n') for string in aut.produce_ungrammatical(num_strings=self.settings.test_strings_ungrammatical,
+        test_set += [(string, 'n') for string in gmr.produce_ungrammatical(num_strings=self.settings.test_strings_ungrammatical,
                                                                            min_length=self.settings.minimum_string_length,
                                                                            max_length=self.settings.maximum_string_length)]
         assert len(test_set) == self.settings.test_strings_grammatical + self.settings.test_strings_ungrammatical

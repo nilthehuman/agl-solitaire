@@ -2,7 +2,7 @@
 
 import math
 
-from src import automaton, grammar
+from src import grammar
 
 
 def test_always_pass():
@@ -11,7 +11,7 @@ def test_always_pass():
 
 def test_grammar_exit_reachable():
     """See if at least one accepting state is always reachable."""
-    g = grammar.Grammar()
+    g = grammar.RegularGrammar()
     for _ in range(100):
         g.randomize()
         assert g.shortest_path_through() < math.inf
@@ -19,15 +19,15 @@ def test_grammar_exit_reachable():
 
 def test_grammar_exit_not_too_close():
     """See if getting to an accepting state takes enough steps."""
-    g = grammar.Grammar()
+    g = grammar.RegularGrammar()
     for _ in range(100):
         g.randomize()
-        assert grammar.Grammar.MIN_PATH_LENGTH <= g.shortest_path_through()
+        assert grammar.RegularGrammar.MIN_PATH_LENGTH <= g.shortest_path_through()
 
 
 def test_grammar_has_cycle():
     """See if a cycle is found in a grammar that's not acyclic."""
-    g = grammar.Grammar()
+    g = grammar.RegularGrammar()
     g.transitions = [ {'S': 1, 'X': 2},
                       {'M': 3},
                       {'V': 4},
@@ -41,7 +41,7 @@ def test_grammar_has_cycle():
 
 def test_grammar_has_no_cycle():
     """See if a grammar is correctly identified as acyclic."""
-    g = grammar.Grammar()
+    g = grammar.RegularGrammar()
     g.transitions = [ {'S': 1, 'X': 2},
                       {'M': 3},
                       {'V': 4},
@@ -55,7 +55,7 @@ def test_grammar_has_no_cycle():
 
 def test_grammar_has_loop():
     """See if a loop (a cycle of length one) is identified as a cycle as well."""
-    g = grammar.Grammar()
+    g = grammar.RegularGrammar()
     # for all states K, all edges from K point to a state K' > K,
     # (except for the loop) so the grammar has no larger cycle
     g.transitions = [ {'S': 1, 'X': 2},
@@ -71,7 +71,7 @@ def test_grammar_has_loop():
 
 def test_grammar_has_no_loop():
     """See if this grammar is correctly identified as "aloopic"."""
-    g = grammar.Grammar()
+    g = grammar.RegularGrammar()
     # for all states K, all edges from K point to a state K' > K,
     # so the grammar has no cycles
     g.transitions = [ {'S': 1, 'X': 2},
@@ -87,7 +87,7 @@ def test_grammar_has_no_loop():
 
 def test_grammar_has_dead_cycle():
     """See if a dead cycle is found in a grammar that has one."""
-    g = grammar.Grammar()
+    g = grammar.RegularGrammar()
     g.transitions = [ {'S': 1, 'X': 2},
                       {'M': 3},
                       {'V': 4},
@@ -101,7 +101,7 @@ def test_grammar_has_dead_cycle():
 
 def test_grammar_has_no_dead_cycle():
     """See if a grammar is correctly identified as acyclic."""
-    g = grammar.Grammar()
+    g = grammar.RegularGrammar()
     g.transitions = [ {'S': 1, 'X': 2},
                       {'M': 3},
                       {'V': 4},
@@ -115,7 +115,7 @@ def test_grammar_has_no_dead_cycle():
 
 def test_grammar_has_dead_loop():
     """See if a dead loop (a dead cycle of length one) is found as well."""
-    g = grammar.Grammar()
+    g = grammar.RegularGrammar()
     # for all states K, all edges from K point to a state K' > K,
     # (except for the loop) so the grammar has no larger cycle
     g.transitions = [ {'S': 1, 'X': 2},
@@ -131,7 +131,7 @@ def test_grammar_has_dead_loop():
 
 def test_grammar_has_no_dead_loop():
     """See if removing the loop helps (even if it creates a trap state)."""
-    g = grammar.Grammar()
+    g = grammar.RegularGrammar()
     # for all states K, all edges from K point to a state K' > K,
     # so the grammar has no cycles
     g.transitions = [ {'S': 1, 'X': 2},
@@ -145,146 +145,138 @@ def test_grammar_has_no_dead_loop():
     assert not g.has_dead_cycle()
 
 
-def test_automaton_output_long_enough():
+def test_grammar_output_long_enough():
     """See if no output strings are below a minimum length."""
-    g = grammar.Grammar()
-    a = automaton.Automaton(g)
+    g = grammar.RegularGrammar()
     for _ in range(100):
         g.randomize()
-        output_strings = a.produce_grammatical(5)
-        assert not any(len(s) < automaton.Automaton.MIN_STRING_LENGTH for s in output_strings)
+        output_strings = g.produce_grammatical(5)
+        assert not any(len(s) < grammar._MIN_STRING_LENGTH for s in output_strings)
 
 
-def test_automaton_output_short_enough():
+def test_grammar_output_short_enough():
     """See if no output strings are above a maximum length."""
-    g = grammar.Grammar()
-    a = automaton.Automaton(g)
+    g = grammar.RegularGrammar()
     for _ in range(100):
         g.randomize()
-        output_strings = a.produce_grammatical(5)
-        assert not any(len(s) > automaton.Automaton.MAX_STRING_LENGTH for s in output_strings)
+        output_strings = g.produce_grammatical(5)
+        assert not any(len(s) > grammar._MAX_STRING_LENGTH for s in output_strings)
 
 
-def test_automaton_accepts_grammatical():
-    """See if the automaton recognizes the same output strings that it generated."""
-    g = grammar.Grammar()
-    a = automaton.Automaton(g)
+def test_grammar_accepts_grammatical():
+    """See if the finite state automaton recognizes the same output strings that it generated."""
+    g = grammar.RegularGrammar()
     for _ in range(100):
         g.randomize()
-        output_strings = a.produce_grammatical(5)
-        assert all(a.recognize(s) for s in output_strings)
+        output_strings = g.produce_grammatical(5)
+        assert all(g.recognize(s) for s in output_strings)
 
 
-def test_automaton_rejects_ungrammatical():
-    """See if the automaton rejects the output strings that it generated as ungrammatical."""
-    g = grammar.Grammar()
-    a = automaton.Automaton(g)
+def test_grammar_rejects_ungrammatical():
+    """See if the finite state automaton rejects the output strings that it generated as ungrammatical."""
+    g = grammar.RegularGrammar()
     for _ in range(100):
         g.randomize()
-        output_strings = a.produce_ungrammatical(5)
-        assert all(not a.recognize(s) for s in output_strings)
+        output_strings = g.produce_ungrammatical(5)
+        assert all(not g.recognize(s) for s in output_strings)
 
 
-def test_automaton_predefined_reber_1967():
+def test_grammar_predefined_reber_1967():
     """See if the example grammar in Reber 1967 is recognized as expected."""
-    reber = automaton.Automaton(grammar.REBER_1967)
-    assert reber.recognize("TTS")
-    assert reber.recognize("TPTS")
-    assert reber.recognize("TPPTS")
-    assert reber.recognize("TPPPPPTS")
-    assert reber.recognize("TTXVS")
-    assert reber.recognize("TPTXXVS")
-    assert reber.recognize("TPTXXXVPXVS")
-    assert reber.recognize("TPTXVPXXXVS")
-    assert reber.recognize("TTXVPS")
-    assert reber.recognize("TPTXVPXVPS")
-    assert reber.recognize("TPTXVPXXVPS")
-    assert reber.recognize("TPTXXXXVPXXVPS")
-    assert reber.recognize("VVS")
-    assert reber.recognize("VXXVS")
-    assert reber.recognize("VXXXXVS")
-    assert reber.recognize("VVPXVS")
-    assert reber.recognize("VVPXXVS")
-    assert reber.recognize("VVPS")
-    assert reber.recognize("VVPXVPS")
-    assert reber.recognize("VVPXXVPS")
-    assert reber.recognize("VXXVPXVPS")
-    assert not reber.recognize("V")
-    assert not reber.recognize("TPS")
-    assert not reber.recognize("VVPSV")
+    assert grammar.REBER_1967.recognize("TTS")
+    assert grammar.REBER_1967.recognize("TPTS")
+    assert grammar.REBER_1967.recognize("TPPTS")
+    assert grammar.REBER_1967.recognize("TPPPPPTS")
+    assert grammar.REBER_1967.recognize("TTXVS")
+    assert grammar.REBER_1967.recognize("TPTXXVS")
+    assert grammar.REBER_1967.recognize("TPTXXXVPXVS")
+    assert grammar.REBER_1967.recognize("TPTXVPXXXVS")
+    assert grammar.REBER_1967.recognize("TTXVPS")
+    assert grammar.REBER_1967.recognize("TPTXVPXVPS")
+    assert grammar.REBER_1967.recognize("TPTXVPXXVPS")
+    assert grammar.REBER_1967.recognize("TPTXXXXVPXXVPS")
+    assert grammar.REBER_1967.recognize("VVS")
+    assert grammar.REBER_1967.recognize("VXXVS")
+    assert grammar.REBER_1967.recognize("VXXXXVS")
+    assert grammar.REBER_1967.recognize("VVPXVS")
+    assert grammar.REBER_1967.recognize("VVPXXVS")
+    assert grammar.REBER_1967.recognize("VVPS")
+    assert grammar.REBER_1967.recognize("VVPXVPS")
+    assert grammar.REBER_1967.recognize("VVPXXVPS")
+    assert grammar.REBER_1967.recognize("VXXVPXVPS")
+    assert not grammar.REBER_1967.recognize("V")
+    assert not grammar.REBER_1967.recognize("TPS")
+    assert not grammar.REBER_1967.recognize("VVPSV")
 
 
-# def test_automaton_predefined_reber_allen_1978_I():
+# def test_grammar_predefined_reber_allen_1978_I():
 #     """See if the first example grammar in Reber & Allen 1978 is recognized as expected."""
-#     reber_allen = automaton.Automaton(grammar.REBER_ALLEN_1978)
-#     assert reber_allen.recognize("MSSSSV")
-#     assert reber_allen.recognize("MSSVS")
-#     assert reber_allen.recognize("MSV")
-#     assert reber_allen.recognize("MSVRX")
-#     assert reber_allen.recognize("MSVRXM")
-#     assert reber_allen.recognize("MVRX")
-#     assert reber_allen.recognize("MVRXRR")
-#     assert reber_allen.recognize("MVRXSV")
-#     assert reber_allen.recognize("MVRXV")
-#     assert reber_allen.recognize("MVRXVS")
-#     assert reber_allen.recognize("VXM")
-#     assert reber_allen.recognize("VXRR")
-#     assert reber_allen.recognize("VXRRM")
-#     assert reber_allen.recognize("VXRRRR")
-#     assert reber_allen.recognize("VXSSVS")
-#     assert reber_allen.recognize("VXSVRX")
-#     assert reber_allen.recognize("VXSVS")
-#     assert reber_allen.recognize("VXVRX")
-#     assert reber_allen.recognize("VXVRXV")
-#     assert reber_allen.recognize("VXVS")
-#     assert not reber_allen.recognize("VXRRS")
-#     assert not reber_allen.recognize("VXX")
-#     assert not reber_allen.recognize("VXRVM")
-#     assert not reber_allen.recognize("XVRXRR")
-#     assert not reber_allen.recognize("XSSSSV")
-#     assert not reber_allen.recognize("MSVV")
-#     assert not reber_allen.recognize("MMVRX")
-#     assert not reber_allen.recognize("MVRSR")
-#     assert not reber_allen.recognize("MSRVRX")
-#     assert not reber_allen.recognize("SSVS")
-#     assert not reber_allen.recognize("MSSVSR")
-#     assert not reber_allen.recognize("RVS")
-#     assert not reber_allen.recognize("MXVS")
-#     assert not reber_allen.recognize("VRRRM")
-#     assert not reber_allen.recognize("VVXRM")
-#     assert not reber_allen.recognize("VXRS")
-#     assert not reber_allen.recognize("MSRV")
-#     assert not reber_allen.recognize("VXMRXV")
-#     assert not reber_allen.recognize("MSM")
-#     assert not reber_allen.recognize("SXRRM")
-#     assert not reber_allen.recognize("MXVRXM")
-#     assert not reber_allen.recognize("MSVRSR")
-#     assert not reber_allen.recognize("SVSSXV")
-#     assert not reber_allen.recognize("XRVXV")
-#     assert not reber_allen.recognize("RRRXV")
+#     assert grammar.REBER_ALLEN_1978.recognize("MSSSSV")
+#     assert grammar.REBER_ALLEN_1978.recognize("MSSVS")
+#     assert grammar.REBER_ALLEN_1978.recognize("MSV")
+#     assert grammar.REBER_ALLEN_1978.recognize("MSVRX")
+#     assert grammar.REBER_ALLEN_1978.recognize("MSVRXM")
+#     assert grammar.REBER_ALLEN_1978.recognize("MVRX")
+#     assert grammar.REBER_ALLEN_1978.recognize("MVRXRR")
+#     assert grammar.REBER_ALLEN_1978.recognize("MVRXSV")
+#     assert grammar.REBER_ALLEN_1978.recognize("MVRXV")
+#     assert grammar.REBER_ALLEN_1978.recognize("MVRXVS")
+#     assert grammar.REBER_ALLEN_1978.recognize("VXM")
+#     assert grammar.REBER_ALLEN_1978.recognize("VXRR")
+#     assert grammar.REBER_ALLEN_1978.recognize("VXRRM")
+#     assert grammar.REBER_ALLEN_1978.recognize("VXRRRR")
+#     assert grammar.REBER_ALLEN_1978.recognize("VXSSVS")
+#     assert grammar.REBER_ALLEN_1978.recognize("VXSVRX")
+#     assert grammar.REBER_ALLEN_1978.recognize("VXSVS")
+#     assert grammar.REBER_ALLEN_1978.recognize("VXVRX")
+#     assert grammar.REBER_ALLEN_1978.recognize("VXVRXV")
+#     assert grammar.REBER_ALLEN_1978.recognize("VXVS")
+#     assert not grammar.REBER_ALLEN_1978.recognize("VXRRS")
+#     assert not grammar.REBER_ALLEN_1978.recognize("VXX")
+#     assert not grammar.REBER_ALLEN_1978.recognize("VXRVM")
+#     assert not grammar.REBER_ALLEN_1978.recognize("XVRXRR")
+#     assert not grammar.REBER_ALLEN_1978.recognize("XSSSSV")
+#     assert not grammar.REBER_ALLEN_1978.recognize("MSVV")
+#     assert not grammar.REBER_ALLEN_1978.recognize("MMVRX")
+#     assert not grammar.REBER_ALLEN_1978.recognize("MVRSR")
+#     assert not grammar.REBER_ALLEN_1978.recognize("MSRVRX")
+#     assert not grammar.REBER_ALLEN_1978.recognize("SSVS")
+#     assert not grammar.REBER_ALLEN_1978.recognize("MSSVSR")
+#     assert not grammar.REBER_ALLEN_1978.recognize("RVS")
+#     assert not grammar.REBER_ALLEN_1978.recognize("MXVS")
+#     assert not grammar.REBER_ALLEN_1978.recognize("VRRRM")
+#     assert not grammar.REBER_ALLEN_1978.recognize("VVXRM")
+#     assert not grammar.REBER_ALLEN_1978.recognize("VXRS")
+#     assert not grammar.REBER_ALLEN_1978.recognize("MSRV")
+#     assert not grammar.REBER_ALLEN_1978.recognize("VXMRXV")
+#     assert not grammar.REBER_ALLEN_1978.recognize("MSM")
+#     assert not grammar.REBER_ALLEN_1978.recognize("SXRRM")
+#     assert not grammar.REBER_ALLEN_1978.recognize("MXVRXM")
+#     assert not grammar.REBER_ALLEN_1978.recognize("MSVRSR")
+#     assert not grammar.REBER_ALLEN_1978.recognize("SVSSXV")
+#     assert not grammar.REBER_ALLEN_1978.recognize("XRVXV")
+#     assert not grammar.REBER_ALLEN_1978.recognize("RRRXV")
 
 
-def test_automaton_predefined_knowlton_squire_1994_I():
+def test_grammar_predefined_knowlton_squire_1994_I():
     """See if the first example grammar in Knowlton & Squire 1994 is recognized as expected."""
-    knowlton_squire = automaton.Automaton(grammar.KNOWLTON_SQUIRE_1994_I)
-    assert knowlton_squire.recognize("MXV")
-    assert knowlton_squire.recognize("VMRV")
-    assert knowlton_squire.recognize("MVXVV")
-    assert knowlton_squire.recognize("VRRRM")
-    assert not knowlton_squire.recognize("VV")
-    assert not knowlton_squire.recognize("MMX")
-    assert not knowlton_squire.recognize("MXR")
-    assert not knowlton_squire.recognize("XXXV")
+    assert grammar.KNOWLTON_SQUIRE_1994_I.recognize("MXV")
+    assert grammar.KNOWLTON_SQUIRE_1994_I.recognize("VMRV")
+    assert grammar.KNOWLTON_SQUIRE_1994_I.recognize("MVXVV")
+    assert grammar.KNOWLTON_SQUIRE_1994_I.recognize("VRRRM")
+    assert not grammar.KNOWLTON_SQUIRE_1994_I.recognize("VV")
+    assert not grammar.KNOWLTON_SQUIRE_1994_I.recognize("MMX")
+    assert not grammar.KNOWLTON_SQUIRE_1994_I.recognize("MXR")
+    assert not grammar.KNOWLTON_SQUIRE_1994_I.recognize("XXXV")
 
 
-def test_automaton_predefined_knowlton_squire_1994_II():
+def test_grammar_predefined_knowlton_squire_1994_II():
     """See if the second example grammar in Knowlton & Squire 1994 is recognized as expected."""
-    knowlton_squire = automaton.Automaton(grammar.KNOWLTON_SQUIRE_1994_II)
-    assert knowlton_squire.recognize("TPT")
-    assert knowlton_squire.recognize("FFPS")
-    assert knowlton_squire.recognize("FS")
-    assert knowlton_squire.recognize("TTSSSF")
-    assert not knowlton_squire.recognize("FFPSSP")
-    assert not knowlton_squire.recognize("PTSF")
-    assert not knowlton_squire.recognize("TFT")
-    assert not knowlton_squire.recognize("TPTPPT")
+    assert grammar.KNOWLTON_SQUIRE_1994_II.recognize("TPT")
+    assert grammar.KNOWLTON_SQUIRE_1994_II.recognize("FFPS")
+    assert grammar.KNOWLTON_SQUIRE_1994_II.recognize("FS")
+    assert grammar.KNOWLTON_SQUIRE_1994_II.recognize("TTSSSF")
+    assert not grammar.KNOWLTON_SQUIRE_1994_II.recognize("FFPSSP")
+    assert not grammar.KNOWLTON_SQUIRE_1994_II.recognize("PTSF")
+    assert not grammar.KNOWLTON_SQUIRE_1994_II.recognize("TFT")
+    assert not grammar.KNOWLTON_SQUIRE_1994_II.recognize("TPTPPT")

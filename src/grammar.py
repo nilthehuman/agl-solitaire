@@ -1,5 +1,7 @@
-"""An implementation of basic regular grammars (equivalent to finite-state automata)."""
+"""An implementation of basic regular grammars by way of finite-state automata."""
 
+import abc
+import enum
 import itertools
 import math
 import random
@@ -8,7 +10,41 @@ import time
 random.seed(time.time())
 
 
-class Grammar:
+_MIN_STRING_LENGTH = 2
+_MAX_STRING_LENGTH = 8
+
+
+class Grammar(abc.ABC):
+    """The common interface to both kinds of concrete grammar."""
+
+    @abc.abstractmethod
+    def obfuscated_repr(self):
+        """A marshalled representation of the grammar made unreadable for repeat experiments."""
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def randomize(self, min_states, max_states):
+        """Construct an arbitrary grammar."""
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def has_cycle(self):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def has_dead_cycle(self):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def produce_grammatical(self):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def produce_ungrammatical(self):
+        raise NotImplementedError
+
+
+class RegularGrammar(Grammar):
     """A regular grammar: a directed graph with an input symbol associated with each edge.
     The whole grammar is represented in a single list of dicts, e.g. the following data
     structure represents the language that starts with one or two A's and then an arbitrary
@@ -29,7 +65,7 @@ class Grammar:
         return str(self.transitions)
 
     def obfuscated_repr(self):
-        """A marshalled representation of the Grammar made unreadable for repeat experiments."""
+        """A marshalled representation of the grammar made unreadable for repeat experiments."""
         repr_string = self.__repr__()
         coprimes = (2, 2)
         while 1 != math.gcd(*coprimes):
@@ -98,7 +134,7 @@ class Grammar:
             # 4. there is no dead cycle in the graph
             acceptable = (self.is_connected() and
                           any(None in s for s in self.transitions) and
-                          Grammar.MIN_PATH_LENGTH <= self.shortest_path_through() < math.inf and
+                          RegularGrammar.MIN_PATH_LENGTH <= self.shortest_path_through() < math.inf and
                           not self.has_dead_cycle())
 
     def is_connected(self):
@@ -142,10 +178,113 @@ class Grammar:
         """Determine if the graph contains a cycle that cannot be escaped."""
         return any(self.shortest_path_through(s) == math.inf for s in range(len(self.transitions)))
 
+    def produce_grammatical(self, num_strings=1, min_length=_MIN_STRING_LENGTH, max_length=_MAX_STRING_LENGTH, max_attempts=10**4):
+        """Follow the given grammar to output grammatical strings."""
+        assert 0 < len(self.transitions)
+        grammatical_strings = set()
+        # there might not exist num_strings different output strings in the length range
+        attempts = 0
+        while len(grammatical_strings) < num_strings and attempts < max_attempts:
+            string = ''
+            # keep trying until we get the string length right
+            while not min_length <= len(string) <= max_length and attempts < max_attempts:
+                string = ''
+                current_state = 0
+                while len(string) < max_length and current_state is not None:
+                    # pick a random edge
+                    available_symbols = list(self.transitions[current_state])
+                    next_symbol = random.choice(available_symbols)
+                    if next_symbol is not None:
+                        string += next_symbol
+                    # follow the edge to the next state
+                    current_state = self.transitions[current_state][next_symbol]
+                attempts += 1
+            # did we end up in a halting state?
+            if current_state is None:
+                grammatical_strings.add(string)
+        return grammatical_strings
+
+    def produce_ungrammatical(self, num_strings=1, min_length=_MIN_STRING_LENGTH, max_length=_MAX_STRING_LENGTH):
+        """Generate unacceptable strings loosely following Reber & Allen 1978's procedure."""
+        class ErrorType(enum.Enum):
+            """List of the different kinds of anomalies we can introduce to make a string ungrammatical."""
+            WRONG_FIRST = 1
+            WRONG_SECOND = 2
+            WRONG_PENULTIMATE = 3
+            WRONG_TERMINATION = 4
+            WRONG_INTERNAL = 5
+            BACKWARDS = 6
+            RANDOM = 7  # arbitrary UG string made up of the given symbols; not in the original paper
+        error_proportions = {
+            ErrorType.WRONG_FIRST : 5,
+            ErrorType.WRONG_SECOND : 5,
+            ErrorType.WRONG_PENULTIMATE : 5,
+            ErrorType.WRONG_TERMINATION : 5,
+            ErrorType.WRONG_INTERNAL : 2,
+            ErrorType.BACKWARDS : 3,
+            ErrorType.RANDOM : 5
+        }
+        ungrammatical_strings = set()
+        while len(ungrammatical_strings) < num_strings:
+            string = ''
+            # pick a random way to create an ungrammatical string
+            error_type = random.choices(list(ErrorType), weights=error_proportions.values())[0]
+            grammatical_string = self.produce_grammatical(1, min_length=min_length, max_length=max_length).pop()
+            if error_type == ErrorType.RANDOM:
+                # arbitrary mangled string
+                string_length = random.randint(min_length, max_length)
+                string = ''.join(random.choice(self.symbols) for _ in range(string_length))
+            elif error_type == ErrorType.BACKWARDS:
+                # a grammatical string mirrored i.e. spelled backwards
+                string = ''.join(reversed(grammatical_string))
+            elif error_type == ErrorType.WRONG_TERMINATION:
+                # chop the final symbol off a correct string
+                if len(grammatical_string) < min_length + 1:
+                    continue  # string not long enough, nevermind
+                string = grammatical_string[:-1]
+            else:
+                # change one letter to break a grammatical string
+                wrong_index = None
+                if error_type == ErrorType.WRONG_FIRST:
+                    wrong_index = 0
+                elif error_type == ErrorType.WRONG_SECOND:
+                    wrong_index = 1
+                elif error_type == ErrorType.WRONG_PENULTIMATE:
+                    wrong_index = len(string) - 2
+                elif error_type == ErrorType.WRONG_INTERNAL:
+                    try:
+                        wrong_index = random.randint(2, len(grammatical_string) - 3)
+                    except ValueError:
+                        continue  # string not long enough, nevermind
+                else:
+                    assert False
+                wrong_symbol = random.choice(self.symbols)
+                while wrong_symbol == grammatical_string[wrong_index]:
+                    wrong_symbol = random.choice(self.symbols)
+                string = grammatical_string[:wrong_index] + wrong_symbol + grammatical_string[wrong_index+1:]
+            # make sure we didn't get another grammatical string by accident
+            if not self.recognize(string) and min_length <= len(string) <= max_length:
+                ungrammatical_strings.add(string)
+        return ungrammatical_strings
+
+    def recognize(self, string):
+        """Decide whether the input string conforms to the given grammar."""
+        assert 0 < len(self.transitions)
+        state = 0
+        while string:
+            head = string[0]
+            string = string[1:]
+            try:
+                state = self.transitions[state][head]
+            except KeyError:
+                return False
+        # can we legally exit from the final state?
+        return None in self.transitions[state]
+
 
 # a few example finite state grammars from classic AGL papers
 
-REBER_1967 = Grammar()
+REBER_1967 = RegularGrammar()
 REBER_1967.transitions = [ {'T': 1, 'V': 3},
                            {'P': 1, 'T': 2},
                            {'X': 3, 'S': 5},
@@ -155,7 +294,7 @@ REBER_1967.transitions = [ {'T': 1, 'V': 3},
                          ]
 
 # N.B. this is grammar no. 2 from the paper; grammar 1 is nondeterministic
-REBER_ALLEN_1978 = Grammar()
+REBER_ALLEN_1978 = RegularGrammar()
 REBER_ALLEN_1978.transitions = [ {'X': 1, 'V': 2},
                                  {'M': 2, 'X': 4},
                                  {'V': 3, 'T': 4},
@@ -164,7 +303,7 @@ REBER_ALLEN_1978.transitions = [ {'X': 1, 'V': 2},
                                  {None: None}
                                ]
 
-ABRAMS_REBER_1989 = Grammar()
+ABRAMS_REBER_1989 = RegularGrammar()
 ABRAMS_REBER_1989 = [ {'X': 0, 'V': 1},
                       {'J': 2, 'X': 3, 'T': 4},
                       {'T': 0, None: None},
@@ -172,7 +311,7 @@ ABRAMS_REBER_1989 = [ {'X': 0, 'V': 1},
                       {'V': 3, None: None}
                     ]
 
-KNOWLTON_RAMUS_SQUIRE_1992 = Grammar()
+KNOWLTON_RAMUS_SQUIRE_1992 = RegularGrammar()
 KNOWLTON_RAMUS_SQUIRE_1992.transitions = [ {'L': 0, 'B': 1},
                                            {'F': 2, 'Z': 3, 'L': 4},
                                            {'Z': 0, None: None},
@@ -180,7 +319,7 @@ KNOWLTON_RAMUS_SQUIRE_1992.transitions = [ {'L': 0, 'B': 1},
                                            {None: None}
                                          ]
 
-KNOWLTON_SQUIRE_1994_I = Grammar()
+KNOWLTON_SQUIRE_1994_I = RegularGrammar()
 KNOWLTON_SQUIRE_1994_I.transitions = [ {'M': 1, 'V': 4},
                                        {'X': 1, 'V': 2},
                                        {'X': 3, None: None},
@@ -188,7 +327,7 @@ KNOWLTON_SQUIRE_1994_I.transitions = [ {'M': 1, 'V': 4},
                                        {'R': 4, 'M': 3, None: None}
                                      ]
 
-KNOWLTON_SQUIRE_1994_II = Grammar()
+KNOWLTON_SQUIRE_1994_II = RegularGrammar()
 KNOWLTON_SQUIRE_1994_II.transitions = [ {'T': 1, 'F': 3},
                                         {'P': 1, 'T': 2},
                                         {'S': 3, None: None},
