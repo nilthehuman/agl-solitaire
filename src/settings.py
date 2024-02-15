@@ -2,6 +2,7 @@
 
 import configparser
 import dataclasses
+import enum
 try:
     import tomllib
     _TOMLLIB_AVAILABLE = True
@@ -14,10 +15,16 @@ _DEFAULT_INI_FILENAME  = 'settings.ini'
 _DEFAULT_TOML_FILENAME = 'settings.toml'
 
 
+class GrammarClass(enum.StrEnum):
+    REGULAR = "regular"
+    PATTERN = "pattern"
+
+
 @dataclasses.dataclass
 class Settings:
     """User options for controlling the details of the experimental paradigm."""
     username:                   str = 'anonymous'
+    grammar_class:              GrammarClass = GrammarClass.REGULAR
     training_strings:           int = 20
     training_time:              int = 300
     test_strings_grammatical:   int = 20
@@ -43,6 +50,7 @@ class Settings:
         """Print all settings in an even more conveniently readable format."""
         pretty = ''
         pretty += f"Username: {self.username}\n"
+        pretty += f"Grammar class: {self.grammar_class}\n"
         pretty += f"Number of training strings: {self.training_strings}\n"
         pretty += f"Time allotted for training: {self.training_time}\n"
         pretty += f"Number of grammatical test strings: {self.test_strings_grammatical}\n"

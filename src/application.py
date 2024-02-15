@@ -97,7 +97,12 @@ class Application:
 
     def generate_grammar(self):
         """Find a grammar that satisfies the protocol's requirements as defined by the user."""
-        gmr = grammar.RegularGrammar(self.settings.string_letters)
+        if self.settings.grammar_class == settings.GrammarClass.REGULAR:
+            gmr = grammar.RegularGrammar(self.settings.string_letters)
+        elif self.settings.grammar_class == settings.GrammarClass.PATTERN:
+            gmr = grammar.PatternGrammar(self.settings.string_letters)
+        else:
+            assert False
         num_required_strings = self.settings.training_strings + self.settings.test_strings_grammatical
         grammatical_strings = []
         max_grammar_attempts = 64
@@ -108,8 +113,16 @@ class Application:
             grammar_attempts = 0
             while num_required_strings != len(grammatical_strings) and grammar_attempts < max_grammar_attempts:
                 grammar_attempts += 1
-                gmr.randomize(min_states=gmr.MIN_STATES + oversize_grammar,
-                              max_states=gmr.MAX_STATES + oversize_grammar)
+                if self.settings.grammar_class == settings.GrammarClass.REGULAR:
+                    gmr.randomize(min_states=gmr.MIN_STATES + oversize_grammar,
+                                  max_states=gmr.MAX_STATES + oversize_grammar)
+                    gmr.randomize(min_states=gmr.MIN_STATES + oversize_grammar,
+                                  max_states=gmr.MAX_STATES + oversize_grammar)
+                elif self.settings.grammar_class == settings.GrammarClass.PATTERN:
+                    # TODO: oversize pattern grammar
+                    gmr.randomize()
+                else:
+                    assert False
                 if not self.settings.recursion and gmr.has_cycle():
                     continue
                 grammatical_strings = list(gmr.produce_grammatical(num_strings=num_required_strings,
@@ -190,17 +203,18 @@ class Application:
             choice = ''
             print('\n--------  SETTINGS  --------')
             print(f" 1: [u]sername (for the record):\t\t{self.settings.username}")
-            print(f" 2: number of training [s]trings:\t\t{self.settings.training_strings}")
-            print(f" 3: [t]ime allotted for training:\t\t{self.settings.training_time} seconds")
-            print(f" 4: number of [g]rammatical test strings:\t{self.settings.test_strings_grammatical}")
-            print(f" 5: number of [u]ngrammatical test strings:\t{self.settings.test_strings_ungrammatical}")
-            print(f" 6: mi[n]imum string length:\t\t\t{self.settings.minimum_string_length}")
-            print(f" 7: ma[x]imum string length:\t\t\t{self.settings.maximum_string_length}")
-            print(f" 8: [l]etters to use in strings:\t\t{self.settings.string_letters}")
-            print(f" 9: allow [r]ecursion in the grammar:\t\t{self.settings.recursion}")
-            print(f"10: log[f]ile to record sessions in:\t\t{self.settings.logfile_filename}")
-            print(f"11: show training strings [o]ne at a time:\t{self.settings.training_one_at_a_time}")
-            print(f"12: run pre and post session [q]uestionnaire:\t{self.settings.run_questionnaire}")
+            print(f" 2: grammar [c]lass:\t\t\t\t{self.settings.grammar_class}")
+            print(f" 3: number of training [s]trings:\t\t{self.settings.training_strings}")
+            print(f" 4: [t]ime allotted for training:\t\t{self.settings.training_time} seconds")
+            print(f" 5: number of [g]rammatical test strings:\t{self.settings.test_strings_grammatical}")
+            print(f" 6: number of [u]ngrammatical test strings:\t{self.settings.test_strings_ungrammatical}")
+            print(f" 7: mi[n]imum string length:\t\t\t{self.settings.minimum_string_length}")
+            print(f" 8: ma[x]imum string length:\t\t\t{self.settings.maximum_string_length}")
+            print(f" 9: [l]etters to use in strings:\t\t{self.settings.string_letters}")
+            print(f"10: allow [r]ecursion in the grammar:\t\t{self.settings.recursion}")
+            print(f"11: log[f]ile to record sessions in:\t\t{self.settings.logfile_filename}")
+            print(f"12: show training strings [o]ne at a time:\t{self.settings.training_one_at_a_time}")
+            print(f"13: run pre and post session [q]uestionnaire:\t{self.settings.run_questionnaire}")
             print(' 0: [b]ack to main menu')
             while not choice:
                 choice = input('what to change> ')
@@ -212,25 +226,30 @@ class Application:
                 if not self.settings.username:
                     self.settings.username = 'anonymous'
                 print(f"good to see you, {self.settings.username}")
-            elif choice in ['2', 's']:
+            elif choice in ['2', 'c']:
+                if self.settings.grammar_class == settings.GrammarClass.REGULAR:
+                    self.settings.grammar_class = settings.GrammarClass.PATTERN
+                else:
+                    self.settings.grammar_class = settings.GrammarClass.REGULAR
+            elif choice in ['3', 's']:
                 prompt = 'number of training strings: '
                 attr_to_change = 'training_strings'
-            elif choice in ['3', 't']:
+            elif choice in ['4', 't']:
                 prompt = 'time allotted for training: '
                 attr_to_change = 'training_time'
-            elif choice in ['4', 'g']:
+            elif choice in ['5', 'g']:
                 prompt = 'number of grammatical test strings: '
                 attr_to_change = 'test_strings_grammatical'
-            elif choice in ['5', 'u']:
+            elif choice in ['6', 'u']:
                 prompt = 'number of ungrammatical test strings: '
                 attr_to_change = 'test_strings_ungrammatical'
-            elif choice in ['6', 'n']:
+            elif choice in ['7', 'n']:
                 prompt = 'minimum string length: '
                 attr_to_change = 'minimum_string_length'
-            elif choice in ['7', 'x']:
+            elif choice in ['8', 'x']:
                 prompt = 'maximum string length: '
                 attr_to_change = 'maximum_string_length'
-            elif choice in ['8', 'l']:
+            elif choice in ['9', 'l']:
                 new_letters = input('letters to use in strings: ')
                 if not new_letters:
                     print('no letters provided')
@@ -244,9 +263,9 @@ class Application:
                     if re.search(r"[A-Z]", new_letters) and re.search(r"[a-z]", new_letters):
                         print('warning: mixing uppercase and lowercase letters is not recommended')
                     self.settings.string_letters = sorted(list(set([*new_letters])))
-            elif choice in ['9', 'r']:
+            elif choice in ['10', 'r']:
                 self.settings.recursion = not self.settings.recursion
-            elif choice in ['10', 'f']:
+            elif choice in ['11', 'f']:
                 new_filename = input('logfile name: ')
                 if os.path.exists(new_filename):
                     if not os.path.isfile(new_filename):
@@ -264,11 +283,11 @@ class Application:
                         choice = input('file does not exist, create it? (y/n)> ')
                         if choice:
                             choice = choice[0].lower()
-                if choice in ['10', 'f', 'y']:
+                if choice in ['11', 'f', 'y']:
                     self.settings.logfile_filename = new_filename
-            elif choice in ['11', 'o']:
+            elif choice in ['12', 'o']:
                 self.settings.training_one_at_a_time = not self.settings.training_one_at_a_time
-            elif choice in ['12', 'q']:
+            elif choice in ['13', 'q']:
                 self.settings.run_questionnaire = not self.settings.run_questionnaire
             elif choice in ['0', 'b']:
                 break

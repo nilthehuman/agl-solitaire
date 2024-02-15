@@ -12,6 +12,7 @@ random.seed(time.time())
 
 _MIN_STRING_LENGTH = 2
 _MAX_STRING_LENGTH = 8
+_MAX_ATTEMPTS = 10 ** 4
 
 
 class Grammar(abc.ABC):
@@ -23,25 +24,86 @@ class Grammar(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def randomize(self, min_states, max_states):
+    def randomize(self):
         """Construct an arbitrary grammar."""
         raise NotImplementedError
 
     @abc.abstractmethod
-    def has_cycle(self):
+    def produce_grammatical(self, num_strings, min_length, max_length, max_attempts):
+        """Follow the given grammar to output grammatical strings."""
         raise NotImplementedError
 
     @abc.abstractmethod
-    def has_dead_cycle(self):
+    def recognize(self, string):
+        """Decide whether the input string conforms to the grammar."""
         raise NotImplementedError
 
-    @abc.abstractmethod
-    def produce_grammatical(self):
-        raise NotImplementedError
+    def produce_ungrammatical(self, num_strings=1, min_length=_MIN_STRING_LENGTH, max_length=_MAX_STRING_LENGTH):
+        """Generate unacceptable strings loosely following Reber & Allen 1978's procedure."""
+        class ErrorType(enum.Enum):
+            """List of the different kinds of deviances we can introduce to make a string ungrammatical."""
+            WRONG_FIRST = 1
+            WRONG_SECOND = 2
+            WRONG_PENULTIMATE = 3
+            WRONG_TERMINATION = 4
+            WRONG_INTERNAL = 5
+            BACKWARDS = 6
+            RANDOM = 7  # arbitrary UG string made up of the given symbols; not in the original paper
+        error_proportions = {
+            ErrorType.WRONG_FIRST : 5,
+            ErrorType.WRONG_SECOND : 5,
+            ErrorType.WRONG_PENULTIMATE : 5,
+            ErrorType.WRONG_TERMINATION : 5,
+            ErrorType.WRONG_INTERNAL : 2,
+            ErrorType.BACKWARDS : 3,
+            ErrorType.RANDOM : 5
+        }
+        ungrammatical_strings = set()
+        while len(ungrammatical_strings) < num_strings:
+            string = ''
+            # pick a random way to create an ungrammatical string
+            error_type = random.choices(list(ErrorType), weights=error_proportions.values())[0]
+            grammatical_string = self.produce_grammatical(1, min_length=min_length, max_length=max_length).pop()
+            if error_type == ErrorType.RANDOM:
+                # arbitrary mangled string
+                string_length = random.randint(min_length, max_length)
+                string = ''.join(random.choice(self.symbols) for _ in range(string_length))
+            elif error_type == ErrorType.BACKWARDS:
+                # a grammatical string mirrored i.e. spelled backwards
+                string = ''.join(reversed(grammatical_string))
+            elif error_type == ErrorType.WRONG_TERMINATION:
+                # chop the final symbol off a correct string
+                if len(grammatical_string) < min_length + 1:
+                    continue  # string not long enough, nevermind
+                string = grammatical_string[:-1]
+            else:
+                # change one letter to break a grammatical string
+                wrong_index = None
+                if error_type == ErrorType.WRONG_FIRST:
+                    wrong_index = 0
+                elif error_type == ErrorType.WRONG_SECOND:
+                    wrong_index = 1
+                elif error_type == ErrorType.WRONG_PENULTIMATE:
+                    wrong_index = len(string) - 2
+                elif error_type == ErrorType.WRONG_INTERNAL:
+                    try:
+                        wrong_index = random.randint(2, len(grammatical_string) - 3)
+                    except ValueError:
+                        continue  # string not long enough, nevermind
+                else:
+                    assert False
+                wrong_symbol = random.choice(self.symbols)
+                while wrong_symbol == grammatical_string[wrong_index]:
+                    wrong_symbol = random.choice(self.symbols)
+                string = grammatical_string[:wrong_index] + wrong_symbol + grammatical_string[wrong_index+1:]
+            # make sure we didn't get another grammatical string by accident
+            if not self.recognize(string) and min_length <= len(string) <= max_length:
+                ungrammatical_strings.add(string)
+        return ungrammatical_strings
 
-    @abc.abstractmethod
-    def produce_ungrammatical(self):
-        raise NotImplementedError
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 class RegularGrammar(Grammar):
@@ -104,8 +166,12 @@ class RegularGrammar(Grammar):
             return f"{i} -{t[0]}-> {t[1]}"
         return '\n'.join([entry_to_str(i, t) for i, state in enumerate(self.transitions) for t in state.items()])
 
-    def randomize(self, min_states=MIN_STATES, max_states=MAX_STATES):
+    def randomize(self, min_states=None, max_states=None):
         """Construct an arbitrary grammar by choosing states and transitions at random."""
+        if min_states is None:
+            min_states=RegularGrammar.MIN_STATES
+        if max_states is None:
+            max_states=RegularGrammar.MAX_STATES
         acceptable = False
         while not acceptable:
             self.transitions = []
@@ -178,7 +244,7 @@ class RegularGrammar(Grammar):
         """Determine if the graph contains a cycle that cannot be escaped."""
         return any(self.shortest_path_through(s) == math.inf for s in range(len(self.transitions)))
 
-    def produce_grammatical(self, num_strings=1, min_length=_MIN_STRING_LENGTH, max_length=_MAX_STRING_LENGTH, max_attempts=10**4):
+    def produce_grammatical(self, num_strings=1, min_length=_MIN_STRING_LENGTH, max_length=_MAX_STRING_LENGTH, max_attempts=_MAX_ATTEMPTS):
         """Follow the given grammar to output grammatical strings."""
         assert 0 < len(self.transitions)
         grammatical_strings = set()
@@ -203,69 +269,6 @@ class RegularGrammar(Grammar):
             if current_state is None:
                 grammatical_strings.add(string)
         return grammatical_strings
-
-    def produce_ungrammatical(self, num_strings=1, min_length=_MIN_STRING_LENGTH, max_length=_MAX_STRING_LENGTH):
-        """Generate unacceptable strings loosely following Reber & Allen 1978's procedure."""
-        class ErrorType(enum.Enum):
-            """List of the different kinds of anomalies we can introduce to make a string ungrammatical."""
-            WRONG_FIRST = 1
-            WRONG_SECOND = 2
-            WRONG_PENULTIMATE = 3
-            WRONG_TERMINATION = 4
-            WRONG_INTERNAL = 5
-            BACKWARDS = 6
-            RANDOM = 7  # arbitrary UG string made up of the given symbols; not in the original paper
-        error_proportions = {
-            ErrorType.WRONG_FIRST : 5,
-            ErrorType.WRONG_SECOND : 5,
-            ErrorType.WRONG_PENULTIMATE : 5,
-            ErrorType.WRONG_TERMINATION : 5,
-            ErrorType.WRONG_INTERNAL : 2,
-            ErrorType.BACKWARDS : 3,
-            ErrorType.RANDOM : 5
-        }
-        ungrammatical_strings = set()
-        while len(ungrammatical_strings) < num_strings:
-            string = ''
-            # pick a random way to create an ungrammatical string
-            error_type = random.choices(list(ErrorType), weights=error_proportions.values())[0]
-            grammatical_string = self.produce_grammatical(1, min_length=min_length, max_length=max_length).pop()
-            if error_type == ErrorType.RANDOM:
-                # arbitrary mangled string
-                string_length = random.randint(min_length, max_length)
-                string = ''.join(random.choice(self.symbols) for _ in range(string_length))
-            elif error_type == ErrorType.BACKWARDS:
-                # a grammatical string mirrored i.e. spelled backwards
-                string = ''.join(reversed(grammatical_string))
-            elif error_type == ErrorType.WRONG_TERMINATION:
-                # chop the final symbol off a correct string
-                if len(grammatical_string) < min_length + 1:
-                    continue  # string not long enough, nevermind
-                string = grammatical_string[:-1]
-            else:
-                # change one letter to break a grammatical string
-                wrong_index = None
-                if error_type == ErrorType.WRONG_FIRST:
-                    wrong_index = 0
-                elif error_type == ErrorType.WRONG_SECOND:
-                    wrong_index = 1
-                elif error_type == ErrorType.WRONG_PENULTIMATE:
-                    wrong_index = len(string) - 2
-                elif error_type == ErrorType.WRONG_INTERNAL:
-                    try:
-                        wrong_index = random.randint(2, len(grammatical_string) - 3)
-                    except ValueError:
-                        continue  # string not long enough, nevermind
-                else:
-                    assert False
-                wrong_symbol = random.choice(self.symbols)
-                while wrong_symbol == grammatical_string[wrong_index]:
-                    wrong_symbol = random.choice(self.symbols)
-                string = grammatical_string[:wrong_index] + wrong_symbol + grammatical_string[wrong_index+1:]
-            # make sure we didn't get another grammatical string by accident
-            if not self.recognize(string) and min_length <= len(string) <= max_length:
-                ungrammatical_strings.add(string)
-        return ungrammatical_strings
 
     def recognize(self, string):
         """Decide whether the input string conforms to the given grammar."""
@@ -334,3 +337,125 @@ KNOWLTON_SQUIRE_1994_II.transitions = [ {'T': 1, 'F': 3},
                                         {'S': 3, 'F': 4, None: None},
                                         {'P': 2, None: None}
                                       ]
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+class PatternGrammar(Grammar):
+    """A certain kind of non-recursive subregular grammar that consists of a finite set of
+    predefined abstract string patterns. The set of all terminal symbols is broken up
+    into a number of subsets called classes that may be nested but may not overlap, i.e.
+    each pair of classes is either disjoint or one contains the other. Then each pattern
+    is defined as a fixed ordered sequence of (possibly repeating) classes, and a string
+    generated based on that pattern is a sequence of terminal symbols taken from those
+    classes in order. Agreement is currently not implemented in this type of grammar."""
+
+    MIN_CLASSES = 2
+    MAX_CLASSES = 6
+    MIN_PATTERNS = 2
+    MAX_PATTERNS = 5
+    MIN_LENGTH = 2
+    MAX_LENGTH = 8
+
+    def __init__(self, symbols=None):
+        self.symbols = symbols
+        if not symbols:
+            self.symbols = ['M', 'R', 'S', 'V', 'X']
+        self.classes = []
+        self.patterns = []
+
+    def obfuscated_repr(self):
+        """A marshalled representation of the grammar made unreadable for repeat experiments."""
+        # TODO
+        return None
+
+    def __repr__(self):
+        return str(self)
+
+    def __str__(self):
+        def class_to_str(i, c):
+            return 'C' + str(i) + ' = ' + str(c)
+        def pattern_to_str(i, t):
+            return 'T' + str(i) + ' = ' + str(t)
+        return '\n'.join([pattern_to_str(i, t) for i, t in enumerate(self.patterns)])
+        return '\n'.join([class_to_str(i, c) for i, c in enumerate(self.classes)])
+        return '\n'.join([entry_to_str(i, t) for i, state in enumerate(self.transitions) for t in state.items()])
+
+    def randomize(self, min_classes=None, max_classes=None,
+                        min_patterns=None, max_patterns=None,
+                        min_length=None, max_length=None):
+        """Construct an arbitrary pattern grammar."""
+        if min_classes is None:
+            min_classes=PatternGrammar.MIN_CLASSES
+        if max_classes is None:
+            max_classes=PatternGrammar.MAX_CLASSES
+        if min_patterns is None:
+            min_patterns=PatternGrammar.MIN_PATTERNS
+        if max_patterns is None:
+            max_patterns=PatternGrammar.MAX_PATTERNS
+        if min_length is None:
+            min_length=PatternGrammar.MIN_LENGTH
+        if max_length is None:
+            max_length=PatternGrammar.MAX_LENGTH
+        self.classes = []
+        self.patterns = []
+        while not self.classes_okay():
+            # partition set of symbols randomly
+            self.classes = [set() for _ in range(random.randint(min_classes, max_classes))]
+            for symbol in self.symbols:
+                # random.choice here?
+                self.classes[random.randrange(len(self.classes))].add(symbol)
+            for cls in self.classes:
+                if not cls:
+                    cls.add(random.choice(self.symbols))
+        self.patterns = [[] for _ in range(random.randint(min_patterns, max_patterns))]
+        for pattern in self.patterns:
+            for _ in range(random.randint(min_length, max_length)):
+                pattern.append(random.choice(self.classes))
+
+    def classes_okay(self):
+        """Verify that current classes aren't trivial, include all symbols and do not overlap."""
+        # not all classes singletons?
+        if all(len(c) == 1 for c in self.classes):
+            return False
+        # all symbols covered?
+        if set().union(*self.classes) != set(self.symbols):
+            return False
+        # no overlaps between classes?
+        for c1, c2 in itertools.combinations(self.classes, 2):
+            if not c1.isdisjoint(c2) and c1.union(c2) - c2 and c2.union(c1) - c1:
+                return False
+        return True
+
+    # def has_cycle(self):
+    #     """Determine if the grammar includes a directed cycle."""
+    #     # false by definition: patterns are simple linear tuples
+    #     return False
+
+    # def has_dead_cycle(self):
+    #     """Determine if the grammar contains a cycle that cannot be escaped."""
+    #     # false by definition
+    #     raise False
+
+    def produce_grammatical(self, num_strings=1, min_length=_MIN_STRING_LENGTH, max_length=_MAX_STRING_LENGTH, max_attempts=_MAX_ATTEMPTS):
+        """Follow the given grammar to output grammatical strings."""
+        assert 0 < len(self.classes)
+        assert 0 < len(self.patterns)
+        grammatical_strings = set()
+        suitable_patterns = list(filter(lambda t: min_length <= len(t) <= max_length, self.patterns))
+        if not suitable_patterns:
+            return set()
+        # there might not exist num_strings different output strings in the length range
+        attempts = 0
+        while len(grammatical_strings) < num_strings and attempts < max_attempts:
+            pattern = random.choice(suitable_patterns)
+            string = ''.join(map(lambda c: random.choice(list(c)), pattern))
+            grammatical_strings.add(string)
+        return grammatical_strings
+
+    def recognize(self, string):
+        """Decide whether the grammar has a pattern matching the input string."""
+        def matches(string, pattern):
+            return all(char in cls for char, cls in zip(string, pattern))
+        return any(matches(string, pattern) for pattern in self.patterns)
