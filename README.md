@@ -25,7 +25,7 @@ Everything that happens on screen during the game is also automatically recorded
 in a file called `agl_sessions.log` by default (you can turn this off if you
 wish). My own sessions are recorded in `arato.log` for the sake of analysis.
 
-See ./agl-solitaire --help for a more detailed explanation of options and
+See `./agl-solitaire --help` for a more detailed explanation of options and
 preferences.
 
 The software is released under the popular open source MIT License.

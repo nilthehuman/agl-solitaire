@@ -20,7 +20,7 @@ class Grammar(abc.ABC):
 
     @abc.abstractmethod
     def obfuscated_repr(self):
-        """A marshalled representation of the grammar made unreadable for repeat experiments."""
+        """A marshalled representation of the grammar made unreadable for the purpose of repeat experiments."""
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -48,7 +48,7 @@ class Grammar(abc.ABC):
             WRONG_TERMINATION = 4
             WRONG_INTERNAL = 5
             BACKWARDS = 6
-            RANDOM = 7  # arbitrary UG string made up of the given symbols; not in the original paper
+            RANDOM = 7  # arbitrary ungrammatical string made up of the given tokens; not in the original paper
         error_proportions = {
             ErrorType.WRONG_FIRST : 5,
             ErrorType.WRONG_SECOND : 5,
@@ -67,12 +67,12 @@ class Grammar(abc.ABC):
             if error_type == ErrorType.RANDOM:
                 # arbitrary mangled string
                 string_length = random.randint(min_length, max_length)
-                string = ''.join(random.choice(self.symbols) for _ in range(string_length))
+                string = ''.join(random.choice(self.tokens) for _ in range(string_length))
             elif error_type == ErrorType.BACKWARDS:
                 # a grammatical string mirrored i.e. spelled backwards
                 string = ''.join(reversed(grammatical_string))
             elif error_type == ErrorType.WRONG_TERMINATION:
-                # chop the final symbol off a correct string
+                # chop the final token off a correct string
                 if len(grammatical_string) < min_length + 1:
                     continue  # string not long enough, nevermind
                 string = grammatical_string[:-1]
@@ -92,10 +92,10 @@ class Grammar(abc.ABC):
                         continue  # string not long enough, nevermind
                 else:
                     assert False
-                wrong_symbol = random.choice(self.symbols)
-                while wrong_symbol == grammatical_string[wrong_index]:
-                    wrong_symbol = random.choice(self.symbols)
-                string = grammatical_string[:wrong_index] + wrong_symbol + grammatical_string[wrong_index+1:]
+                wrong_token = random.choice(self.tokens)
+                while wrong_token == grammatical_string[wrong_index]:
+                    wrong_token = random.choice(self.tokens)
+                string = grammatical_string[:wrong_index] + wrong_token + grammatical_string[wrong_index+1:]
             # make sure we didn't get another grammatical string by accident
             if not self.recognize(string) and min_length <= len(string) <= max_length:
                 ungrammatical_strings.add(string)
@@ -107,7 +107,7 @@ class Grammar(abc.ABC):
 
 
 class RegularGrammar(Grammar):
-    """A regular grammar: a directed graph with an input symbol associated with each edge.
+    """A regular grammar: a directed graph with an input token associated with each edge.
     The whole grammar is represented in a single list of dicts, e.g. the following data
     structure represents the language that starts with one or two A's and then an arbitrary
     number of B's follow. The starting state is number 0. A 'None' index stands for 'OUT'.
@@ -117,17 +117,17 @@ class RegularGrammar(Grammar):
     MAX_STATES = 7
     MIN_PATH_LENGTH = 2
 
-    def __init__(self, symbols=None):
-        self.symbols = symbols
-        if not symbols:
-            self.symbols = ['M', 'R', 'S', 'V', 'X']
+    def __init__(self, tokens=None):
+        self.tokens = tokens
+        if not tokens:
+            self.tokens = ['M', 'R', 'S', 'V', 'X']
         self.transitions = []
 
     def __repr__(self):
         return str(self.transitions)
 
     def obfuscated_repr(self):
-        """A marshalled representation of the grammar made unreadable for repeat experiments."""
+        """A marshalled representation of the grammar made unreadable for the purpose of repeat experiments."""
         repr_string = self.__repr__()
         coprimes = (2, 2)
         while 1 != math.gcd(*coprimes):
@@ -166,6 +166,9 @@ class RegularGrammar(Grammar):
             return f"{i} -{t[0]}-> {t[1]}"
         return '\n'.join([entry_to_str(i, t) for i, state in enumerate(self.transitions) for t in state.items()])
 
+    def has_one_char_tokens_only(self):
+        return all(1 == len(x) for x in self.tokens)
+
     def randomize(self, min_states=None, max_states=None):
         """Construct an arbitrary grammar by choosing states and transitions at random."""
         if min_states is None:
@@ -179,16 +182,16 @@ class RegularGrammar(Grammar):
             for _ in range(num_states):
                 self.transitions.append({})
                 num_transitions = random.randint(0, num_states)
-                for _ in range(min(num_transitions, len(self.symbols))):  # avoid inf loop if all symbols are already used up
+                for _ in range(min(num_transitions, len(self.tokens))):  # avoid inf loop if all tokens are already used up
                     # allow accidentally overwriting a previous entry, that's fine
-                    symbol = random.choice(self.symbols + [None])
+                    token = random.choice(self.tokens + [None])
                     new_state = None
-                    if symbol is not None:
+                    if token is not None:
                         new_state = random.randrange(num_states)
                         # no more than one edge between the same states
                         while new_state in self.transitions[-1].values():
                             new_state = random.randrange(num_states)
-                    self.transitions[-1][symbol] = new_state
+                    self.transitions[-1][token] = new_state
             # fix trap states after the fact
             for state in self.transitions:
                 if not state:
@@ -252,18 +255,24 @@ class RegularGrammar(Grammar):
         attempts = 0
         while len(grammatical_strings) < num_strings and attempts < max_attempts:
             string = ''
+            length = 0
             # keep trying until we get the string length right
-            while not min_length <= len(string) <= max_length and attempts < max_attempts:
+            while not min_length <= length <= max_length and attempts < max_attempts:
                 string = ''
+                length = 0
                 current_state = 0
-                while len(string) < max_length and current_state is not None:
+                while length < max_length and current_state is not None:
                     # pick a random edge
-                    available_symbols = list(self.transitions[current_state])
-                    next_symbol = random.choice(available_symbols)
-                    if next_symbol is not None:
-                        string += next_symbol
+                    available_tokens = list(self.transitions[current_state])
+                    next_token = random.choice(available_tokens)
+                    if next_token is not None:
+                        interspersed_space = ''
+                        if len(string) and not self.has_one_char_tokens_only():
+                            interspersed_space = ' '
+                        string += interspersed_space + next_token
+                        length += 1
                     # follow the edge to the next state
-                    current_state = self.transitions[current_state][next_symbol]
+                    current_state = self.transitions[current_state][next_token]
                 attempts += 1
             # did we end up in a halting state?
             if current_state is None:
@@ -344,11 +353,11 @@ KNOWLTON_SQUIRE_1994_II.transitions = [ {'T': 1, 'F': 3},
 
 class PatternGrammar(Grammar):
     """A certain kind of non-recursive subregular grammar that consists of a finite set of
-    predefined abstract string patterns. The set of all terminal symbols is broken up
+    predefined abstract string patterns. The set of all terminal tokens is broken up
     into a number of subsets called classes that may be nested but may not overlap, i.e.
     each pair of classes is either disjoint or one contains the other. Then each pattern
     is defined as a fixed ordered sequence of (possibly repeating) classes, and a string
-    generated based on that pattern is a sequence of terminal symbols taken from those
+    generated based on that pattern is a sequence of terminal tokens taken from those
     classes in order. Agreement is currently not implemented in this type of grammar."""
 
     MIN_CLASSES = 2
@@ -358,15 +367,15 @@ class PatternGrammar(Grammar):
     MIN_LENGTH = 2
     MAX_LENGTH = 8
 
-    def __init__(self, symbols=None):
-        self.symbols = symbols
-        if not symbols:
-            self.symbols = ['M', 'R', 'S', 'V', 'X']
+    def __init__(self, tokens=None):
+        self.tokens = tokens
+        if not tokens:
+            self.tokens = ['M', 'R', 'S', 'V', 'X']
         self.classes = []
         self.patterns = []
 
     def obfuscated_repr(self):
-        """A marshalled representation of the grammar made unreadable for repeat experiments."""
+        """A marshalled representation of the grammar made unreadable for the purpose of repeat experiments."""
         # TODO
         return None
 
@@ -401,26 +410,26 @@ class PatternGrammar(Grammar):
         self.classes = []
         self.patterns = []
         while not self.classes_okay():
-            # partition set of symbols randomly
+            # partition set of tokens randomly
             self.classes = [set() for _ in range(random.randint(min_classes, max_classes))]
-            for symbol in self.symbols:
+            for token in self.tokens:
                 # random.choice here?
-                self.classes[random.randrange(len(self.classes))].add(symbol)
+                self.classes[random.randrange(len(self.classes))].add(token)
             for cls in self.classes:
                 if not cls:
-                    cls.add(random.choice(self.symbols))
+                    cls.add(random.choice(self.tokens))
         self.patterns = [[] for _ in range(random.randint(min_patterns, max_patterns))]
         for pattern in self.patterns:
             for _ in range(random.randint(min_length, max_length)):
                 pattern.append(random.choice(self.classes))
 
     def classes_okay(self):
-        """Verify that current classes aren't trivial, include all symbols and do not overlap."""
+        """Verify that current classes aren't trivial, include all tokens and do not overlap."""
         # not all classes singletons?
         if all(len(c) == 1 for c in self.classes):
             return False
-        # all symbols covered?
-        if set().union(*self.classes) != set(self.symbols):
+        # all tokens covered?
+        if set().union(*self.classes) != set(self.tokens):
             return False
         # no overlaps between classes?
         for c1, c2 in itertools.combinations(self.classes, 2):

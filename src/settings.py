@@ -31,7 +31,7 @@ class Settings:
     test_strings_ungrammatical: int = 20
     minimum_string_length:      int = 2
     maximum_string_length:      int = 8
-    string_letters:             list[str] = dataclasses.field(default_factory = lambda: ['M', 'R', 'S', 'V', 'X'])
+    string_tokens:              list[str] = dataclasses.field(default_factory = lambda: ['M', 'R', 'S', 'V', 'X'])
     recursion:                  bool = True
     # idea: test_strings_reuse_from_training?
     logfile_filename:           str = 'agl_sessions.log'
@@ -57,7 +57,7 @@ class Settings:
         pretty += f"Number of ungrammatical test strings: {self.test_strings_ungrammatical}\n"
         pretty += f"Minimum string length: {self.minimum_string_length}\n"
         pretty += f"Maximum string length: {self.maximum_string_length}\n"
-        pretty += f"Letters to use in strings: {self.string_letters}\n"
+        pretty += f"Tokens to use in strings: {self.string_tokens}\n"
         pretty += f"Recursion allowed in grammar: {self.recursion}\n"
         pretty += f"Logfile to record session in: {self.logfile_filename}\n"
         pretty += f"Show training strings one at a time: {self.training_one_at_a_time}\n"
@@ -85,6 +85,8 @@ class Settings:
             parsed_value = type(getattr(self, attr_name))(value)
             if attr_name in ['recursion', 'training_one_at_a_time', 'run_questionnaire']:
                 parsed_value = str(value).lower() in ['true', 'yes', '1']
+            if 'string_tokens' == attr_name:
+                parsed_value = ''.join(value).split()
             setattr(self, attr_name, parsed_value)
         except TypeError:
             # current grammar is None which you cannot cast to
@@ -133,9 +135,10 @@ class Settings:
         for field in dataclasses.fields(self):
             if 'grammar' == field.name and self.grammar is None:
                 continue
-            # the string_letters variable is a list of strings internally
-            if 'string_letters' == field.name:
-                config['DEFAULT'][field.name] = ''.join(self.string_letters)
+            # the string_tokens variable is a list of strings internally
+            if 'string_tokens' == field.name:
+                # string_tokens may be a list of strings or a list of individual letters
+                config['DEFAULT'][field.name] = ' '.join(self.string_tokens)
             else:
                 # configparser will try to interpolate the string and cry
                 # if it has a stray % character so we must escape those
@@ -152,9 +155,9 @@ class Settings:
                     if 'grammar' == field.name and self.grammar is None:
                         continue
                     value = getattr(self, field.name)
-                    # the string_letters variable is a list of strings internally
-                    if 'string_letters' == field.name:
-                        value = ''.join(self.string_letters)
+                    # string_tokens may be a list of strings or a list of individual letters
+                    if 'string_tokens' == field.name:
+                        config['DEFAULT'][field.name] = ' '.join(self.string_tokens)
                     if type(value) is str:
                         # N.B.: can't use repr(value) because Python and TOML treat single quotes
                         # differently: Python interpolates inside single quotes but TOML does not

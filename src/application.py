@@ -98,9 +98,9 @@ class Application:
     def generate_grammar(self):
         """Find a grammar that satisfies the protocol's requirements as defined by the user."""
         if self.settings.grammar_class == settings.GrammarClass.REGULAR:
-            gmr = grammar.RegularGrammar(self.settings.string_letters)
+            gmr = grammar.RegularGrammar(self.settings.string_tokens)
         elif self.settings.grammar_class == settings.GrammarClass.PATTERN:
-            gmr = grammar.PatternGrammar(self.settings.string_letters)
+            gmr = grammar.PatternGrammar(self.settings.string_tokens)
         else:
             assert False
         num_required_strings = self.settings.training_strings + self.settings.test_strings_grammatical
@@ -193,8 +193,8 @@ class Application:
                 choice = input('keep the current settings instead? (y/n)> ')
             if choice[0].lower() != 'y':
                 self.settings = settings_and_gmr
-        # don't forget to reset letters as well
-        gmr.symbols = self.settings.string_letters
+        # don't forget to reset tokens as well
+        gmr.symbols = self.settings.string_tokens
         self.run_experiment(filename, gmr)
 
     def settings_menu(self):
@@ -210,7 +210,7 @@ class Application:
             print(f" 6: number of [u]ngrammatical test strings:\t{self.settings.test_strings_ungrammatical}")
             print(f" 7: mi[n]imum string length:\t\t\t{self.settings.minimum_string_length}")
             print(f" 8: ma[x]imum string length:\t\t\t{self.settings.maximum_string_length}")
-            print(f" 9: [l]etters to use in strings:\t\t{self.settings.string_letters}")
+            print(f" 9: [l]etters or words to use in strings:\t\t{self.settings.string_tokens}")
             print(f"10: allow [r]ecursion in the grammar:\t\t{self.settings.recursion}")
             print(f"11: log[f]ile to record sessions in:\t\t{self.settings.logfile_filename}")
             print(f"12: show training strings [o]ne at a time:\t{self.settings.training_one_at_a_time}")
@@ -250,19 +250,21 @@ class Application:
                 prompt = 'maximum string length: '
                 attr_to_change = 'maximum_string_length'
             elif choice in ['9', 'l']:
-                new_letters = input('letters to use in strings: ')
-                if not new_letters:
-                    print('no letters provided')
-                elif not re.match(r"^\w+$", new_letters):
+                new_tokens = input('tokens to use in strings: ')
+                if not new_tokens:
+                    print('no tokens provided')
+                elif not re.match(r"^[\s\w]+$", new_tokens):
                     print('error: please type letters only')
-                elif len(set([*new_letters])) < 2:
-                    print('error: at least two different letters required')
+                elif len(set([*new_tokens])) < 2:
+                    print('error: at least two different tokens required')
                 else:
-                    if re.search(r"\d", new_letters):
+                    if re.search(r"\d", new_tokens):
                         print('warning: using numbers in stimuli is not recommended')
-                    if re.search(r"[A-Z]", new_letters) and re.search(r"[a-z]", new_letters):
+                    if re.search(r"[A-Z]", new_tokens) and re.search(r"[a-z]", new_tokens):
                         print('warning: mixing uppercase and lowercase letters is not recommended')
-                    self.settings.string_letters = sorted(list(set([*new_letters])))
+                    if re.search(r"\s", new_tokens):
+                        new_tokens = new_tokens.split()
+                    self.settings.string_tokens = sorted(list(set([*new_tokens])))
             elif choice in ['10', 'r']:
                 self.settings.recursion = not self.settings.recursion
             elif choice in ['11', 'f']:
