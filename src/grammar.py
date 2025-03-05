@@ -143,6 +143,7 @@ class RegularGrammar(Grammar):
         """Restore Grammar from string representation."""
         grammar = cls()
         grammar.transitions = eval(repr_string)
+        grammar.tokens = list(filter(bool, set(sum(map(list, grammar.transitions), []))))
         return grammar
 
     @classmethod
@@ -157,6 +158,7 @@ class RegularGrammar(Grammar):
             repr_string += chr(32 + (ord(char) - 32 - coprimes[0] ** i % coprimes[1]) % 95)
         grammar = cls()
         grammar.transitions = eval(repr_string)
+        grammar.tokens = list(filter(bool, set(sum(map(list, grammar.transitions), []))))
         return grammar
 
     def __str__(self):
