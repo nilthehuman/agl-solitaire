@@ -15,6 +15,14 @@ _MAX_STRING_LENGTH = 8
 _MAX_ATTEMPTS = 10 ** 4
 
 
+def tokenized(string):
+    assert string
+    string_split = string.split()
+    if 1 == len(string_split):
+        return string_split[0]
+    return string_split
+
+
 class Grammar(abc.ABC):
     """The common interface to both kinds of concrete grammar."""
 
@@ -37,6 +45,18 @@ class Grammar(abc.ABC):
     def recognize(self, string):
         """Decide whether the input string conforms to the grammar."""
         raise NotImplementedError
+
+    def has_one_char_tokens_only(self):
+        """Check if the grammar uses single letter tokens as opposed to multi-letter ones."""
+        return all(1 == len(x) for x in self.tokens)
+
+    def joiner(self):
+        """Whitespace string to insert between tokens."""
+        if not self.has_one_char_tokens_only():
+            # a single space if multi-letter tokens are used
+            return ' '
+        # empty otherwise
+        return ''
 
     def produce_ungrammatical(self, num_strings=1, min_length=_MIN_STRING_LENGTH, max_length=_MAX_STRING_LENGTH):
         """Generate unacceptable strings loosely following Reber & Allen 1978's procedure."""
@@ -67,38 +87,44 @@ class Grammar(abc.ABC):
             if error_type == ErrorType.RANDOM:
                 # arbitrary mangled string
                 string_length = random.randint(min_length, max_length)
-                string = ''.join(random.choice(self.tokens) for _ in range(string_length))
+                string = [ random.choice(self.tokens) for _ in range(string_length) ]
             elif error_type == ErrorType.BACKWARDS:
                 # a grammatical string mirrored i.e. spelled backwards
-                string = ''.join(reversed(grammatical_string))
+                string = list(reversed(tokenized(grammatical_string)))
             elif error_type == ErrorType.WRONG_TERMINATION:
                 # chop the final token off a correct string
-                if len(grammatical_string) < min_length + 1:
+                tokenized_string = tokenized(grammatical_string)
+                if len(tokenized_string) < min_length + 1:
                     continue  # string not long enough, nevermind
-                string = grammatical_string[:-1]
+                string = tokenized_string[:-1]
             else:
-                # change one letter to break a grammatical string
+                # change one token to break a grammatical string
+                tokenized_string = tokenized(grammatical_string)
                 wrong_index = None
                 if error_type == ErrorType.WRONG_FIRST:
                     wrong_index = 0
                 elif error_type == ErrorType.WRONG_SECOND:
                     wrong_index = 1
                 elif error_type == ErrorType.WRONG_PENULTIMATE:
-                    wrong_index = len(string) - 2
+                    wrong_index = len(tokenized_string) - 2
                 elif error_type == ErrorType.WRONG_INTERNAL:
                     try:
-                        wrong_index = random.randint(2, len(grammatical_string) - 3)
+                        wrong_index = random.randint(2, len(tokenized_string) - 3)
                     except ValueError:
                         continue  # string not long enough, nevermind
                 else:
                     assert False
                 wrong_token = random.choice(self.tokens)
-                while wrong_token == grammatical_string[wrong_index]:
+                while wrong_token == tokenized_string[wrong_index]:
                     wrong_token = random.choice(self.tokens)
-                string = grammatical_string[:wrong_index] + wrong_token + grammatical_string[wrong_index+1:]
+                if not self.has_one_char_tokens_only():
+                    wrong_token = [ wrong_token ]
+                string = tokenized_string[:wrong_index] + wrong_token + tokenized_string[wrong_index+1:]
             # make sure we didn't get another grammatical string by accident
             if not self.recognize(string) and min_length <= len(string) <= max_length:
-                ungrammatical_strings.add(string)
+                # N.B. joining a plain string is a harmless null operation
+                string_reassembled = self.joiner().join(string)
+                ungrammatical_strings.add(string_reassembled)
         return ungrammatical_strings
 
 
@@ -167,9 +193,6 @@ class RegularGrammar(Grammar):
                 return f"{i} ---> OUT"
             return f"{i} -{t[0]}-> {t[1]}"
         return '\n'.join([entry_to_str(i, t) for i, state in enumerate(self.transitions) for t in state.items()])
-
-    def has_one_char_tokens_only(self):
-        return all(1 == len(x) for x in self.tokens)
 
     def randomize(self, min_states=None, max_states=None):
         """Construct an arbitrary grammar by choosing states and transitions at random."""
@@ -268,10 +291,7 @@ class RegularGrammar(Grammar):
                     available_tokens = list(self.transitions[current_state])
                     next_token = random.choice(available_tokens)
                     if next_token is not None:
-                        interspersed_space = ''
-                        if len(string) and not self.has_one_char_tokens_only():
-                            interspersed_space = ' '
-                        string += interspersed_space + next_token
+                        string += (self.joiner() if len(string) else '') + next_token
                         length += 1
                     # follow the edge to the next state
                     current_state = self.transitions[current_state][next_token]
