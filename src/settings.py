@@ -2,6 +2,10 @@
 
 import configparser
 import dataclasses
+try:
+    import dill as pickle
+except ImportError:
+    import pickle
 import enum
 try:
     import tomllib
@@ -21,8 +25,17 @@ class GrammarClass(enum.StrEnum):
 
 
 @dataclasses.dataclass
+class ExperimentState:
+    """Current state of an experiment procedure, used to persistently save user's progress midway through."""
+    training_finished: bool
+    training_set:      list[str]
+    test_set:          list[(str, bool, typing.Optional[bool])]
+
+
+@dataclasses.dataclass
 class Settings:
     """User options for controlling the details of the experimental paradigm."""
+    filename:                   typing.Optional[str] = None
     username:                   str = 'anonymous'
     grammar_class:              GrammarClass = GrammarClass.REGULAR
     training_strings:           int = 20
@@ -38,6 +51,16 @@ class Settings:
     training_one_at_a_time:     bool = True
     run_questionnaire:          bool = True
     grammar:                    typing.Optional[str] = None
+    experiment_state:           typing.Optional[ExperimentState] = None
+
+    def settings_equal(self, other):
+        """Check if all options are equal except irrelevant ones."""
+        for field in dataclasses.fields(self):
+            if field.name in ['filename', 'grammar', 'experiment_state']:
+                continue
+            if getattr(self, field.name) != getattr(other, field.name):
+                return False
+        return True
 
     def __str__(self):
         """Print all settings in an .ini config file format."""
@@ -87,16 +110,30 @@ class Settings:
                 parsed_value = str(value).lower() in ['true', 'yes', '1']
             if 'string_tokens' == attr_name:
                 parsed_value = ''.join(value).split()
+            if 'experiment_state' == attr_name:
+                # deserialize from byte string
+                parsed_value = pickle.loads(eval(value))
             setattr(self, attr_name, parsed_value)
         except TypeError:
-            # current grammar is None which you cannot cast to
+            # value is None which you cannot cast to
             assert getattr(self, attr_name) is None
-            self.grammar = value
+            try:
+                # see if this string is really a binary string in disguise
+                value = pickle.loads(eval(value))
+            except Exception as e:
+                # nevermind
+                pass
+            setattr(self, attr_name, value)
         except AttributeError:
             pass  # doesn't matter
 
-    def load_all(self, filename):
+    def load_all(self, filename=None):
         """Read and set our settings values from file according to format based on its extension."""
+        if filename and not self.filename:
+            self.filename = filename
+        if not filename:
+            filename = self.filename
+        assert filename
         # figure out format from the tail end of the filename
         if _TOMLLIB_AVAILABLE and 4 < len(filename) and 'toml' == filename[-4:].lower():
             self.load_all_from_toml(filename)
@@ -129,8 +166,12 @@ class Settings:
                     self.process_loaded_entry(key, settings_dict[key])
             self.autosave = True
 
-    def save_all_to_ini(self, filename=_DEFAULT_INI_FILENAME):
+    def save_all_to_ini(self, filename=None):
         """Write the current values of all our member variables to an INI config file."""
+        if filename:
+            self.filename = filename
+        else:
+            filename = _DEFAULT_INI_FILENAME
         config = configparser.ConfigParser()
         for field in dataclasses.fields(self):
             if 'grammar' == field.name and self.grammar is None:
@@ -139,6 +180,9 @@ class Settings:
             if 'string_tokens' == field.name:
                 # string_tokens may be a list of strings or a list of individual letters
                 config['DEFAULT'][field.name] = ' '.join(self.string_tokens)
+            elif 'experiment_state' == field.name:
+                # serialize to byte string
+                config['DEFAULT'][field.name] = str(pickle.dumps(self.experiment_state))
             else:
                 # configparser will try to interpolate the string and cry
                 # if it has a stray % character so we must escape those
@@ -148,8 +192,12 @@ class Settings:
             config.write(configfile)
 
     if _TOMLLIB_AVAILABLE:
-        def save_all_to_toml(self, filename=_DEFAULT_TOML_FILENAME):
+        def save_all_to_toml(self, filename=None):
             """Write the current values of all our member variables to a TOML config file."""
+            if filename:
+                self.filename = filename
+            else:
+                filename = _DEFAULT_INI_FILENAME
             with open(filename, 'w', encoding='UTF-8') as configfile:
                 for field in dataclasses.fields(self):
                     if 'grammar' == field.name and self.grammar is None:
@@ -158,6 +206,9 @@ class Settings:
                     # string_tokens may be a list of strings or a list of individual letters
                     if 'string_tokens' == field.name:
                         config['DEFAULT'][field.name] = ' '.join(self.string_tokens)
+                    elif 'experiment_state' == field.name:
+                        # serialize to byte string
+                        config['DEFAULT'][field.name] = str(pickle.dumps(self.experiment_state))
                     if type(value) is str:
                         # N.B.: can't use repr(value) because Python and TOML treat single quotes
                         # differently: Python interpolates inside single quotes but TOML does not

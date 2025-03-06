@@ -56,6 +56,7 @@ class Application:
     def __init__(self):
         self.settings = settings.Settings()
         self.settings.load_all_from_ini()
+        self.grammar = None
 
     def duplicate_print(self, string, log_only=False):
         """Output the string on the screen and log it in a text file at the same time."""
@@ -85,9 +86,9 @@ class Application:
             if choice in ['1', 's']:
                 self.run_experiment()
             elif choice in ['2', 'r']:
-                self.load_grammar()
+                self.load_experiment()
             elif choice in ['3', 'g']:
-                self.save_grammar()
+                self.generate_experiment()
             elif choice in ['4', 'c']:
                 self.settings_menu()
             elif choice in ['0', 'q']:
@@ -137,10 +138,10 @@ class Application:
         print('Grammar selected. The rules of the grammar will be revealed after the session.')
         return gmr, grammatical_strings
 
-    def save_grammar(self):
-        """Generate and serialize a suitable grammar to file for later use."""
-        gmr, _ = self.generate_grammar()
-        if not gmr:
+    def generate_experiment(self):
+        """Generate and serialize a new suitable grammar to file for later use."""
+        self.grammar, _ = self.generate_grammar()
+        if not self.grammar:
             return
         while True:
             filename = input('save to filename (leave empty to cancel): ')
@@ -153,13 +154,17 @@ class Application:
                 if choice and choice[0].lower() == 'y':
                     go_ahead = True
             if go_ahead:
-                settings_and_gmr = copy.copy(self.settings)
-                settings_and_gmr.autosave = False
-                settings_and_gmr.grammar = gmr.obfuscated_repr()
-                settings_and_gmr.save_all_to_ini(filename)
+                self.save_experiment(filename)
                 return
 
-    def load_grammar(self):
+    def save_experiment(self, filename=None):
+        """Serialize current experiment state to file to be run or resumed later."""
+        settings_and_gmr = copy.copy(self.settings)
+        settings_and_gmr.autosave = False
+        settings_and_gmr.grammar = self.grammar.obfuscated_repr()
+        settings_and_gmr.save_all_to_ini(filename)
+
+    def load_experiment(self):
         """Restore a previously generated grammar from a file of the user's choice
         and (re)run the experiment with the same grammar."""
         filename = input('file to load grammar from (leave empty to go back): ')
@@ -184,7 +189,7 @@ class Application:
             return
         settings_without_gmr = copy.copy(settings_and_gmr)
         settings_without_gmr.grammar = None
-        if self.settings != settings_without_gmr:
+        if not self.settings.settings_equal(settings_without_gmr):
             print('warning: your current settings differ from those loaded from file:\n')
             print(f"settings in {filename}:\n" + settings_without_gmr.pretty_print())
             print(f"current settings:\n" + self.settings.pretty_print())
@@ -195,7 +200,7 @@ class Application:
                 self.settings = settings_and_gmr
         # don't forget to reset tokens as well
         gmr.symbols = self.settings.string_tokens
-        self.run_experiment(filename, gmr)
+        self.run_experiment(gmr)
 
     def settings_menu(self):
         """Enable user to configure and adjust the experimental protocol."""
@@ -210,7 +215,7 @@ class Application:
             print(f" 6: number of [u]ngrammatical test strings:\t{self.settings.test_strings_ungrammatical}")
             print(f" 7: mi[n]imum string length:\t\t\t{self.settings.minimum_string_length}")
             print(f" 8: ma[x]imum string length:\t\t\t{self.settings.maximum_string_length}")
-            print(f" 9: [l]etters or words to use in strings:\t\t{self.settings.string_tokens}")
+            print(f" 9: [l]etters or words to use in strings:\t{self.settings.string_tokens}")
             print(f"10: allow [r]ecursion in the grammar:\t\t{self.settings.recursion}")
             print(f"11: log[f]ile to record sessions in:\t\t{self.settings.logfile_filename}")
             print(f"12: show training strings [o]ne at a time:\t{self.settings.training_one_at_a_time}")
@@ -317,138 +322,158 @@ class Application:
                     else:
                         print('error: invalid number')
 
-    def run_experiment(self, filename=None, gmr=None):
+    def run_experiment(self, gmr=None):
         """Run one session of training and testing with a random grammar and record everything in the log file."""
-        def clear():
-            if os.system('cls'):
-                # non-zero exit code, try the other command
-                os.system('clear')
-        clear()
-        num_required_grammatical = self.settings.training_strings + self.settings.test_strings_grammatical
-        self.duplicate_print('=' * 120, log_only=True)
-        grammatical_strings = None
-        if gmr is not None:
-            self.duplicate_print('agl-solitaire session started with a pregenerated grammar:')
-            self.duplicate_print(self.settings.pretty_short())
-            self.duplicate_print('Generating training strings and test strings based on the grammar...')
-            grammatical_strings = list(gmr.produce_grammatical(num_strings=num_required_grammatical,
-                                                               min_length=self.settings.minimum_string_length,
-                                                               max_length=self.settings.maximum_string_length))
-        else:
-            self.duplicate_print('agl-solitaire session started with the following settings:')
-            self.duplicate_print(self.settings.pretty_print())
-            gmr, grammatical_strings = self.generate_grammar()
-            if gmr is None:
-                return
-            self.duplicate_print('Generating training strings and test strings based on the grammar...')
-        # partition grammatical_strings into two subsets
-        picked_for_training = random.sample(range(0,num_required_grammatical), k=self.settings.training_strings)
-        training_set = [grammatical_strings[i] for i in picked_for_training]
-        test_set = [(grammatical_strings[i], 'y') for i in set(range(0,num_required_grammatical)) - set(picked_for_training)]
-        test_set += [(string, 'n') for string in gmr.produce_ungrammatical(num_strings=self.settings.test_strings_ungrammatical,
-                                                                           min_length=self.settings.minimum_string_length,
-                                                                           max_length=self.settings.maximum_string_length)]
-        assert len(test_set) == self.settings.test_strings_grammatical + self.settings.test_strings_ungrammatical
-        # permute test_set
-        random.shuffle(test_set)
-        self.duplicate_print('Done.')
-        if self.settings.run_questionnaire:
-            self.duplicate_print('A few questions before we begin. Feel free to answer as briefly or in as much detail as you like.')
-            self.duplicate_print('Your answers are going to be stored in the log file.')
-            self.duplicate_print('Have you heard about artificial grammar learning experiments before?')
-            answer = input()
-            self.duplicate_print(answer, log_only=True)
-            self.duplicate_print('What languages do you speak?')
-            answer = input()
-            self.duplicate_print(answer, log_only=True)
-            self.duplicate_print('What is your profession if you care to share?')
-            answer = input()
-            self.duplicate_print(answer, log_only=True)
-            self.duplicate_print(f"Out of {len(test_set)} questions what do you expect your score to be in this session?")
-            answer = input()
-            self.duplicate_print(answer, log_only=True)
-        self.duplicate_print(f"You may add any {'further ' if self.settings.run_questionnaire else ''}notes or comments for the record before the training phase begins (optional). Please enter an empty line when you're done:")
-        comments = '\n'.join(iter(input, ''))
-        self.duplicate_print(comments, log_only=True)
-        clear()
-        if self.settings.training_one_at_a_time:
-            time_per_item = round(float(self.settings.training_time) / self.settings.training_strings, 2)
-            self.duplicate_print(f"The training phase will now begin. You will be presented with {self.settings.training_strings} exemplars of the hidden grammar for {time_per_item} seconds each.")
-        else:
-            self.duplicate_print(f"The training phase will now begin. You will have {self.settings.training_time} seconds to study a list of {self.settings.training_strings} exemplars of the hidden grammar.")
-        self.duplicate_print('Please make sure your screen and terminal font are comfortable to read. Press return when you are ready.')
-        input()
-        input_thread = None
-        if self.settings.training_one_at_a_time:
-            for string in training_set:
-                clear()
-                self.duplicate_print(string)
-                time.sleep(float(self.settings.training_time) / self.settings.training_strings)
-        else:
-            self.duplicate_print('Training phase started. Please study the following list of strings:')
-            self.duplicate_print('\n'.join(training_set))
-            print()
-            input_thread = threading.Thread(target=input, daemon=True)
-            input_thread.start()
-            remaining_time = self.settings.training_time
-            while input_thread.is_alive() and 0 < remaining_time:
-                print(f"\r{remaining_time} seconds remaining (press return to finish early)...  ", end='')
-                time.sleep(1)
-                remaining_time -= 1
-        print('\rTraining phase finished.' + ' ' * 30)
-        self.duplicate_print('Training phase finished.', log_only=True)
-        clear()
-        self.duplicate_print(f"The test phase will now begin. You will be shown {len(test_set)} new strings one at a time and prompted to judge the grammaticality of each.")
-        self.duplicate_print("You may type 'y' for yes (i.e. grammatical) and 'n' for no (ungrammatical). Press return when you are ready.")
-        # recycle input_thread if it's still running...
-        if input_thread and input_thread.is_alive():
-            input_thread.join()
-        else:
-            input()
-        # N.B. you can't do the following because you want to update the original test_set
-        #for i, item in enumerate(test_set):
-        for i in range(len(test_set)):
+        # wrap the whole function body in a try block to handle a keyboard interrupt
+        def run_experiment_(self, gmr):
+            def clear():
+                if os.system('cls'):
+                    # non-zero exit code, try the other command
+                    os.system('clear')
             clear()
-            self.duplicate_print(f"Test item #{i+1} out of {len(test_set)}. Is the following string grammatical? (y/n)")
-            self.duplicate_print(test_set[i][0])
-            answer = '_'
-            while answer[0] not in ['y', 'n']:
-                answer = None
-                while not answer:
-                    answer = input('> ')
-                answer = answer[0].lower()
-                if answer == 'g':
-                    answer = 'y'
-                elif answer == 'u':
-                    answer = 'n'
-            self.duplicate_print(answer, log_only=True)
-            test_set[i] = (test_set[i][0], test_set[i][1], answer)
-        clear()
-        self.duplicate_print('Test phase finished. Hope you had fun!')
-        if self.settings.run_questionnaire:
-            self.duplicate_print('A few more questions if you feel like it:')
-            self.duplicate_print('How did you feel during the session?')
-            answer = input()
-            self.duplicate_print(answer, log_only=True)
-            self.duplicate_print('Do you feel like you did well in this session?')
-            answer = input()
-            self.duplicate_print(answer, log_only=True)
-            self.duplicate_print('Did you seem to find any concrete or giveaways or hints in the strings?')
-            answer = input()
-            self.duplicate_print(answer, log_only=True)
-        clear()
-        self.duplicate_print('And now for the big reveal... Strings were generated using the following regular grammar:')
-        self.duplicate_print(str(gmr))
-        correct = sum(item[1] == item[2] for item in test_set)
-        self.duplicate_print(f"You gave {correct} correct answers out of {len(test_set)} ({100 * correct/len(test_set):.3}%). The answers were the following:")
-        # make table columns wider if needed
-        width = max(16, 2 + max(len(item[0]) for item in test_set))
-        self.duplicate_print(f"{'Test string':<{width}}{'Correct answer':<16}{'Your answer':<16}")
-        for item in test_set:
-            self.duplicate_print(f"{item[0]:<{width}}{'yes' if 'y' == item[1] else 'no':<16}{'yes' if 'y' == item[2] else 'no':<16}")
-        self.duplicate_print('You now have a chance to add any other post hoc notes or comments for the record if you wish. Please enter an empty line when you\'re done:')
-        comments = '\n'.join(iter(input, ''))
-        self.duplicate_print(comments, log_only=True)
+            if self.settings.experiment_state:
+                self.duplicate_print('You are now resuming a previously paused session.')
+            else:
+                self.settings.experiment_state = settings.ExperimentState(False, [], [])
+                num_required_grammatical = self.settings.training_strings + self.settings.test_strings_grammatical
+                self.duplicate_print('=' * 120, log_only=True)
+                grammatical_strings = None
+                if gmr is not None:
+                    self.duplicate_print('agl-solitaire session started with a pregenerated grammar:')
+                    self.duplicate_print(self.settings.pretty_short())
+                    self.duplicate_print('Generating training strings and test strings based on the grammar...')
+                    grammatical_strings = list(gmr.produce_grammatical(num_strings=num_required_grammatical,
+                                                                       min_length=self.settings.minimum_string_length,
+                                                                       max_length=self.settings.maximum_string_length))
+                else:
+                    self.duplicate_print('agl-solitaire session started with the following settings:')
+                    self.duplicate_print(self.settings.pretty_print())
+                    gmr, grammatical_strings = self.generate_grammar()
+                    if gmr is None:
+                        return
+                    self.duplicate_print('Generating training strings and test strings based on the grammar...')
+                # partition grammatical_strings into two subsets
+                picked_for_training = random.sample(range(0,num_required_grammatical), k=self.settings.training_strings)
+                self.settings.experiment_state.training_set = [grammatical_strings[i] for i in picked_for_training]
+                self.settings.experiment_state.test_set = [(grammatical_strings[i], 'y', None) for i in set(range(0,num_required_grammatical)) - set(picked_for_training)]
+                self.settings.experiment_state.test_set += [(string, 'n', None) for string in gmr.produce_ungrammatical(num_strings=self.settings.test_strings_ungrammatical,
+                                                                                                                        min_length=self.settings.minimum_string_length,
+                                                                                                                        max_length=self.settings.maximum_string_length)]
+                assert len(self.settings.experiment_state.test_set) == self.settings.test_strings_grammatical + self.settings.test_strings_ungrammatical
+                # permute test_set
+                random.shuffle(self.settings.experiment_state.test_set)
+                self.duplicate_print('Done.')
+                if self.settings.run_questionnaire:
+                    self.duplicate_print('A few questions before we begin. Feel free to answer as briefly or in as much detail as you like.')
+                    self.duplicate_print('Your answers are going to be stored in the log file.')
+                    self.duplicate_print('Have you heard about artificial grammar learning experiments before?')
+                    answer = input()
+                    self.duplicate_print(answer, log_only=True)
+                    self.duplicate_print('What languages do you speak?')
+                    answer = input()
+                    self.duplicate_print(answer, log_only=True)
+                    self.duplicate_print('What is your profession if you care to share?')
+                    answer = input()
+                    self.duplicate_print(answer, log_only=True)
+                    self.duplicate_print(f"Out of {len(self.settings.experiment_state.test_set)} questions what do you expect your score to be in this session?")
+                    answer = input()
+                    self.duplicate_print(answer, log_only=True)
+                # end of "else"
+            self.duplicate_print(f"You may add any {'further ' if self.settings.run_questionnaire else ''}notes or comments for the record before the training phase begins (optional). Please enter an empty line when you're done:")
+            comments = '\n'.join(iter(input, ''))
+            self.duplicate_print(comments, log_only=True)
+            clear()
+            assert self.settings.experiment_state
+            if not self.settings.experiment_state.training_finished:
+                if self.settings.training_one_at_a_time:
+                    time_per_item = round(float(self.settings.training_time) / self.settings.training_strings, 2)
+                    self.duplicate_print(f"The training phase will now begin. You will be presented with {self.settings.training_strings} exemplars of the hidden grammar for {time_per_item} seconds each.")
+                else:
+                    self.duplicate_print(f"The training phase will now begin. You will have {self.settings.training_time} seconds to study a list of {self.settings.training_strings} exemplars of the hidden grammar.")
+                self.duplicate_print('Please make sure your screen and terminal font are comfortable to read. Press return when you are ready.')
+                self.duplicate_print('You can use a keyboard interrupt (Ctrl-Break on Windows, Ctrl-C on macOS/Unix) to save your progress and exit at any time. You will be able to finish the experiment later.')
+                input()
+                input_thread = None
+                if self.settings.training_one_at_a_time:
+                    for string in self.settings.experiment_state.training_set:
+                        clear()
+                        self.duplicate_print(string)
+                        time.sleep(float(self.settings.training_time) / self.settings.training_strings)
+                else:
+                    self.duplicate_print('Training phase started. Please study the following list of strings:')
+                    print()
+                    self.duplicate_print('\n'.join(self.settings.experiment_state.training_set))
+                    print()
+                    input_thread = threading.Thread(target=input, daemon=True)
+                    input_thread.start()
+                    remaining_time = self.settings.training_time
+                    while input_thread.is_alive() and 0 < remaining_time:
+                        print(f"\r{remaining_time} seconds remaining (press return to finish early)...  ", end='')
+                        time.sleep(1)
+                        remaining_time -= 1
+                print('\rTraining phase finished.' + ' ' * 30)
+                self.duplicate_print('Training phase finished.', log_only=True)
+                self.settings.experiment_state.training_finished = True
+                clear()
+            self.duplicate_print(f"The test phase will now begin. You will be shown {len(self.settings.experiment_state.test_set)} new strings one at a time and prompted to judge the grammaticality of each.")
+            self.duplicate_print("You may type 'y' for yes (i.e. grammatical) and 'n' for no (ungrammatical). Press return when you are ready.")
+            self.duplicate_print('You can use a keyboard interrupt (Ctrl-Break on Windows, Ctrl-C on macOS/Unix) to save your progress and exit at any time. You will be able to finish the experiment later.')
+            # recycle input_thread if it's still running...
+            if input_thread and input_thread.is_alive():
+                input_thread.join()
+            else:
+                input()
+            # N.B. you can't do the following because you want to update the original test_set
+            #for i, item in enumerate(self.settings.experiment_state.test_set):
+            for i in range(len(self.settings.experiment_state.test_set)):
+                if self.settings.experiment_state.test_set[i][2] is not None:
+                    # already answered in a previous session
+                    continue
+                clear()
+                self.duplicate_print(f"Test item #{i+1} out of {len(self.settings.experiment_state.test_set)}. Is the following string grammatical? (y/n)")
+                self.duplicate_print(self.settings.experiment_state.test_set[i][0])
+                answer = '_'
+                while answer[0] not in ['y', 'n']:
+                    answer = None
+                    while not answer:
+                        answer = input('> ')
+                    answer = answer[0].lower()
+                    if answer == 'g':
+                        answer = 'y'
+                    elif answer == 'u':
+                        answer = 'n'
+                self.duplicate_print(answer, log_only=True)
+                self.settings.experiment_state.test_set[i] = (self.settings.experiment_state.test_set[i][0], self.settings.experiment_state.test_set[i][1], answer)
+            clear()
+            self.duplicate_print('Test phase finished. Hope you had fun!')
+            if self.settings.run_questionnaire:
+                self.duplicate_print('A few more questions if you feel like it:')
+                self.duplicate_print('How did you feel during the session?')
+                answer = input()
+                self.duplicate_print(answer, log_only=True)
+                self.duplicate_print('Do you feel like you did well in this session?')
+                answer = input()
+                self.duplicate_print(answer, log_only=True)
+                self.duplicate_print('Did you seem to find any concrete giveaways or hints in the strings?')
+                answer = input()
+                self.duplicate_print(answer, log_only=True)
+            clear()
+            self.duplicate_print('And now for the big reveal... Strings were generated using the following regular grammar:')
+            self.duplicate_print(str(gmr))
+            correct = sum(item[1] == item[2] for item in self.settings.experiment_state.test_set)
+            self.duplicate_print(f"You gave {correct} correct answers out of {len(self.settings.experiment_state.test_set)} ({100 * correct/len(self.settings.experiment_state.test_set):.3}%). The answers were the following:")
+            # make table columns wider if needed
+            width = max(16, 2 + max(len(item[0]) for item in self.settings.experiment_state.test_set))
+            self.duplicate_print(f"{'Test string':<{width}}{'Correct answer':<16}{'Your answer':<16}")
+            for item in self.settings.experiment_state.test_set:
+                self.duplicate_print(f"{item[0]:<{width}}{'yes' if 'y' == item[1] else 'no':<16}{'yes' if 'y' == item[2] else 'no':<16}")
+            self.duplicate_print('You now have a chance to add any other post hoc notes or comments for the record if you wish. Please enter an empty line when you\'re done:')
+            comments = '\n'.join(iter(input, ''))
+            self.duplicate_print(comments, log_only=True)
+        try:
+            run_experiment_(self, gmr)
+        except KeyboardInterrupt:
+            self.save_experiment()
 
 
 if __name__ == '__main__':
