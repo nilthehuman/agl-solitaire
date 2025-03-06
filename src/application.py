@@ -327,9 +327,15 @@ class Application:
         # wrap the whole function body in a try block to handle a keyboard interrupt
         def run_experiment_(self, gmr):
             def clear():
-                if os.system('cls'):
+                global which_clear
+                try:
+                    which_clear
+                except NameError:
+                    which_clear = 'cls'
+                if os.system(which_clear):
                     # non-zero exit code, try the other command
-                    os.system('clear')
+                    (which_clear,) = set(['cls', 'clear']) - set([which_clear])
+                    os.system(which_clear)
             clear()
             if self.settings.experiment_state:
                 self.duplicate_print('You are now resuming a previously paused session.')
