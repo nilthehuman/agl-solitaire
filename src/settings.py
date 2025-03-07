@@ -221,6 +221,13 @@ class Settings:
                     value = str(value)
                     configfile.write(field.name + ' = ' + value + '\n')
 
+    def without_autosave(self, callback):
+        """Temporarily suspend the autosave functionality."""
+        autosave_backup = self.autosave
+        self.autosave = False
+        callback()
+        self.autosave = autosave_backup
+
     def __setattr__(self, attr, value):
         """Save any and all settings changes automatically if required."""
         super().__setattr__(attr, value)
