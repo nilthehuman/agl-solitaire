@@ -176,7 +176,11 @@ class Application:
             print('error: not a file (maybe a folder?)')
             return
         settings_and_gmr = settings.Settings()
-        settings_and_gmr.load_all(filename)
+        try:
+            settings_and_gmr.load_all(filename)
+        except Exception:
+            print('error: loading experiment from file failed')
+            return
         settings_and_gmr.autosave = False
         if settings_and_gmr.grammar is None:
             print('error: file does not include a grammar')
