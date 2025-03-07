@@ -190,11 +190,9 @@ class Application:
         except (IndexError, SyntaxError):
             print('error: loading grammar from file failed')
             return
-        settings_without_gmr = copy.copy(settings_and_gmr)
-        settings_without_gmr.grammar = None
-        if not self.settings.settings_equal(settings_without_gmr):
+        if not self.settings.settings_equal(settings_and_gmr):
             print('warning: your current settings differ from those loaded from file:\n')
-            print(f"settings in {filename}:\n" + settings_without_gmr.pretty_print())
+            print(f"settings in {filename}:\n" + settings_and_gmr.pretty_print())
             print(f"current settings:\n" + self.settings.pretty_print())
             choice = ''
             while not choice:
