@@ -172,10 +172,14 @@ class Settings:
             self.filename = filename
         config = configparser.ConfigParser()
         for field in dataclasses.fields(self):
-            if 'grammar' == field.name and self.grammar is None:
+            if 'filename' == field.name:
+                continue
+            elif 'grammar' == field.name and self.grammar is None:
+                continue
+            elif 'experiment_state' == field.name and self.experiment_state is None:
                 continue
             # the string_tokens variable is a list of strings internally
-            if 'string_tokens' == field.name:
+            elif 'string_tokens' == field.name:
                 # string_tokens may be a list of strings or a list of individual letters
                 config['DEFAULT'][field.name] = ' '.join(self.string_tokens)
             elif 'experiment_state' == field.name:
@@ -196,7 +200,11 @@ class Settings:
                 self.filename = filename
             with open(self.filename, 'w', encoding='UTF-8') as configfile:
                 for field in dataclasses.fields(self):
-                    if 'grammar' == field.name and self.grammar is None:
+                    if 'filename' == field.name:
+                        continue
+                    elif 'grammar' == field.name and self.grammar is None:
+                        continue
+                    elif 'experiment_state' == field.name and self.experiment_state is None:
                         continue
                     value = getattr(self, field.name)
                     # string_tokens may be a list of strings or a list of individual letters
