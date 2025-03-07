@@ -438,6 +438,8 @@ class Application:
                 print('\rTraining phase finished.' + ' ' * 30)
                 self.duplicate_print('Training phase finished.', log_only=True)
                 loaded_settings.experiment_state.training_finished = True
+                # FIXME: need to call this manually because __setattr__ doesn't get called if you update a member variable in-place :(
+                loaded_settings.save_all_to_ini()
                 clear()
             self.duplicate_print(f"The test phase will now begin. You will be shown {len(loaded_settings.experiment_state.test_set)} new strings one at a time and prompted to judge the grammaticality of each.")
             self.duplicate_print(f"You can use Ctrl-Break on Windows or Ctrl-C on macOS/Unix to halt the experiment at any time. Your progress will be saved to '{loaded_settings.filename}' and you will be able to finish the experiment later.")
@@ -468,6 +470,8 @@ class Application:
                         answer = 'n'
                 self.duplicate_print(answer, log_only=True)
                 loaded_settings.experiment_state.test_set[i] = (loaded_settings.experiment_state.test_set[i][0], loaded_settings.experiment_state.test_set[i][1], answer)
+                # FIXME: need to call this manually because __setattr__ doesn't get called if you update a member variable in-place :(
+                loaded_settings.save_all_to_ini()
             clear()
             self.duplicate_print('Test phase finished. Hope you had fun!')
             if loaded_settings.run_questionnaire:
