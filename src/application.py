@@ -74,8 +74,8 @@ class Application:
         while True:
             print('\n--------  MAIN MENU  --------')
             print('1: [s]tart new experiment session')
-            print('2: [r]epeat experiment with previously used grammar')
-            print('3: [g]enerate and save grammar for repeat sessions')
+            print('2: [l]oad experiment from file')
+            print('3: [g]enerate and save grammar for later sessions')
             print('4: [c]onfigure settings')
             print('0: [q]uit')
             choice = ''
@@ -84,7 +84,7 @@ class Application:
             choice = choice[0].lower()
             if choice in ['1', 's']:
                 self.run_experiment()
-            elif choice in ['2', 'r']:
+            elif choice in ['2', 'l']:
                 self.load_experiment()
             elif choice in ['3', 'g']:
                 self.generate_experiment()
