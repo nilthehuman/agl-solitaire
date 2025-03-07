@@ -336,8 +336,17 @@ class Application:
                     (which_clear,) = set(['cls', 'clear']) - set([which_clear])
                     os.system(which_clear)
             clear()
-            if self.settings.experiment_state:
-                self.duplicate_print('You are now resuming a previously paused session.')
+            if self.settings.experiment_state and self.settings.experiment_state.test_set:
+                if any(judgement is None for (_, _, judgement) in self.settings.experiment_state.test_set):
+                    self.duplicate_print('You are now resuming a previously paused session.')
+                else:
+                    print('You have loaded a previously completed experiment. Do you want to repeat the same experiment? (y/n)')
+                    do_repeat = None
+                    while do_repeat is None or do_repeat[0] not in ['y', 'n']:
+                        do_repeat = input('> ')
+                    if 'y' != do_repeat[0]:
+                        return
+                    self.settings.experiment_state = settings.ExperimentState(False, [], [])
             else:
                 self.settings.experiment_state = settings.ExperimentState(False, [], [])
                 num_required_grammatical = self.settings.training_strings + self.settings.test_strings_grammatical
