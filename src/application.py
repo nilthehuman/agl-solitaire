@@ -56,7 +56,6 @@ class Application:
     def __init__(self):
         self.settings = settings.Settings()
         self.settings.load_all_from_ini()
-        self.grammar = None
 
     def duplicate_print(self, string, log_only=False):
         """Output the string on the screen and log it in a text file at the same time."""
@@ -140,8 +139,8 @@ class Application:
 
     def generate_experiment(self):
         """Generate and serialize a new suitable grammar to file for later use."""
-        self.grammar, _ = self.generate_grammar()
-        if not self.grammar:
+        gmr, _ = self.generate_grammar()
+        if not gmr:
             return
         while True:
             filename = input('save to filename (leave empty to cancel): ')
@@ -154,14 +153,14 @@ class Application:
                 if choice and choice[0].lower() == 'y':
                     go_ahead = True
             if go_ahead:
-                self.save_experiment(filename)
+                self.save_experiment(gmr, filename)
                 return
 
-    def save_experiment(self, filename=None):
+    def save_experiment(self, gmr, filename=None):
         """Serialize current experiment state to file to be run or resumed later."""
         settings_and_gmr = copy.copy(self.settings)
         settings_and_gmr.autosave = False
-        settings_and_gmr.grammar = self.grammar.obfuscated_repr()
+        settings_and_gmr.grammar = gmr.obfuscated_repr()
         settings_and_gmr.save_all_to_ini(filename)
 
     def load_experiment(self):
