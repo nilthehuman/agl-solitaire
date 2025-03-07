@@ -327,10 +327,10 @@ class Application:
                     else:
                         print('error: invalid number')
 
-    def run_experiment(self, gmr=None):
+    def run_experiment(self, loaded_settings=None, gmr=None):
         """Run one session of training and testing with a random grammar and record everything in the log file."""
         # wrap the whole function body in a try block to handle a keyboard interrupt
-        def run_experiment_(self, gmr):
+        try:
             def clear():
                 global which_clear
                 try:
@@ -342,48 +342,50 @@ class Application:
                     (which_clear,) = set(['cls', 'clear']) - set([which_clear])
                     os.system(which_clear)
             clear()
-            if self.settings.experiment_state and self.settings.experiment_state.test_set:
-                if any(judgement is None for (_, _, judgement) in self.settings.experiment_state.test_set):
+            if loaded_settings is None:
+                loaded_settings = self.settings
+            if loaded_settings.experiment_state and loaded_settings.experiment_state.test_set:
+                if any(judgement is None for (_, _, judgement) in loaded_settings.experiment_state.test_set):
                     self.duplicate_print('You are now resuming a previously paused session.')
                 else:
-                    print('You have loaded a previously completed experiment. Do you want to repeat the same experiment? (y/n)')
+                    print('You have loaded a previously completed experiment. Do you want to repeat the same experiment all over again? (y/n)')
                     do_repeat = None
                     while do_repeat is None or do_repeat[0] not in ['y', 'n']:
                         do_repeat = input()
                     if 'y' != do_repeat[0]:
                         return
-                    self.settings.experiment_state = settings.ExperimentState(False, [], [])
+                    loaded_settings.experiment_state = settings.ExperimentState(False, [], [])
             else:
-                self.settings.experiment_state = settings.ExperimentState(False, [], [])
-                num_required_grammatical = self.settings.training_strings + self.settings.test_strings_grammatical
+                loaded_settings.experiment_state = settings.ExperimentState(False, [], [])
+                num_required_grammatical = loaded_settings.training_strings + loaded_settings.test_strings_grammatical
                 self.duplicate_print('=' * 120, log_only=True)
                 grammatical_strings = None
                 if gmr is not None:
                     self.duplicate_print('agl-solitaire session started with a pregenerated grammar:')
-                    self.duplicate_print(self.settings.pretty_short())
+                    self.duplicate_print(loaded_settings.pretty_short())
                     self.duplicate_print('Generating training strings and test strings based on the grammar...')
                     grammatical_strings = list(gmr.produce_grammatical(num_strings=num_required_grammatical,
-                                                                       min_length=self.settings.minimum_string_length,
-                                                                       max_length=self.settings.maximum_string_length))
+                                                                       min_length=loaded_settings.minimum_string_length,
+                                                                       max_length=loaded_settings.maximum_string_length))
                 else:
                     self.duplicate_print('agl-solitaire session started with the following settings:')
-                    self.duplicate_print(self.settings.pretty_print())
+                    self.duplicate_print(loaded_settings.pretty_print())
                     gmr, grammatical_strings = self.generate_grammar()
                     if gmr is None:
                         return
                     self.duplicate_print('Generating training strings and test strings based on the grammar...')
                 # partition grammatical_strings into two subsets
-                picked_for_training = random.sample(range(0,num_required_grammatical), k=self.settings.training_strings)
-                self.settings.experiment_state.training_set = [grammatical_strings[i] for i in picked_for_training]
-                self.settings.experiment_state.test_set = [(grammatical_strings[i], 'y', None) for i in set(range(0,num_required_grammatical)) - set(picked_for_training)]
-                self.settings.experiment_state.test_set += [(string, 'n', None) for string in gmr.produce_ungrammatical(num_strings=self.settings.test_strings_ungrammatical,
-                                                                                                                        min_length=self.settings.minimum_string_length,
-                                                                                                                        max_length=self.settings.maximum_string_length)]
-                assert len(self.settings.experiment_state.test_set) == self.settings.test_strings_grammatical + self.settings.test_strings_ungrammatical
+                picked_for_training = random.sample(range(0,num_required_grammatical), k=loaded_settings.training_strings)
+                loaded_settings.experiment_state.training_set = [grammatical_strings[i] for i in picked_for_training]
+                loaded_settings.experiment_state.test_set = [(grammatical_strings[i], 'y', None) for i in set(range(0,num_required_grammatical)) - set(picked_for_training)]
+                loaded_settings.experiment_state.test_set += [(string, 'n', None) for string in gmr.produce_ungrammatical(num_strings=loaded_settings.test_strings_ungrammatical,
+                                                                                                                          min_length=loaded_settings.minimum_string_length,
+                                                                                                                          max_length=loaded_settings.maximum_string_length)]
+                assert len(loaded_settings.experiment_state.test_set) == loaded_settings.test_strings_grammatical + loaded_settings.test_strings_ungrammatical
                 # permute test_set
-                random.shuffle(self.settings.experiment_state.test_set)
+                random.shuffle(loaded_settings.experiment_state.test_set)
                 self.duplicate_print('Done.')
-                if self.settings.run_questionnaire:
+                if loaded_settings.run_questionnaire:
                     self.duplicate_print('A few questions before we begin. Feel free to answer as briefly or in as much detail as you like.')
                     self.duplicate_print('Your answers are going to be stored in the log file.')
                     self.duplicate_print('Have you heard about artificial grammar learning experiments before?')
@@ -395,65 +397,65 @@ class Application:
                     self.duplicate_print('What is your profession if you care to share?')
                     answer = input()
                     self.duplicate_print(answer, log_only=True)
-                    self.duplicate_print(f"Out of {len(self.settings.experiment_state.test_set)} questions what do you expect your score to be in this session?")
+                    self.duplicate_print(f"Out of {len(loaded_settings.experiment_state.test_set)} questions what do you expect your score to be in this session?")
                     answer = input()
                     self.duplicate_print(answer, log_only=True)
                 # end of "else"
-            self.duplicate_print(f"You may add any {'further ' if self.settings.run_questionnaire else ''}notes or comments for the record before the training phase begins (optional). Please enter an empty line when you're done:")
+            self.duplicate_print(f"You may add any {'further ' if loaded_settings.run_questionnaire else ''}notes or comments for the record before the training phase begins (optional). Please enter an empty line when you're done:")
             comments = '\n'.join(iter(input, ''))
             self.duplicate_print(comments, log_only=True)
             clear()
-            assert self.settings.experiment_state
+            assert loaded_settings.experiment_state
             # used for sleeping but keeping the keyboard awake
             input_thread = None
-            if not self.settings.experiment_state.training_finished:
-                if self.settings.training_one_at_a_time:
-                    time_per_item = round(float(self.settings.training_time) / self.settings.training_strings, 2)
-                    self.duplicate_print(f"The training phase will now begin. You will be presented with {self.settings.training_strings} exemplars of the hidden grammar for {time_per_item} seconds each.")
+            if not loaded_settings.experiment_state.training_finished:
+                if loaded_settings.training_one_at_a_time:
+                    time_per_item = round(float(loaded_settings.training_time) / loaded_settings.training_strings, 2)
+                    self.duplicate_print(f"The training phase will now begin. You will be presented with {loaded_settings.training_strings} exemplars of the hidden grammar for {time_per_item} seconds each.")
                 else:
-                    self.duplicate_print(f"The training phase will now begin. You will have {self.settings.training_time} seconds to study a list of {self.settings.training_strings} exemplars of the hidden grammar.")
+                    self.duplicate_print(f"The training phase will now begin. You will have {loaded_settings.training_time} seconds to study a list of {loaded_settings.training_strings} exemplars of the hidden grammar.")
+                self.duplicate_print('You can use Ctrl-Break on Windows or Ctrl-C on macOS/Unix to halt the experiment at any time.')
                 self.duplicate_print('Please make sure your screen and terminal font are comfortable to read. Press return when you are ready.')
-                self.duplicate_print('You can use a keyboard interrupt (Ctrl-Break on Windows, Ctrl-C on macOS/Unix) to save your progress and exit at any time. You will be able to finish the experiment later.')
                 input()
-                if self.settings.training_one_at_a_time:
-                    for string in self.settings.experiment_state.training_set:
+                if loaded_settings.training_one_at_a_time:
+                    for string in loaded_settings.experiment_state.training_set:
                         clear()
                         print()
                         self.duplicate_print(string)
-                        time.sleep(float(self.settings.training_time) / self.settings.training_strings)
+                        time.sleep(float(loaded_settings.training_time) / loaded_settings.training_strings)
                 else:
                     self.duplicate_print('Training phase started. Please study the following list of strings:')
                     print()
-                    self.duplicate_print('\n'.join(self.settings.experiment_state.training_set))
+                    self.duplicate_print('\n'.join(loaded_settings.experiment_state.training_set))
                     print()
                     input_thread = threading.Thread(target=input, daemon=True)
                     input_thread.start()
-                    remaining_time = self.settings.training_time
+                    remaining_time = loaded_settings.training_time
                     while input_thread.is_alive() and 0 < remaining_time:
                         print(f"\r{remaining_time} seconds remaining (press return to finish early)...  ", end='')
                         time.sleep(1)
                         remaining_time -= 1
                 print('\rTraining phase finished.' + ' ' * 30)
                 self.duplicate_print('Training phase finished.', log_only=True)
-                self.settings.experiment_state.training_finished = True
+                loaded_settings.experiment_state.training_finished = True
                 clear()
-            self.duplicate_print(f"The test phase will now begin. You will be shown {len(self.settings.experiment_state.test_set)} new strings one at a time and prompted to judge the grammaticality of each.")
+            self.duplicate_print(f"The test phase will now begin. You will be shown {len(loaded_settings.experiment_state.test_set)} new strings one at a time and prompted to judge the grammaticality of each.")
+            self.duplicate_print(f"You can use Ctrl-Break on Windows or Ctrl-C on macOS/Unix to halt the experiment at any time. Your progress will be saved to '{loaded_settings.filename}' and you will be able to finish the experiment later.")
             self.duplicate_print("You may type 'y' for yes (i.e. grammatical) and 'n' for no (ungrammatical). Press return when you are ready.")
-            self.duplicate_print('You can use a keyboard interrupt (Ctrl-Break on Windows, Ctrl-C on macOS/Unix) to save your progress and exit at any time. You will be able to finish the experiment later.')
             # recycle input_thread if it's still running...
             if input_thread and input_thread.is_alive():
                 input_thread.join()
             else:
                 input()
             # N.B. you can't do the following because you want to update the original test_set
-            #for i, item in enumerate(self.settings.experiment_state.test_set):
-            for i in range(len(self.settings.experiment_state.test_set)):
-                if self.settings.experiment_state.test_set[i][2] is not None:
+            #for i, item in enumerate(loaded_settings.experiment_state.test_set):
+            for i in range(len(loaded_settings.experiment_state.test_set)):
+                if loaded_settings.experiment_state.test_set[i][2] is not None:
                     # already answered in a previous session
                     continue
                 clear()
-                self.duplicate_print(f"Test item #{i+1} out of {len(self.settings.experiment_state.test_set)}. Is the following string grammatical? (y/n)")
-                self.duplicate_print(self.settings.experiment_state.test_set[i][0])
+                self.duplicate_print(f"Test item #{i+1} out of {len(loaded_settings.experiment_state.test_set)}. Is the following string grammatical? (y/n)")
+                self.duplicate_print(loaded_settings.experiment_state.test_set[i][0])
                 answer = '_'
                 while answer[0] not in ['y', 'n']:
                     answer = None
@@ -465,10 +467,10 @@ class Application:
                     elif answer == 'u':
                         answer = 'n'
                 self.duplicate_print(answer, log_only=True)
-                self.settings.experiment_state.test_set[i] = (self.settings.experiment_state.test_set[i][0], self.settings.experiment_state.test_set[i][1], answer)
+                loaded_settings.experiment_state.test_set[i] = (loaded_settings.experiment_state.test_set[i][0], loaded_settings.experiment_state.test_set[i][1], answer)
             clear()
             self.duplicate_print('Test phase finished. Hope you had fun!')
-            if self.settings.run_questionnaire:
+            if loaded_settings.run_questionnaire:
                 self.duplicate_print('A few more questions if you feel like it:')
                 self.duplicate_print('How did you feel during the session?')
                 answer = input()
@@ -482,20 +484,21 @@ class Application:
             clear()
             self.duplicate_print('And now for the big reveal... Strings were generated using the following regular grammar:')
             self.duplicate_print(str(gmr))
-            correct = sum(item[1] == item[2] for item in self.settings.experiment_state.test_set)
-            self.duplicate_print(f"You gave {correct} correct answers out of {len(self.settings.experiment_state.test_set)} ({100 * correct/len(self.settings.experiment_state.test_set):.3}%). The answers were the following:")
+            correct = sum(item[1] == item[2] for item in loaded_settings.experiment_state.test_set)
+            self.duplicate_print(f"You gave {correct} correct answers out of {len(loaded_settings.experiment_state.test_set)} ({100 * correct/len(loaded_settings.experiment_state.test_set):.3}%). The answers were the following:")
             # make table columns wider if needed
-            width = max(16, 2 + max(len(item[0]) for item in self.settings.experiment_state.test_set))
+            width = max(16, 2 + max(len(item[0]) for item in loaded_settings.experiment_state.test_set))
             self.duplicate_print(f"{'Test string':<{width}}{'Correct answer':<16}{'Your answer':<16}")
-            for item in self.settings.experiment_state.test_set:
+            for item in loaded_settings.experiment_state.test_set:
                 self.duplicate_print(f"{item[0]:<{width}}{'yes' if 'y' == item[1] else 'no':<16}{'yes' if 'y' == item[2] else 'no':<16}")
             self.duplicate_print('You now have a chance to add any other post hoc notes or comments for the record if you wish. Please enter an empty line when you\'re done:')
             comments = '\n'.join(iter(input, ''))
             self.duplicate_print(comments, log_only=True)
-        try:
-            run_experiment_(self, gmr)
         except KeyboardInterrupt:
-            self.save_experiment()
+            # autosave is on, no need to call save_experiment again
+            print()
+            self.duplicate_print(f"Experiment halted by user. Progress saved to '{loaded_settings.filename}'.")
+            # returning to main menu
 
 
 if __name__ == '__main__':
