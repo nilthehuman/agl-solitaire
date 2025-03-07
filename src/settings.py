@@ -129,8 +129,6 @@ class Settings:
 
     def load_all(self, filename=None):
         """Read and set our settings values from file according to format based on its extension."""
-        if filename and not self.filename:
-            self.filename = filename
         if not filename:
             filename = self.filename
         assert filename
@@ -143,6 +141,7 @@ class Settings:
 
     def load_all_from_ini(self, filename=_DEFAULT_INI_FILENAME):
         """Read and set our settings values from an INI settings file if it exists."""
+        self.filename = filename
         config = configparser.ConfigParser()
         config.read(filename)
         for section in config:
@@ -153,6 +152,7 @@ class Settings:
     if _TOMLLIB_AVAILABLE:
         def load_all_from_toml(self, filename=_DEFAULT_TOML_FILENAME):
             """Read and set our settings values from a TOML settings file if it exists."""
+            self.filename = filename
             try:
                 with open(filename, 'rb') as file:
                     settings_dict = tomllib.load(file)
@@ -170,8 +170,6 @@ class Settings:
         """Write the current values of all our member variables to an INI config file."""
         if filename:
             self.filename = filename
-        else:
-            filename = _DEFAULT_INI_FILENAME
         config = configparser.ConfigParser()
         for field in dataclasses.fields(self):
             if 'grammar' == field.name and self.grammar is None:
@@ -188,7 +186,7 @@ class Settings:
                 # if it has a stray % character so we must escape those
                 escaped_str = str(getattr(self, field.name)).replace('%', '%%')
                 config['DEFAULT'][field.name] = escaped_str
-        with open(filename, 'w', encoding='UTF-8') as configfile:
+        with open(self.filename, 'w', encoding='UTF-8') as configfile:
             config.write(configfile)
 
     if _TOMLLIB_AVAILABLE:
@@ -196,9 +194,7 @@ class Settings:
             """Write the current values of all our member variables to a TOML config file."""
             if filename:
                 self.filename = filename
-            else:
-                filename = _DEFAULT_INI_FILENAME
-            with open(filename, 'w', encoding='UTF-8') as configfile:
+            with open(self.filename, 'w', encoding='UTF-8') as configfile:
                 for field in dataclasses.fields(self):
                     if 'grammar' == field.name and self.grammar is None:
                         continue
