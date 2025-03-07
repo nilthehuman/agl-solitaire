@@ -200,8 +200,12 @@ class Application:
             if choice[0].lower() != 'y':
                 self.settings = settings_and_gmr
         # don't forget to reset tokens as well
-        gmr.symbols = self.settings.string_tokens
-        self.run_experiment(gmr)
+        try:
+            gmr.set_tokens(self.settings.string_tokens)
+        except ValueError as err:
+            print('\nerror: ' + str(err))
+            return
+        self.run_experiment(settings_and_gmr, gmr)
 
     def settings_menu(self):
         """Enable user to configure and adjust the experimental protocol."""
