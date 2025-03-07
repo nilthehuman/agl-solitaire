@@ -221,10 +221,11 @@ class Application:
             print(f" 7: mi[n]imum string length:\t\t\t{self.settings.minimum_string_length}")
             print(f" 8: ma[x]imum string length:\t\t\t{self.settings.maximum_string_length}")
             print(f" 9: [l]etters or words to use in strings:\t{self.settings.string_tokens}")
-            print(f"10: allow [r]ecursion in the grammar:\t\t{self.settings.recursion}")
+            print(f"10: allow recursion in the grammar:\t\t{self.settings.recursion}")
             print(f"11: log[f]ile to record sessions in:\t\t{self.settings.logfile_filename}")
             print(f"12: show training strings [o]ne at a time:\t{self.settings.training_one_at_a_time}")
-            print(f"13: run pre and post session [q]uestionnaire:\t{self.settings.run_questionnaire}")
+            print(f"13: number of training [r]epetitions:\t\t{self.settings.training_reps} round(s)")
+            print(f"14: run pre and post session [q]uestionnaire:\t{self.settings.run_questionnaire}")
             print(' 0: [b]ack to main menu')
             while not choice:
                 choice = input('what to change> ')
@@ -275,7 +276,7 @@ class Application:
                     if re.search(r"\s", new_tokens):
                         new_tokens = new_tokens.split()
                     self.settings.string_tokens = sorted(list(set([*new_tokens])))
-            elif choice in ['10', 'r']:
+            elif choice in ['10']:
                 self.settings.recursion = not self.settings.recursion
             elif choice in ['11', 'f']:
                 new_filename = input('logfile name: ')
@@ -299,7 +300,10 @@ class Application:
                     self.settings.logfile_filename = new_filename
             elif choice in ['12', 'o']:
                 self.settings.training_one_at_a_time = not self.settings.training_one_at_a_time
-            elif choice in ['13', 'q']:
+            elif choice in ['13', 'r']:
+                prompt = 'number of rounds to repeat training data: '
+                attr_to_change = 'training_reps'
+            elif choice in ['14', 'q']:
                 self.settings.run_questionnaire = not self.settings.run_questionnaire
             elif choice in ['0', 'b']:
                 break
@@ -410,19 +414,26 @@ class Application:
             input_thread = None
             if not loaded_settings.experiment_state.training_finished:
                 if loaded_settings.training_one_at_a_time:
+                    the_same = 'the same ' if 1 < loaded_settings.training_reps else ''
+                    in_rounds = f"in {loaded_settings.training_reps} rounds " if 1 < loaded_settings.training_reps else ''
                     time_per_item = round(float(loaded_settings.training_time) / loaded_settings.training_strings, 2)
-                    self.duplicate_print(f"The training phase will now begin. You will be presented with {loaded_settings.training_strings} exemplars of the hidden grammar for {time_per_item} seconds each.")
+                    self.duplicate_print(f"The training phase will now begin. You will be presented with {the_same}{loaded_settings.training_strings} exemplars of the hidden grammar {in_rounds}for {time_per_item} seconds each.")
                 else:
                     self.duplicate_print(f"The training phase will now begin. You will have {loaded_settings.training_time} seconds to study a list of {loaded_settings.training_strings} exemplars of the hidden grammar.")
                 self.duplicate_print('You can use Ctrl-Break on Windows or Ctrl-C on macOS/Unix to halt the experiment at any time.')
                 self.duplicate_print('Please make sure your screen and terminal font are comfortable to read. Press return when you are ready.')
                 input()
                 if loaded_settings.training_one_at_a_time:
-                    for string in loaded_settings.experiment_state.training_set:
-                        clear()
-                        print()
-                        self.duplicate_print(string)
-                        time.sleep(float(loaded_settings.training_time) / loaded_settings.training_strings)
+                    for training_rep in range(1, loaded_settings.training_reps + 1):
+                        for string in loaded_settings.experiment_state.training_set:
+                            clear()
+                            print()
+                            self.duplicate_print(string)
+                            time.sleep(float(loaded_settings.training_time) / loaded_settings.training_strings)
+                        if training_rep < loaded_settings.training_reps:
+                            clear()
+                            self.duplicate_print(f"Round {training_rep} out of {loaded_settings.training_reps} done. Press return to start round {training_rep+1}.")
+                            input()
                 else:
                     self.duplicate_print('Training phase started. Please study the following list of strings:')
                     print()

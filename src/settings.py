@@ -40,6 +40,7 @@ class Settings:
     grammar_class:              GrammarClass = GrammarClass.REGULAR
     training_strings:           int = 20
     training_time:              int = 300
+    training_reps:              int = 1
     test_strings_grammatical:   int = 20
     test_strings_ungrammatical: int = 20
     minimum_string_length:      int = 2
@@ -76,6 +77,7 @@ class Settings:
         pretty += f"Grammar class: {self.grammar_class}\n"
         pretty += f"Number of training strings: {self.training_strings}\n"
         pretty += f"Time allotted for training: {self.training_time}\n"
+        pretty += f"Number of training rounds: {self.training_reps}\n"
         pretty += f"Number of grammatical test strings: {self.test_strings_grammatical}\n"
         pretty += f"Number of ungrammatical test strings: {self.test_strings_ungrammatical}\n"
         pretty += f"Minimum string length: {self.minimum_string_length}\n"
@@ -93,6 +95,7 @@ class Settings:
         pretty += f"Username: {self.username}\n"
         pretty += f"Number of training strings: {self.training_strings}\n"
         pretty += f"Time allotted for training: {self.training_time}\n"
+        pretty += f"Number of training rounds: {self.training_reps}\n"
         pretty += f"Number of grammatical test strings: {self.test_strings_grammatical}\n"
         pretty += f"Number of ungrammatical test strings: {self.test_strings_ungrammatical}\n"
         pretty += f"Logfile to record session in: {self.logfile_filename}\n"
