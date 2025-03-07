@@ -192,13 +192,14 @@ class Application:
             return
         if not self.settings.settings_equal(settings_and_gmr):
             print('warning: your current settings differ from those loaded from file:\n')
-            print(f"settings in {filename}:\n" + settings_and_gmr.pretty_print())
-            print(f"current settings:\n" + self.settings.pretty_print())
+            print(f"settings in {filename}:\n" + settings_and_gmr.diff(self.settings))
+            print(f"current settings:\n" + self.settings.diff(settings_and_gmr))
             choice = ''
             while not choice:
                 choice = input('keep the current settings instead? (y/n)> ')
             if choice[0].lower() != 'y':
                 self.settings = settings_and_gmr
+                # TODO: save to file here for good measure? ¯\_(ツ)_/¯
         # don't forget to reset tokens as well
         try:
             gmr.set_tokens(self.settings.string_tokens)

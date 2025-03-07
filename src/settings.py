@@ -103,6 +103,36 @@ class Settings:
         pretty += f"Run pre and post session questionnaire: {self.run_questionnaire}\n"
         return pretty
 
+    def diff(self, other):
+        """Show our settings whose values are different from those in other."""
+        diff = ''
+        # I could really use a macro here
+        if self.grammar_class != other.grammar_class:
+            diff += f"Grammar class: {self.grammar_class}\n"
+        if self.training_strings != other.training_strings:
+            diff += f"Number of training strings: {self.training_strings}\n"
+        if self.training_time != other.training_time:
+            diff += f"Time allotted for training: {self.training_time}\n"
+        if self.test_strings_grammatical != other.test_strings_grammatical:
+            diff += f"Number of grammatical test strings: {self.test_strings_grammatical}\n"
+        if self.test_strings_ungrammatical != other.test_strings_ungrammatical:
+            diff += f"Number of ungrammatical test strings: {self.test_strings_ungrammatical}\n"
+        if self.minimum_string_length != other.minimum_string_length:
+            diff += f"Minimum string length: {self.minimum_string_length}\n"
+        if self.maximum_string_length != other.maximum_string_length:
+            diff += f"Maximum string length: {self.maximum_string_length}\n"
+        if self.string_tokens != other.string_tokens:
+            diff += f"Tokens to use in strings: {self.string_tokens}\n"
+        if self.recursion != other.recursion:
+            diff += f"Recursion allowed in grammar: {self.recursion}\n"
+        if self.logfile_filename != other.logfile_filename:
+            diff += f"Logfile to record session in: {self.logfile_filename}\n"
+        if self.training_one_at_a_time != other.training_one_at_a_time:
+            diff += f"Show training strings one at a time: {self.training_one_at_a_time}\n"
+        if self.training_reps != other.training_reps:
+            diff += f"Number of training rounds: {self.training_reps}\n"
+        return diff
+
     def process_loaded_entry(self, attr_name, value):
         """Helper method to set a specific member variable based on the value
         loaded from file."""
