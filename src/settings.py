@@ -77,7 +77,6 @@ class Settings:
         pretty += f"Grammar class: {self.grammar_class}\n"
         pretty += f"Number of training strings: {self.training_strings}\n"
         pretty += f"Time allotted for training: {self.training_time}\n"
-        pretty += f"Number of training rounds: {self.training_reps}\n"
         pretty += f"Number of grammatical test strings: {self.test_strings_grammatical}\n"
         pretty += f"Number of ungrammatical test strings: {self.test_strings_ungrammatical}\n"
         pretty += f"Minimum string length: {self.minimum_string_length}\n"
@@ -86,6 +85,7 @@ class Settings:
         pretty += f"Recursion allowed in grammar: {self.recursion}\n"
         pretty += f"Logfile to record session in: {self.logfile_filename}\n"
         pretty += f"Show training strings one at a time: {self.training_one_at_a_time}\n"
+        pretty += f"Number of training rounds: {self.training_reps}\n"
         pretty += f"Run pre and post session questionnaire: {self.run_questionnaire}\n"
         return pretty
 
@@ -95,11 +95,11 @@ class Settings:
         pretty += f"Username: {self.username}\n"
         pretty += f"Number of training strings: {self.training_strings}\n"
         pretty += f"Time allotted for training: {self.training_time}\n"
-        pretty += f"Number of training rounds: {self.training_reps}\n"
         pretty += f"Number of grammatical test strings: {self.test_strings_grammatical}\n"
         pretty += f"Number of ungrammatical test strings: {self.test_strings_ungrammatical}\n"
         pretty += f"Logfile to record session in: {self.logfile_filename}\n"
         pretty += f"Show training strings one at a time: {self.training_one_at_a_time}\n"
+        pretty += f"Number of training rounds: {self.training_reps}\n"
         pretty += f"Run pre and post session questionnaire: {self.run_questionnaire}\n"
         return pretty
 
