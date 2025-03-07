@@ -402,6 +402,8 @@ class Application:
             self.duplicate_print(comments, log_only=True)
             clear()
             assert self.settings.experiment_state
+            # used for sleeping but keeping the keyboard awake
+            input_thread = None
             if not self.settings.experiment_state.training_finished:
                 if self.settings.training_one_at_a_time:
                     time_per_item = round(float(self.settings.training_time) / self.settings.training_strings, 2)
@@ -411,10 +413,10 @@ class Application:
                 self.duplicate_print('Please make sure your screen and terminal font are comfortable to read. Press return when you are ready.')
                 self.duplicate_print('You can use a keyboard interrupt (Ctrl-Break on Windows, Ctrl-C on macOS/Unix) to save your progress and exit at any time. You will be able to finish the experiment later.')
                 input()
-                input_thread = None
                 if self.settings.training_one_at_a_time:
                     for string in self.settings.experiment_state.training_set:
                         clear()
+                        print()
                         self.duplicate_print(string)
                         time.sleep(float(self.settings.training_time) / self.settings.training_strings)
                 else:
