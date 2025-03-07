@@ -46,7 +46,7 @@ def print(string='', end='\n'):
 
 _builtin_input = input
 
-def input(prompt=''):
+def input(prompt='> '):
     """input function with constant left margin for improved readability."""
     return _builtin_input(' ' * _LEFT_MARGIN_WIDTH + prompt)
 
@@ -80,7 +80,7 @@ class Application:
             print('0: [q]uit')
             choice = ''
             while not choice:
-                choice = input('> ')
+                choice = input()
             choice = choice[0].lower()
             if choice in ['1', 's']:
                 self.run_experiment()
@@ -347,7 +347,7 @@ class Application:
                     print('You have loaded a previously completed experiment. Do you want to repeat the same experiment? (y/n)')
                     do_repeat = None
                     while do_repeat is None or do_repeat[0] not in ['y', 'n']:
-                        do_repeat = input('> ')
+                        do_repeat = input()
                     if 'y' != do_repeat[0]:
                         return
                     self.settings.experiment_state = settings.ExperimentState(False, [], [])
@@ -456,7 +456,7 @@ class Application:
                 while answer[0] not in ['y', 'n']:
                     answer = None
                     while not answer:
-                        answer = input('> ')
+                        answer = input()
                     answer = answer[0].lower()
                     if answer == 'g':
                         answer = 'y'
