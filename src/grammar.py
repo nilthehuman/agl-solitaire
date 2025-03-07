@@ -137,7 +137,7 @@ class Grammar(abc.ABC):
 
 
 class RegularGrammar(Grammar):
-    """A regular grammar: a directed graph with an input token associated with each edge.
+    """A regular grammar: a directed graph with an output token associated with each edge.
     The whole grammar is represented in a single list of dicts, e.g. the following data
     structure represents the language that starts with one or two A's and then an arbitrary
     number of B's follow. The starting state is number 0. A 'None' index stands for 'OUT'.
