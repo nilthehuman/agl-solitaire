@@ -25,16 +25,33 @@ class GrammarClass(enum.StrEnum):
 
 
 @dataclasses.dataclass
-class ExperimentState:
-    """Current state of an experiment procedure, used to persistently save user's progress midway through."""
-    training_finished: typing.Optional[bool]  # None means brand new, not even started
-    training_set:      list[str]
-    test_set:          list[(str, bool, typing.Optional[bool])]
-
-
-@dataclasses.dataclass
 class Settings:
     """User options for controlling the details of the experimental paradigm."""
+
+    @dataclasses.dataclass
+    class ExperimentState:
+        """Current state of an experiment procedure, used to persistently save user's progress midway through."""
+        settings:          typing.Optional[None]  # alas we cannot refer to the Settings type here :/
+        training_finished: typing.Optional[bool]  # None means brand new, not even started
+        training_set:      list[str]
+        test_set:          list[(str, bool, typing.Optional[bool])]
+
+        def __getstate__(self):
+            state = dict(self.__dict__)
+            # avoid pickling the settings reference
+            try:
+                del state['settings']
+            except KeyError:
+                # nevermind
+                pass
+            return state
+
+        def __setattr__(self, name, value):
+            super().__setattr__(name, value)
+            # propagate our changes to the owner object
+            if self.settings.autosave:
+                self.settings.save_all_to_ini()
+
     filename:                   typing.Optional[str] = None
     username:                   str = 'anonymous'
     grammar_class:              GrammarClass = GrammarClass.REGULAR
@@ -53,6 +70,7 @@ class Settings:
     run_questionnaire:          bool = True
     grammar:                    typing.Optional[str] = None
     experiment_state:           typing.Optional[ExperimentState] = None
+
 
     def settings_equal(self, other):
         """Check if all options are equal except irrelevant ones."""
@@ -216,15 +234,15 @@ class Settings:
             # the string_tokens variable is a list of strings internally
             elif 'string_tokens' == field.name:
                 # string_tokens may be a list of strings or a list of individual letters
-                config['DEFAULT'][field.name] = ' '.join(self.string_tokens)
+                string_value = ' '.join(self.string_tokens)
             elif 'experiment_state' == field.name:
                 # serialize to byte string
-                config['DEFAULT'][field.name] = str(pickle.dumps(self.experiment_state))
+                string_value = str(pickle.dumps(self.experiment_state))
             else:
-                # configparser will try to interpolate the string and cry
-                # if it has a stray % character so we must escape those
-                escaped_str = str(getattr(self, field.name)).replace('%', '%%')
-                config['DEFAULT'][field.name] = escaped_str
+                string_value = str(getattr(self, field.name))
+            # configparser will try to interpolate the string and cry
+            # if it has a stray % character so we must escape those
+            config['DEFAULT'][field.name] = string_value.replace('%', '%%')
         with open(self.filename, 'w', encoding='UTF-8') as configfile:
             config.write(configfile)
 

@@ -236,7 +236,7 @@ class Application:
                 do_repeat = input()
             if 'y' != do_repeat[0]:
                 return
-            settings_and_gmr.experiment_state = settings.ExperimentState(None, [], [])
+            settings_and_gmr.experiment_state = settings.Settings.ExperimentState(settings_and_gmr, None, [], [])
         self.run_experiment(gmr, settings_and_gmr)
 
     def settings_menu(self):
@@ -372,7 +372,7 @@ class Application:
         gmr, grammatical_strings = self.generate_grammar()
         if gmr is None:
             return
-        self.settings.experiment_state = settings.ExperimentState(None, [], [])
+        self.settings.experiment_state = settings.Settings.ExperimentState(self.settings, None, [], [])
         self.run_experiment(gmr)
 
     def run_experiment(self, gmr, stngs=None):
@@ -460,8 +460,6 @@ class Application:
                 print('\rTraining phase finished.' + ' ' * 30)
                 self.duplicate_print('Training phase finished.', log_only=True)
                 stngs.experiment_state.training_finished = True
-                # FIXME: need to call this manually because __setattr__ doesn't get called if you update a member variable in-place :(
-                stngs.save_all_to_ini()
                 clear()
             self.duplicate_print(f"The test phase will now begin. You will be shown {len(stngs.experiment_state.test_set)} new strings one at a time and prompted to judge the grammaticality of each.")
             self.duplicate_print(f"You can use Ctrl-Break on Windows or Ctrl-C on macOS/Unix to halt the experiment at any time. Your progress will be saved to '{stngs.filename}' and you will be able to finish the experiment later.")
