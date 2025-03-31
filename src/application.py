@@ -195,7 +195,6 @@ class Application:
             print('error: loading experiment from file failed')
             return
         print(f"Experiment loaded from '{settings_and_gmr.filename}'.")
-        settings_and_gmr.autosave = False
         if settings_and_gmr.grammar is None:
             print('error: file does not include a grammar')
             return
@@ -233,7 +232,9 @@ class Application:
                 do_repeat = input()
             if 'y' != do_repeat[0]:
                 return
-            settings_and_gmr.experiment_state = settings.Settings.ExperimentState(settings_and_gmr, None, [], [])
+            def callback():
+                settings_and_gmr.experiment_state = settings.Settings.ExperimentState(settings_and_gmr, None, [], [])
+            settings_and_gmr.without_autosave(callback)
         self.run_experiment(gmr, settings_and_gmr)
 
     def settings_menu(self):
