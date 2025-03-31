@@ -199,13 +199,13 @@ class Application:
             print('error: file does not include a grammar')
             return
         try:
-            gmr = grammar.RegularGrammar.from_obfuscated_repr(settings_and_gmr.grammar)
-        except (IndexError, SyntaxError, TypeError):
-            try:
+            if settings_and_gmr.grammar_class == settings.GrammarClass.REGULAR:
+                gmr = grammar.RegularGrammar.from_obfuscated_repr(settings_and_gmr.grammar)
+            else:
                 gmr = grammar.PatternGrammar.from_obfuscated_repr(settings_and_gmr.grammar)
-            except (IndexError, SyntaxError, TypeError):
-                print('error: loading grammar from file failed')
-                return
+        except (IndexError, SyntaxError, TypeError):
+            print('error: loading grammar from file failed')
+            return
         print(f"Experiment loaded from '{settings_and_gmr.filename}'.")
         if not self.settings.settings_equal(settings_and_gmr):
             print('warning: your current settings differ from those loaded from file:\n')
