@@ -49,8 +49,13 @@ class Settings:
         def __setattr__(self, name, value):
             super().__setattr__(name, value)
             # propagate our changes to the owner object
-            if self.settings.autosave:
-                self.settings.save_all_to_ini()
+            try:
+                if self.settings.autosave:
+                    self.settings.save_all_to_ini()
+            except AttributeError:
+                # no settings set
+                pass
+
 
     filename:                   typing.Optional[str] = None
     username:                   str = 'anonymous'
