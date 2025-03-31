@@ -223,13 +223,12 @@ class Application:
         except ValueError as err:
             print('\nerror: ' + str(err))
             return
-        if any(judgement is None for (_, _, judgement) in settings_and_gmr.experiment_state.test_set):
-            if all(judgement is None for (_, _, judgement) in settings_and_gmr.experiment_state.test_set):
-                self.duplicate_print('=' * 120, log_only=True)
-                self.duplicate_print('You are now starting a previously generated experiment:')
-                self.duplicate_print(settings_and_gmr.pretty_short())
-            else:
-                self.duplicate_print('You are now resuming a previously paused session.')
+        if all(judgement is None for (_, _, judgement) in settings_and_gmr.experiment_state.test_set):
+            self.duplicate_print('=' * 120, log_only=True)
+            self.duplicate_print('You are now starting a previously generated experiment:')
+            self.duplicate_print(settings_and_gmr.pretty_short())
+        elif any(judgement is None for (_, _, judgement) in settings_and_gmr.experiment_state.test_set):
+            self.duplicate_print('You are now resuming a previously paused session.')
         else:
             print('You have loaded a previously completed experiment. Do you want to repeat the same experiment all over again? (y/n)')
             do_repeat = None
@@ -259,7 +258,7 @@ class Application:
             print(f"12: show training strings [o]ne at a time:\t{self.settings.training_one_at_a_time}")
             print(f"13: number of training [r]epetitions:\t\t{self.settings.training_reps} round(s)")
             print(f"14: run pre and post session [q]uestionnaire:\t{self.settings.run_questionnaire}")
-            print(f"15: automatically [e]mail logs to author\t{self.settings.email_logs}")
+            print(f"15: automatically [e]mail logs to author:\t{self.settings.email_logs}")
             print(' 0: [b]ack to main menu')
             while not choice:
                 choice = input('what to change> ')
