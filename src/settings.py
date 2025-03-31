@@ -27,7 +27,7 @@ class GrammarClass(enum.StrEnum):
 @dataclasses.dataclass
 class ExperimentState:
     """Current state of an experiment procedure, used to persistently save user's progress midway through."""
-    training_finished: bool
+    training_finished: typing.Optional[bool]  # None means brand new, not even started
     training_set:      list[str]
     test_set:          list[(str, bool, typing.Optional[bool])]
 
@@ -164,7 +164,9 @@ class Settings:
         """Read and set our settings values from file according to format based on its extension."""
         if not filename:
             filename = self.filename
-        assert filename
+        # FIXME: ugly kludge, but .ini is the "more supported" type anyways
+        if not filename:
+            filename = _DEFAULT_INI_FILENAME
         # figure out format from the tail end of the filename
         if _TOMLLIB_AVAILABLE and 4 < len(filename) and 'toml' == filename[-4:].lower():
             self.load_all_from_toml(filename)

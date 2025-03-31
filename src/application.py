@@ -74,8 +74,8 @@ class Application:
         while True:
             print('\n--------  MAIN MENU  --------')
             print('1: [s]tart new experiment session')
-            print('2: [l]oad experiment from file')
-            print('3: [g]enerate and save grammar for later sessions')
+            print('2: [l]oad/resume experiment')
+            print('3: [g]enerate and save experiment for later sessions')
             print('4: [c]onfigure settings')
             print('0: [q]uit')
             choice = ''
@@ -83,7 +83,7 @@ class Application:
                 choice = input()
             choice = choice[0].lower()
             if choice in ['1', 's']:
-                self.run_experiment()
+                self.start_new_experiment()
             elif choice in ['2', 'l']:
                 self.load_experiment()
             elif choice in ['3', 'g']:
@@ -164,23 +164,25 @@ class Application:
         settings_and_gmr.save_all_to_ini(filename)
 
     def load_experiment(self):
-        """Restore a previously generated grammar from a file of the user's choice
+        """Resume a previously generated experiment from a file of the user's choice
         and (re)run the experiment with the same grammar."""
-        filename = input('file to load grammar from (leave empty to go back): ')
+        filename = input('file to load grammar from (leave blank to use default settings file): ')
         if not filename:
-            return
-        if not os.path.exists(filename):
-            print('error: file not found')
-            return
-        if not os.path.isfile(filename):
-            print('error: not a file (maybe a folder?)')
-            return
+            filename = None
+        else:
+            if not os.path.exists(filename):
+                print('error: file not found')
+                return
+            if not os.path.isfile(filename):
+                print('error: not a file (maybe a folder?)')
+                return
         settings_and_gmr = settings.Settings()
         try:
             settings_and_gmr.load_all(filename)
         except Exception:
             print('error: loading experiment from file failed')
             return
+        print(f"Experiment loaded from '{settings_and_gmr.filename}'.")
         settings_and_gmr.autosave = False
         if settings_and_gmr.grammar is None:
             print('error: file does not include a grammar')
@@ -206,7 +208,22 @@ class Application:
         except ValueError as err:
             print('\nerror: ' + str(err))
             return
-        self.run_experiment(settings_and_gmr, gmr)
+        if any(judgement is None for (_, _, judgement) in settings_and_gmr.experiment_state.test_set):
+            if all(judgement is None for (_, _, judgement) in settings_and_gmr.experiment_state.test_set):
+                self.duplicate_print('=' * 120, log_only=True)
+                self.duplicate_print('You are now starting a previously generated experiment:')
+                self.duplicate_print(settings_and_gmr.pretty_short())
+            else:
+                self.duplicate_print('You are now resuming a previously paused session.')
+        else:
+            print('You have loaded a previously completed experiment. Do you want to repeat the same experiment all over again? (y/n)')
+            do_repeat = None
+            while not do_repeat or do_repeat[0] not in ['y', 'n']:
+                do_repeat = input()
+            if 'y' != do_repeat[0]:
+                return
+            settings_and_gmr.experiment_state = settings.ExperimentState(None, [], [])
+        self.run_experiment(gmr, settings_and_gmr)
 
     def settings_menu(self):
         """Enable user to configure and adjust the experimental protocol."""
@@ -332,53 +349,32 @@ class Application:
                     else:
                         print('error: invalid number')
 
-    def run_experiment(self, stngs=None, gmr=None):
+    def start_new_experiment(self):
+        """Create a brand new random grammar based on user's settings, run the experimental procedure and record everything in the log file."""
+        clear()
+        self.duplicate_print('=' * 120, log_only=True)
+        self.duplicate_print('agl-solitaire session started with the following settings:')
+        self.duplicate_print(self.settings.pretty_print())
+        gmr, grammatical_strings = self.generate_grammar()
+        if gmr is None:
+            return
+        self.settings.experiment_state = settings.ExperimentState(None, [], [])
+        self.run_experiment(gmr)
+
+    def run_experiment(self, gmr, stngs=None):
         """Run one session of training and testing with a random grammar and record everything in the log file."""
         # wrap the whole function body in a try block to handle a keyboard interrupt
         try:
-            def clear():
-                global which_clear
-                try:
-                    which_clear
-                except NameError:
-                    which_clear = 'cls'
-                if os.system(which_clear):
-                    # non-zero exit code, try the other command
-                    (which_clear,) = set(['cls', 'clear']) - set([which_clear])
-                    os.system(which_clear)
-            clear()
             if stngs is None:
                 stngs = self.settings
-            if stngs.experiment_state and stngs.experiment_state.test_set:
-                if any(judgement is None for (_, _, judgement) in stngs.experiment_state.test_set):
-                    self.duplicate_print('You are now resuming a previously paused session.')
-                else:
-                    print('You have loaded a previously completed experiment. Do you want to repeat the same experiment all over again? (y/n)')
-                    do_repeat = None
-                    while do_repeat is None or do_repeat[0] not in ['y', 'n']:
-                        do_repeat = input()
-                    if 'y' != do_repeat[0]:
-                        return
-                    stngs.experiment_state = settings.ExperimentState(False, [], [])
-            else:
-                stngs.experiment_state = settings.ExperimentState(False, [], [])
+            assert stngs.experiment_state is not None
+            assert stngs.experiment_state.training_finished is not None or gmr is not None
+            if stngs.experiment_state.training_finished is None:
+                self.duplicate_print('Generating training strings and test strings based on the grammar...')
                 num_required_grammatical = stngs.training_strings + stngs.test_strings_grammatical
-                self.duplicate_print('=' * 120, log_only=True)
-                grammatical_strings = None
-                if gmr is not None:
-                    self.duplicate_print('agl-solitaire session started with a pregenerated grammar:')
-                    self.duplicate_print(stngs.pretty_short())
-                    self.duplicate_print('Generating training strings and test strings based on the grammar...')
-                    grammatical_strings = list(gmr.produce_grammatical(num_strings=num_required_grammatical,
-                                                                       min_length=stngs.minimum_string_length,
-                                                                       max_length=stngs.maximum_string_length))
-                else:
-                    self.duplicate_print('agl-solitaire session started with the following settings:')
-                    self.duplicate_print(stngs.pretty_print())
-                    gmr, grammatical_strings = self.generate_grammar()
-                    if gmr is None:
-                        return
-                    self.duplicate_print('Generating training strings and test strings based on the grammar...')
+                grammatical_strings = list(gmr.produce_grammatical(num_strings=num_required_grammatical,
+                                                                   min_length=stngs.minimum_string_length,
+                                                                   max_length=stngs.maximum_string_length))
                 # partition grammatical_strings into two subsets
                 picked_for_training = random.sample(range(0,num_required_grammatical), k=stngs.training_strings)
                 stngs.experiment_state.training_set = [grammatical_strings[i] for i in picked_for_training]
@@ -390,6 +386,7 @@ class Application:
                 # permute test_set
                 random.shuffle(stngs.experiment_state.test_set)
                 self.duplicate_print('Done.')
+                assert stngs.experiment_state.test_set
                 if stngs.run_questionnaire:
                     self.duplicate_print('A few questions before we begin. Feel free to answer as briefly or in as much detail as you like.')
                     self.duplicate_print('Your answers are going to be stored in the log file.')
@@ -405,7 +402,6 @@ class Application:
                     self.duplicate_print(f"Out of {len(stngs.experiment_state.test_set)} questions what do you expect your score to be in this session?")
                     answer = input()
                     self.duplicate_print(answer, log_only=True)
-                # end of "else"
             self.duplicate_print(f"You may add any {'further ' if stngs.run_questionnaire else ''}notes or comments for the record before the training phase begins (optional). Please enter an empty line when you're done:")
             comments = '\n'.join(iter(input, ''))
             self.duplicate_print(comments, log_only=True)
