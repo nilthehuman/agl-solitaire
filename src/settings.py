@@ -86,6 +86,13 @@ class Settings:
                 return False
         return True
 
+    def override(self, other):
+        """Replace our settings, but not the grammar or the experiment state, with the other object's settings."""
+        for field in dataclasses.fields(self):
+            if field.name in ['filename', 'grammar', 'experiment_state']:
+                continue
+            setattr(self, field.name, getattr(other, field.name))
+
     def __str__(self):
         """Print all settings in an .ini config file format."""
         str_repr = ''

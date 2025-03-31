@@ -213,10 +213,9 @@ class Application:
             print(f"current settings:\n" + self.settings.diff(settings_and_gmr))
             choice = ''
             while not choice:
-                choice = input('keep the current settings instead? (y/n)> ')
-            if choice[0].lower() != 'y':
-                self.settings = settings_and_gmr
-                # TODO: save to file here for good measure? ¯\_(ツ)_/¯
+                choice = input('use the current settings instead? (y/n)> ')
+            if choice[0].lower() == 'y':
+                settings_and_gmr.override(self.settings)
         # don't forget to reset tokens as well
         try:
             gmr.set_tokens(self.settings.string_tokens)
