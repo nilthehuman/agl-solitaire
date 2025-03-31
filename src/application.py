@@ -6,6 +6,7 @@ import os
 import random
 import re
 import readline
+import smtplib
 import threading
 import time
 
@@ -258,6 +259,7 @@ class Application:
             print(f"12: show training strings [o]ne at a time:\t{self.settings.training_one_at_a_time}")
             print(f"13: number of training [r]epetitions:\t\t{self.settings.training_reps} round(s)")
             print(f"14: run pre and post session [q]uestionnaire:\t{self.settings.run_questionnaire}")
+            print(f"15: automatically [e]mail logs to author\t{self.settings.email_logs}")
             print(' 0: [b]ack to main menu')
             while not choice:
                 choice = input('what to change> ')
@@ -337,6 +339,8 @@ class Application:
                 attr_to_change = 'training_reps'
             elif choice in ['14', 'q']:
                 self.settings.run_questionnaire = not self.settings.run_questionnaire
+            elif choice in ['15', 'e']:
+                self.settings.email_logs = not self.settings.email_logs
             elif choice in ['0', 'b']:
                 break
             else:
@@ -519,8 +523,23 @@ class Application:
             self.duplicate_print('You now have a chance to add any other post hoc notes or comments for the record if you wish. Please enter an empty line when you\'re done:')
             comments = '\n'.join(iter(input, ''))
             self.duplicate_print(comments, log_only=True)
+            if stngs.email_logs:
+                print('Sending experiment logs to the author of the application...')
+                with open(stngs.logfile_filename, 'r') as fh:
+                    log_lines = fh.read().split('\n')
+                try:
+                    from_line = len(log_lines) - 1 - next(i for i, line in enumerate(log_lines[::-1]) if '====' in line)
+                except StopIteration:
+                    # oh well, let's just send the whole file
+                    from_line = 0
+                message_body = 'Subject: experiment logs\n\n' + '\n'.join(log_lines[from_line:])
+                with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+                    # all in plaintext, probably not a good idea :(
+                    server.login('aglsolitaire@gmail.com', 'llot gfpy csfw wuyt')
+                    server.sendmail('aglsolitaire@gmail.com', 'aglsolitaire@gmail.com', message_body)
+                print('Success. Thank you for your contribution!')
         except KeyboardInterrupt:
-            # autosave is on, no need to call save_experiment again
+            # no need to call save_experiment again
             print()
             self.duplicate_print(f"Experiment halted by user. Progress saved to '{stngs.filename}'.")
             # returning to main menu

@@ -68,6 +68,7 @@ class Settings:
     logfile_filename:           str = 'agl_sessions.log'
     training_one_at_a_time:     bool = True
     run_questionnaire:          bool = True
+    email_logs:                 bool = True
     grammar:                    typing.Optional[str] = None
     experiment_state:           typing.Optional[ExperimentState] = None
 
@@ -105,6 +106,7 @@ class Settings:
         pretty += f"Show training strings one at a time: {self.training_one_at_a_time}\n"
         pretty += f"Number of training rounds: {self.training_reps}\n"
         pretty += f"Run pre and post session questionnaire: {self.run_questionnaire}\n"
+        pretty += f"Automatically email logs to author: {self.email_logs}\n"
         return pretty
 
     def pretty_short(self):
@@ -157,7 +159,7 @@ class Settings:
         try:
             # parse attribute from string
             parsed_value = type(getattr(self, attr_name))(value)
-            if attr_name in ['recursion', 'training_one_at_a_time', 'run_questionnaire']:
+            if attr_name in ['recursion', 'training_one_at_a_time', 'run_questionnaire', 'email_logs']:
                 parsed_value = str(value).lower() in ['true', 'yes', '1']
             if 'string_tokens' == attr_name:
                 parsed_value = ''.join(value).split()
