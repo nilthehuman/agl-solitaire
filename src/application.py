@@ -168,15 +168,12 @@ class Application:
                 if choice and choice[0].lower() == 'y':
                     go_ahead = True
             if go_ahead:
-                self.save_experiment(gmr, filename)
+                settings_and_gmr = copy.copy(self.settings)
+                settings_and_gmr.autosave = False
+                settings_and_gmr.grammar = gmr.obfuscated_repr()
+                settings_and_gmr.experiment_state = settings.Settings.ExperimentState(None, None, [], [])
+                settings_and_gmr.save_all(filename)
                 return
-
-    def save_experiment(self, gmr, filename=None):
-        """Serialize current experiment state to file to be run or resumed later."""
-        settings_and_gmr = copy.copy(self.settings)
-        settings_and_gmr.autosave = False
-        settings_and_gmr.grammar = gmr.obfuscated_repr()
-        settings_and_gmr.save_all_to_ini(filename)
 
     def load_experiment(self):
         """Resume a previously generated experiment from a file of the user's choice
