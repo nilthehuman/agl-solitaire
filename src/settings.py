@@ -51,11 +51,10 @@ class Settings:
             # propagate our changes to the owner object
             try:
                 if self.settings.autosave:
-                    self.settings.save_all_to_ini()
+                    self.settings.save_all()
             except AttributeError:
                 # no settings set
                 pass
-
 
     filename:                   typing.Optional[str] = None
     username:                   str = 'anonymous'
@@ -168,9 +167,12 @@ class Settings:
                 parsed_value = str(value).lower() in ['true', 'yes', '1']
             if 'string_tokens' == attr_name:
                 parsed_value = ''.join(value).split()
+            # FIXME: is this a dead branch? get rid of duplicate code below
             if 'experiment_state' == attr_name:
                 # deserialize from byte string
                 parsed_value = pickle.loads(eval(value))
+                if not hasattr(parsed_value, 'settings'):
+                    parsed_value.settings = self
             setattr(self, attr_name, parsed_value)
         except TypeError:
             # value is None which you cannot cast to
@@ -178,6 +180,8 @@ class Settings:
             try:
                 # see if this string is really a binary string in disguise
                 value = pickle.loads(eval(value))
+                if not hasattr(value, 'settings'):
+                    value.settings = self
             except Exception as e:
                 # nevermind
                 pass
@@ -226,10 +230,23 @@ class Settings:
                     self.process_loaded_entry(key, settings_dict[key])
             self.autosave = True
 
+    def save_all(self, filename=None):
+        """Write the current values of all our member variables to file."""
+        if not filename:
+            filename = self.filename
+        assert filename
+        if _TOMLLIB_AVAILABLE and 4 < len(filename) and 'toml' == filename[-4:].lower():
+            self.save_all_to_toml(filename)
+        else:
+            self.save_all_to_ini(filename)
+
     def save_all_to_ini(self, filename=None):
         """Write the current values of all our member variables to an INI config file."""
         if filename:
-            self.filename = filename
+            # avoid falling into infinite recursion
+            def callback():
+                self.filename = filename
+            self.without_autosave(callback)
         config = configparser.ConfigParser()
         for field in dataclasses.fields(self):
             if 'filename' == field.name:
@@ -298,7 +315,7 @@ class Settings:
         if attr != 'autosave':
             try:
                 if self.autosave:
-                    self.save_all_to_ini()
+                    self.save_all()
             except AttributeError:
                 pass  # that's fine
 

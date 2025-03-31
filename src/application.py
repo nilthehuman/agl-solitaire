@@ -495,7 +495,7 @@ class Application:
                 self.duplicate_print(answer, log_only=True)
                 stngs.experiment_state.test_set[i] = (stngs.experiment_state.test_set[i][0], stngs.experiment_state.test_set[i][1], answer)
                 # FIXME: need to call this manually because __setattr__ doesn't get called if you update a member variable in-place :(
-                stngs.save_all_to_ini()
+                stngs.save_all()
             clear()
             self.duplicate_print('Test phase finished. Hope you had fun!')
             if stngs.run_questionnaire:
@@ -538,7 +538,6 @@ class Application:
                     server.sendmail('aglsolitaire@gmail.com', 'aglsolitaire@gmail.com', message_body)
                 print('Success. Thank you for your contribution!')
         except KeyboardInterrupt:
-            # no need to call save_experiment again
             print()
             self.duplicate_print(f"Experiment halted by user. Progress saved to '{stngs.filename}'.")
             # returning to main menu
