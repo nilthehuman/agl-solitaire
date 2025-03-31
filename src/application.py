@@ -111,7 +111,7 @@ class Application:
                 print('no such option')
 
     def generate_grammar(self):
-        """Find a grammar that satisfies the protocol's requirements as defined by the user."""
+        """Find a grammar that satisfies the experimental protocol's requirements as defined by the user."""
         if self.settings.grammar_class == settings.GrammarClass.REGULAR:
             gmr = grammar.RegularGrammar(self.settings.string_tokens)
         elif self.settings.grammar_class == settings.GrammarClass.PATTERN:
@@ -119,14 +119,15 @@ class Application:
         else:
             assert False
         num_required_strings = self.settings.training_strings + self.settings.test_strings_grammatical
-        grammatical_strings = []
+        grammatical_strings = None
         max_grammar_attempts = 64
         max_oversize_attempts = 5
         oversize_grammar = 0
         print('Looking for a suitable random grammar...')
-        while num_required_strings != len(grammatical_strings) and oversize_grammar <= max_oversize_attempts:
+        # TODO: move this whole loop to the Grammar classes
+        while grammatical_strings is None and oversize_grammar <= max_oversize_attempts:
             grammar_attempts = 0
-            while num_required_strings != len(grammatical_strings) and grammar_attempts < max_grammar_attempts:
+            while grammatical_strings is None and grammar_attempts < max_grammar_attempts:
                 grammar_attempts += 1
                 if self.settings.grammar_class == settings.GrammarClass.REGULAR:
                     gmr.randomize(min_states=gmr.MIN_STATES + oversize_grammar,
@@ -140,17 +141,19 @@ class Application:
                     assert False
                 if not self.settings.recursion and gmr.has_cycle():
                     continue
-                grammatical_strings = list(gmr.produce_grammatical(num_strings=num_required_strings,
-                                                                   min_length=self.settings.minimum_string_length,
-                                                                   max_length=self.settings.maximum_string_length))
+                grammatical_strings = gmr.produce_grammatical(num_strings=num_required_strings,
+                                                              min_length=self.settings.minimum_string_length,
+                                                              max_length=self.settings.maximum_string_length)
             oversize_grammar += 1
-            if num_required_strings != len(grammatical_strings):
+            if grammatical_strings is None:
                 print(f"None found, expanding search to between {gmr.MIN_STATES+oversize_grammar} and {gmr.MAX_STATES+oversize_grammar} states...")
-        if num_required_strings != len(grammatical_strings):
+        if grammatical_strings is None:
             print('Sorry, no grammar found that would satisfy the current settings. Try relaxing some of your preferences.')
             return None, None
+        # TODO: this should especially be moved to the Grammars
+        gmr.tokens = None
         print('Grammar selected. The rules of the grammar will be revealed after the session.')
-        return gmr, grammatical_strings
+        return gmr, list(grammatical_strings)
 
     def generate_experiment(self):
         """Generate and serialize a new suitable grammar to file for later use."""
@@ -390,9 +393,14 @@ class Application:
             if stngs.experiment_state.training_finished is None:
                 self.duplicate_print('Generating training strings and test strings based on the grammar...')
                 num_required_grammatical = stngs.training_strings + stngs.test_strings_grammatical
-                grammatical_strings = list(gmr.produce_grammatical(num_strings=num_required_grammatical,
-                                                                   min_length=stngs.minimum_string_length,
-                                                                   max_length=stngs.maximum_string_length))
+                grammatical_strings = gmr.produce_grammatical(num_strings=num_required_grammatical,
+                                                              min_length=stngs.minimum_string_length,
+                                                              max_length=stngs.maximum_string_length)
+                if grammatical_strings is None:
+                    self.duplicate_print('Sorry, it looks like the selected grammar cannot produce the required amount of different training and test strings.')
+                    self.duplicate_print('Try lowering the number of strings to use and try again.')
+                    return
+                grammatical_strings = list(grammatical_strings)
                 # partition grammatical_strings into two subsets
                 picked_for_training = random.sample(range(0,num_required_grammatical), k=stngs.training_strings)
                 stngs.experiment_state.training_set = [grammatical_strings[i] for i in picked_for_training]

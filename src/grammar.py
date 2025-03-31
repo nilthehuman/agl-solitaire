@@ -326,6 +326,8 @@ class RegularGrammar(Grammar):
             # did we end up in a halting state?
             if current_state is None:
                 grammatical_strings.add(string)
+        if len(grammatical_strings) < num_strings:
+            return None
         return grammatical_strings
 
     def recognize(self, string):
@@ -551,6 +553,8 @@ class PatternGrammar(Grammar):
             string = ''.join(map(lambda c: random.choice(list(c)), pattern))
             grammatical_strings.add(string)
             attempts += 1
+        if len(grammatical_strings) < num_strings:
+            return None
         return grammatical_strings
 
     def recognize(self, string):
