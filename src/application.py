@@ -132,8 +132,6 @@ class Application:
                 if self.settings.grammar_class == settings.GrammarClass.REGULAR:
                     gmr.randomize(min_states=gmr.MIN_STATES + oversize_grammar,
                                   max_states=gmr.MAX_STATES + oversize_grammar)
-                    gmr.randomize(min_states=gmr.MIN_STATES + oversize_grammar,
-                                  max_states=gmr.MAX_STATES + oversize_grammar)
                 elif self.settings.grammar_class == settings.GrammarClass.PATTERN:
                     # TODO: oversize pattern grammar
                     gmr.randomize()
