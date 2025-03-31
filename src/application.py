@@ -50,6 +50,20 @@ def input(prompt='> '):
     """input function with constant left margin for improved readability."""
     return _builtin_input(' ' * _LEFT_MARGIN_WIDTH + prompt)
 
+_which_clear = None
+
+def clear():
+    """Find the right clear screen command by trial-and-error and remember it."""
+    global which_clear
+    try:
+        which_clear
+    except NameError:
+        which_clear = 'cls'
+    if os.system(which_clear):
+        # non-zero exit code, try the other command
+        (which_clear,) = set(['cls', 'clear']) - set([which_clear])
+        os.system(which_clear)
+
 class Application:
     """The main class responsible for basic user interactions and driving the procedure of the experiment."""
 
