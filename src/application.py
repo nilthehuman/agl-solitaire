@@ -424,6 +424,7 @@ class Application:
             # used for sleeping but keeping the keyboard awake
             input_thread = None
             if not stngs.experiment_state.training_finished:
+                stngs.experiment_state.training_finished = False  # meaning started but not finished
                 if stngs.training_one_at_a_time:
                     the_same = 'the same ' if 1 < stngs.training_reps else ''
                     in_rounds = f"in {stngs.training_reps} rounds " if 1 < stngs.training_reps else ''
