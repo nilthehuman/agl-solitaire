@@ -194,15 +194,18 @@ class Application:
         except Exception:
             print('error: loading experiment from file failed')
             return
-        print(f"Experiment loaded from '{settings_and_gmr.filename}'.")
         if settings_and_gmr.grammar is None:
             print('error: file does not include a grammar')
             return
         try:
             gmr = grammar.RegularGrammar.from_obfuscated_repr(settings_and_gmr.grammar)
-        except (IndexError, SyntaxError):
-            print('error: loading grammar from file failed')
-            return
+        except (IndexError, SyntaxError, TypeError):
+            try:
+                gmr = grammar.PatternGrammar.from_obfuscated_repr(settings_and_gmr.grammar)
+            except (IndexError, SyntaxError, TypeError):
+                print('error: loading grammar from file failed')
+                return
+        print(f"Experiment loaded from '{settings_and_gmr.filename}'.")
         if not self.settings.settings_equal(settings_and_gmr):
             print('warning: your current settings differ from those loaded from file:\n')
             print(f"settings in {filename}:\n" + settings_and_gmr.diff(self.settings))
@@ -508,7 +511,7 @@ class Application:
                 answer = input()
                 self.duplicate_print(answer, log_only=True)
             clear()
-            self.duplicate_print('And now for the big reveal... Strings were generated using the following regular grammar:')
+            self.duplicate_print(f"And now for the big reveal... Strings were generated using the following {stngs.grammar_class} grammar:")
             self.duplicate_print(str(gmr))
             correct = sum(item[1] == item[2] for item in stngs.experiment_state.test_set)
             self.duplicate_print(f"You gave {correct} correct answers out of {len(stngs.experiment_state.test_set)} ({100 * correct/len(stngs.experiment_state.test_set):.3}%). The answers were the following:")
