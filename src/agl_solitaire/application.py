@@ -3,6 +3,7 @@
 import copy
 import datetime
 import os
+os.system("")  # apparently makes Windows terminal handle ANSI escape sequences too
 import random
 import re
 try:
@@ -252,24 +253,40 @@ class Application:
     def settings_menu(self):
         """Enable user to configure and adjust the experimental protocol."""
         while True:
-            choice = ''
             print('\n--------  SETTINGS  --------')
-            print(f" 1: [u]sername (for the record):\t\t{self.settings.username}")
-            print(f" 2: grammar [c]lass:\t\t\t\t{self.settings.grammar_class}")
-            print(f" 3: number of training [s]trings:\t\t{self.settings.training_strings}")
-            print(f" 4: [t]ime allotted for training:\t\t{self.settings.training_time} seconds")
-            print(f" 5: number of [g]rammatical test strings:\t{self.settings.test_strings_grammatical}")
-            print(f" 6: number of [u]ngrammatical test strings:\t{self.settings.test_strings_ungrammatical}")
-            print(f" 7: mi[n]imum string length:\t\t\t{self.settings.minimum_string_length}")
-            print(f" 8: ma[x]imum string length:\t\t\t{self.settings.maximum_string_length}")
-            print(f" 9: [l]etters or words to use in strings:\t{self.settings.string_tokens}")
-            print(f"10: allow recursion in the grammar:\t\t{self.settings.recursion}")
-            print(f"11: log[f]ile to record sessions in:\t\t{self.settings.logfile_filename}")
-            print(f"12: show training strings [o]ne at a time:\t{self.settings.training_one_at_a_time}")
-            print(f"13: number of training [r]epetitions:\t\t{self.settings.training_reps} round(s)")
-            print(f"14: run pre and post session [q]uestionnaire:\t{self.settings.run_questionnaire}")
-            print(f"15: automatically [e]mail logs to author:\t{self.settings.email_logs}")
-            print(' 0: [b]ack to main menu')
+            options = [
+                f" 1: [u]sername (for the record):\t\t{self.settings.username}",
+                f" 2: grammar [c]lass:\t\t\t\t{self.settings.grammar_class}",
+                f" 3: number of training [s]trings:\t\t{self.settings.training_strings}",
+                f" 4: [t]ime allotted for training:\t\t{self.settings.training_time} seconds",
+                f" 5: number of [g]rammatical test strings:\t{self.settings.test_strings_grammatical}",
+                f" 6: number of [u]ngrammatical test strings:\t{self.settings.test_strings_ungrammatical}",
+                f" 7: mi[n]imum string length:\t\t\t{self.settings.minimum_string_length}",
+                f" 8: ma[x]imum string length:\t\t\t{self.settings.maximum_string_length}",
+                f" 9: [l]etters or words to use in strings:\t{self.settings.string_tokens}",
+                f"10: allow recursion in the grammar:\t\t{self.settings.recursion}",
+                f"11: log[f]ile to record sessions in:\t\t{self.settings.logfile_filename}",
+                f"12: show training strings [o]ne at a time:\t{self.settings.training_one_at_a_time}",
+                f"13: number of training [r]epetitions:\t\t{self.settings.training_reps} round(s)",
+                f"14: run pre and post session [q]uestionnaire:\t{self.settings.run_questionnaire}",
+                f"15: automatically [e]mail logs to author:\t{self.settings.email_logs}",
+                ' 0: [b]ack to main menu'
+            ]
+            for i, option in enumerate(options):
+                option_num = re.match(r"\s*(\d+)", option).group(1)
+                option_letter = None
+                if letter_search := re.search(r"\[(\w)\]", option):
+                    option_letter = letter_search.group(1)
+                try:
+                    if choice in [option_num, option_letter]:
+                        # highlight last selected value
+                        colon_match = re.match(r"(.*:.*):(.*)", option)
+                        options[i] = colon_match.group(1) + ":\033[31m" + colon_match.group(2) + "\033[0m"
+                except UnboundLocalError:
+                    # choice variable has not been assigned
+                    pass
+            print("\n".join(options))
+            choice = ''
             while not choice:
                 choice = input('what to change> ')
             if choice.isalpha():
