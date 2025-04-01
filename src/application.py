@@ -519,7 +519,7 @@ class Application:
             self.duplicate_print(f"And now for the big reveal... Strings were generated using the following {stngs.grammar_class} grammar:")
             self.duplicate_print(str(gmr))
             correct = sum(item[1] == item[2] for item in stngs.experiment_state.test_set)
-            self.duplicate_print(f"You gave {correct} correct answers out of {len(stngs.experiment_state.test_set)} ({100 * correct/len(stngs.experiment_state.test_set):.3}%). The answers were the following:")
+            self.duplicate_print(f"You gave {correct} correct answers out of {len(stngs.experiment_state.test_set)} ({100 * correct/len(stngs.experiment_state.test_set):.4}%). The answers were the following:")
             # make table columns wider if needed
             width = max(16, 2 + max(len(item[0]) for item in stngs.experiment_state.test_set))
             self.duplicate_print(f"{'Test string':<{width}}{'Correct answer':<16}{'Your answer':<16}")
