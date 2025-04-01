@@ -1,5 +1,9 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
-from src.application import Application
+from src.agl_solitaire.application import Application
 
-Application().main_menu()
+def main():
+    Application().main_menu()
+
+if __name__ == "__main__":
+    main()

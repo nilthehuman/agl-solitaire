@@ -10,9 +10,9 @@ import smtplib
 import threading
 import time
 
-from src import grammar
-from src import settings
-from src import version
+from src.agl_solitaire import grammar
+from src.agl_solitaire import settings
+from src.agl_solitaire import version
 
 
 _LEFT_MARGIN_WIDTH = 2
