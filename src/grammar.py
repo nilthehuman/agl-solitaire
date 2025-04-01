@@ -53,7 +53,11 @@ class Grammar(abc.ABC):
 
     def has_one_char_tokens_only(self):
         """Check if the grammar uses single letter tokens as opposed to multi-letter ones."""
-        return all(1 == len(x) for x in self.tokens)
+        if self.tokens:
+            tokens = self.tokens
+        else:
+            tokens = self.get_tokens_used()
+        return all(1 == len(x) for x in tokens)
 
     def get_tokens_used(self):
         """Return list of all string tokens currently used in generated strings."""
@@ -87,6 +91,7 @@ class Grammar(abc.ABC):
             ErrorType.BACKWARDS : 3,
             ErrorType.RANDOM : 5
         }
+        tokens = self.get_tokens_used()
         ungrammatical_strings = set()
         while len(ungrammatical_strings) < num_strings:
             string = ''
@@ -96,7 +101,7 @@ class Grammar(abc.ABC):
             if error_type == ErrorType.RANDOM:
                 # arbitrary mangled string
                 string_length = random.randint(min_length, max_length)
-                string = [ random.choice(self.tokens) for _ in range(string_length) ]
+                string = [ random.choice(tokens) for _ in range(string_length) ]
             elif error_type == ErrorType.BACKWARDS:
                 # a grammatical string mirrored i.e. spelled backwards
                 string = list(reversed(tokenized(grammatical_string)))
@@ -123,9 +128,9 @@ class Grammar(abc.ABC):
                         continue  # string not long enough, nevermind
                 else:
                     assert False
-                wrong_token = random.choice(self.tokens)
+                wrong_token = random.choice(tokens)
                 while wrong_token == tokenized_string[wrong_index]:
-                    wrong_token = random.choice(self.tokens)
+                    wrong_token = random.choice(tokens)
                 if not self.has_one_char_tokens_only():
                     wrong_token = [ wrong_token ]
                 string = tokenized_string[:wrong_index] + wrong_token + tokenized_string[wrong_index+1:]
@@ -178,7 +183,6 @@ class RegularGrammar(Grammar):
         """Restore Grammar from string representation."""
         grammar = cls()
         grammar.transitions = eval(repr_string)
-        grammar.tokens = grammar.get_tokens_used()
         return grammar
 
     @classmethod
@@ -192,7 +196,7 @@ class RegularGrammar(Grammar):
             repr_string += chr(32 + (ord(char) - 32 - coprimes[0] ** i % coprimes[1]) % 95)
         grammar = cls()
         grammar.transitions = eval(repr_string)
-        grammar.tokens = grammar.get_tokens_used()
+        grammar.tokens = None
         return grammar
 
     def __str__(self):
@@ -455,6 +459,7 @@ class PatternGrammar(Grammar):
             repr_string += chr(32 + (ord(char) - 32 - coprimes[0] ** i % coprimes[1]) % 95)
         grammar = cls()
         grammar.patterns = eval(repr_string)
+        grammar.tokens = None
         return grammar
 
     def __str__(self):
