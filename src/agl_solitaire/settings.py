@@ -31,6 +31,7 @@ GrammarClass.next = lambda self: (
 )[-1]
 
 
+# TODO: split this into a leaner Settings base class and an ExperimentSession derived class
 @dataclasses.dataclass
 class Settings:
     """User options for controlling the details of the experimental paradigm."""
@@ -196,7 +197,7 @@ class Settings:
                 value = pickle.loads(eval(value))
                 if not hasattr(value, 'settings'):
                     value.settings = self
-            except Exception as e:
+            except Exception:
                 # nevermind
                 pass
             setattr(self, attr_name, value)
