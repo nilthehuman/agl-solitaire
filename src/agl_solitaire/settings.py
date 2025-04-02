@@ -39,10 +39,11 @@ class Settings:
     @dataclasses.dataclass
     class ExperimentState:
         """Current state of an experiment procedure, used to persistently save user's progress midway through."""
-        settings:          typing.Optional[None]  # alas we cannot refer to the Settings type here :/
-        training_finished: typing.Optional[bool]  # None means brand new, not even started
-        training_set:      list[str]
-        test_set:          list[(str, bool, typing.Optional[bool])]
+        settings:          typing.Optional[None] = None  # alas we cannot refer to the Settings type here :/
+        stages_finished:   int = 0
+        training_finished: typing.Optional[bool] = None # None means brand new, not even started
+        training_set:      list[str] = dataclasses.field(default_factory = lambda: [])
+        test_set:          list[(str, bool, typing.Optional[bool])] = dataclasses.field(default_factory = lambda: [])
 
         def __getstate__(self):
             state = dict(self.__dict__)

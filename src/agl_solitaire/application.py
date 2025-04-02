@@ -194,7 +194,7 @@ class Application:
                 settings_and_gmr = copy.copy(self.settings)
                 settings_and_gmr.autosave = False
                 settings_and_gmr.grammar = gmr.obfuscated_repr()
-                settings_and_gmr.experiment_state = settings.Settings.ExperimentState(None, None, [], [])
+                settings_and_gmr.experiment_state = settings.Settings.ExperimentState()
                 settings_and_gmr.save_all(filename)
                 return
 
@@ -258,7 +258,7 @@ class Application:
             if 'y' != do_repeat[0]:
                 return
             def callback():
-                settings_and_gmr.experiment_state = settings.Settings.ExperimentState(settings_and_gmr, None, [], [])
+                settings_and_gmr.experiment_state = settings.Settings.ExperimentState(settings_and_gmr)
             settings_and_gmr.without_autosave(callback)
         self.run_experiment(gmr, settings_and_gmr)
 
