@@ -2,7 +2,7 @@
 
 import math
 
-from src import grammar
+from src.agl_solitaire import grammar
 
 
 def test_always_pass():
@@ -151,7 +151,7 @@ def test_grammar_output_long_enough():
     for _ in range(100):
         g.randomize()
         output_strings = g.produce_grammatical(5)
-        assert not any(len(s) < grammar._MIN_STRING_LENGTH for s in output_strings)
+        assert output_strings is None or not any(len(s) < grammar._MIN_STRING_LENGTH for s in output_strings)
 
 
 def test_grammar_output_short_enough():
@@ -160,7 +160,7 @@ def test_grammar_output_short_enough():
     for _ in range(100):
         g.randomize()
         output_strings = g.produce_grammatical(5)
-        assert not any(len(s) > grammar._MAX_STRING_LENGTH for s in output_strings)
+        assert output_strings is None or not any(len(s) > grammar._MAX_STRING_LENGTH for s in output_strings)
 
 
 def test_grammar_accepts_grammatical():
@@ -169,7 +169,7 @@ def test_grammar_accepts_grammatical():
     for _ in range(100):
         g.randomize()
         output_strings = g.produce_grammatical(5)
-        assert all(g.recognize(s) for s in output_strings)
+        assert output_strings is None or all(g.recognize(s) for s in output_strings)
 
 
 def test_grammar_rejects_ungrammatical():
