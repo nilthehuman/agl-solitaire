@@ -21,7 +21,7 @@ import smtplib
 import threading
 import time
 
-from src.agl_solitaire import custom
+from src.agl_solitaire import custom_helpers
 from src.agl_solitaire import grammar
 from src.agl_solitaire import settings
 from src.agl_solitaire import version
@@ -85,7 +85,7 @@ class Application:
         self.settings.load_all_from_ini()
         # load custom experiment scripts from the custom/ directory
         self.custom_experiments = []
-        custom_names = custom.get_custom_experiment_names()
+        custom_names = custom_helpers.get_custom_experiment_names()
         for name in custom_names:
             try:
                 importlib.import_module('src.agl_solitaire.custom.' + name)
