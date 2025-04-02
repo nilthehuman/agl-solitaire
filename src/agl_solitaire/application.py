@@ -2,6 +2,7 @@
 
 import copy
 import datetime
+import importlib
 import os
 os.system("")  # apparently makes Windows terminal handle ANSI escape sequences too
 import random
@@ -20,6 +21,7 @@ import smtplib
 import threading
 import time
 
+from src.agl_solitaire import custom
 from src.agl_solitaire import grammar
 from src.agl_solitaire import settings
 from src.agl_solitaire import version
@@ -81,6 +83,16 @@ class Application:
     def __init__(self):
         self.settings = settings.Settings()
         self.settings.load_all_from_ini()
+        # load custom experiment scripts from the custom/ directory
+        self.custom_experiments = []
+        custom_names = custom.get_custom_experiment_names()
+        for name in custom_names:
+            try:
+                importlib.import_module('src.agl_solitaire.custom.' + name)
+                self.custom_experiments.append(name)
+            except Exception:
+                # TODO: find out if this can happen for any reason
+                pass
 
     def duplicate_print(self, string, log_only=False):
         """Output the string on the screen and log it in a text file at the same time."""
@@ -298,10 +310,7 @@ class Application:
                     self.settings.username = 'anonymous'
                 print(f"good to see you, {self.settings.username}")
             elif choice in ['2', 'c']:
-                if self.settings.grammar_class == settings.GrammarClass.REGULAR:
-                    self.settings.grammar_class = settings.GrammarClass.PATTERN
-                else:
-                    self.settings.grammar_class = settings.GrammarClass.REGULAR
+                self.settings.grammar_class = self.settings.grammar_class.next()
             elif choice in ['3', 's']:
                 prompt = 'number of training strings: '
                 attr_to_change = 'training_strings'

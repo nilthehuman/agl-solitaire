@@ -15,13 +15,20 @@ except ImportError:
 import typing
 
 
+from src.agl_solitaire import custom
+
+
 _DEFAULT_INI_FILENAME  = 'settings.ini'
 _DEFAULT_TOML_FILENAME = 'settings.toml'
 
 
-class GrammarClass(enum.StrEnum):
-    REGULAR = "regular"
-    PATTERN = "pattern"
+GrammarClass = enum.StrEnum('GrammarClass', {name:name.lower() for name in ['REGULAR', 'PATTERN'] + custom.get_custom_experiment_names()})
+# thank God for StackOverflow
+GrammarClass.next = lambda self: (
+    gc_names := [name for name in GrammarClass],
+    i := gc_names.index(self),
+    gc_names[i + 1] if i < len(gc_names) - 1 else gc_names[0]
+)[-1]
 
 
 @dataclasses.dataclass
