@@ -5,9 +5,13 @@ import enum
 import itertools
 import math
 import random
+import re
 import time
 
-random.seed(time.time())
+try:
+    random.seeded
+except AttributeError:
+    random.seed(time.time())
 
 
 _MIN_STRING_LENGTH = 2
@@ -24,7 +28,38 @@ def tokenized(string):
 
 
 class Grammar(abc.ABC):
-    """The common interface to both kinds of concrete grammar."""
+    """A common interface to all kinds of concrete grammars."""
+
+    @abc.abstractmethod
+    def produce_grammatical(self, num_strings):
+        """Output distinct random strings conforming to this grammar."""
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def produce_ungrammatical(self, num_strings):
+        """Output distinct random strings violating this grammar."""
+        raise NotImplementedError
+
+
+class CustomGrammar(Grammar):
+    """Base class for non-trivial grammars (as opposed to simple formal grammars)."""
+
+    def __init__(self, tokens=None):
+        self.tokens = tokens
+
+    def translate(self, string):
+        """Map English sentence chunks to the token set of this grammar."""
+        assert self.lexicon
+        if type(string) is str:
+            return self.lexicon[string]
+        def tr(word):
+            # disregard whitespace on either side
+            return re.sub(r"(\w+(\s*\w*)*\w)", lambda m: self.lexicon[m.group(1)], word)
+        return tuple(tr(x) for x in string)
+
+
+class FormalGrammar(Grammar):
+    """The common interface to both kinds of simple formal grammar."""
 
     @abc.abstractmethod
     def obfuscated_repr(self):
@@ -146,7 +181,7 @@ class Grammar(abc.ABC):
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
-class RegularGrammar(Grammar):
+class RegularGrammar(FormalGrammar):
     """A regular grammar: a directed graph with an output token associated with each edge.
     The whole grammar is represented in a single list of dicts, e.g. the following data
     structure represents the language that starts with one or two A's and then an arbitrary
@@ -411,7 +446,7 @@ KNOWLTON_SQUIRE_1994_II.transitions = [ {'T': 1, 'F': 3},
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
-class PatternGrammar(Grammar):
+class PatternGrammar(FormalGrammar):
     """A certain kind of non-recursive subregular grammar that consists of a finite set of
     predefined abstract string patterns. The set of all terminal tokens is broken up
     into a number of subsets called classes that may be nested but may not overlap, i.e.

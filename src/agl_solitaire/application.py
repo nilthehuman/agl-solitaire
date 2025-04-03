@@ -18,11 +18,13 @@ except ModuleNotFoundError:
         # nevermind, input history won't be available but that's fine
         pass
 import smtplib
+import sys
 import threading
 import time
 
 from src.agl_solitaire import custom_helpers
 from src.agl_solitaire import grammar
+from src.agl_solitaire import task
 from src.agl_solitaire import settings
 from src.agl_solitaire import version
 
@@ -408,11 +410,15 @@ class Application:
         self.duplicate_print('=' * 120, log_only=True)
         self.duplicate_print('agl-solitaire session started with the following settings:')
         self.duplicate_print(self.settings.pretty_print())
-        gmr, grammatical_strings = self.generate_grammar()
-        if gmr is None:
-            return
-        self.settings.experiment_state = settings.Settings.ExperimentState(self.settings, None, [], [])
-        self.run_experiment(gmr)
+        if not self.settings.grammar_class.custom():
+            gmr, grammatical_strings = self.generate_grammar()
+            if gmr is None:
+                return
+            self.settings.experiment_state = settings.Settings.ExperimentState(self.settings)
+            self.run_experiment(gmr)
+        else:
+            custom_module = sys.modules[custom_helpers.CUSTOM_MODULE_PREFIX + self.settings.grammar_class.name]
+            custom_module.run_experiment()
 
     def run_experiment(self, gmr, stngs=None):
         """Run one session of training and testing with a random grammar and record everything in the log file."""
@@ -420,10 +426,14 @@ class Application:
         try:
             if stngs is None:
                 stngs = self.settings
+            if stngs.grammar_class.custom():
+                # TODO call run_experiment
+                pass
             assert stngs.experiment_state is not None
             assert stngs.experiment_state.training_finished is not None or gmr is not None
             if stngs.experiment_state.training_finished is None:
                 self.duplicate_print('Generating training strings and test strings based on the grammar...')
+                # TODO: get rid of duplication in task.Task
                 num_required_grammatical = stngs.training_strings + stngs.test_strings_grammatical
                 grammatical_strings = gmr.produce_grammatical(num_strings=num_required_grammatical,
                                                               min_length=stngs.minimum_string_length,
@@ -465,80 +475,8 @@ class Application:
             self.duplicate_print(comments, log_only=True)
             clear()
             assert stngs.experiment_state
-            # used for sleeping but keeping the keyboard awake
-            input_thread = None
-            if not stngs.experiment_state.training_finished:
-                stngs.experiment_state.training_finished = False  # meaning started but not finished
-                if stngs.training_one_at_a_time:
-                    the_same = 'the same ' if 1 < stngs.training_reps else ''
-                    in_rounds = f"in {stngs.training_reps} rounds " if 1 < stngs.training_reps else ''
-                    time_per_item = round(float(stngs.training_time) / stngs.training_strings, 2)
-                    self.duplicate_print(f"The training phase will now begin. You will be presented with {the_same}{stngs.training_strings} exemplars of the hidden grammar {in_rounds}for {time_per_item} seconds each.")
-                else:
-                    self.duplicate_print(f"The training phase will now begin. You will have {stngs.training_time} seconds to study a list of {stngs.training_strings} exemplars of the hidden grammar.")
-                self.duplicate_print('You can use Ctrl-Break on Windows or Ctrl-C on macOS/Unix to halt the experiment at any time.')
-                self.duplicate_print('Please make sure your screen and terminal font are comfortable to read. Press return when you are ready.')
-                input()
-                if stngs.training_one_at_a_time:
-                    for training_rep in range(1, stngs.training_reps + 1):
-                        for string in stngs.experiment_state.training_set:
-                            clear()
-                            print()
-                            self.duplicate_print(string)
-                            time.sleep(float(stngs.training_time) / stngs.training_strings)
-                        if training_rep < stngs.training_reps:
-                            clear()
-                            self.duplicate_print(f"Round {training_rep} out of {stngs.training_reps} done. Press return to start round {training_rep+1}.")
-                            input()
-                else:
-                    self.duplicate_print('Training phase started. Please study the following list of strings:')
-                    print()
-                    self.duplicate_print('\n'.join(stngs.experiment_state.training_set))
-                    print()
-                    input_thread = threading.Thread(target=input, daemon=True)
-                    input_thread.start()
-                    remaining_time = stngs.training_time
-                    while input_thread.is_alive() and 0 < remaining_time:
-                        print(f"\r{remaining_time} seconds remaining (press return to finish early)...  ", end='')
-                        time.sleep(1)
-                        remaining_time -= 1
-                print('\rTraining phase finished.' + ' ' * 30)
-                self.duplicate_print('Training phase finished.', log_only=True)
-                stngs.experiment_state.training_finished = True
-                clear()
-            self.duplicate_print(f"The test phase will now begin. You will be shown {len(stngs.experiment_state.test_set)} new strings one at a time and prompted to judge the grammaticality of each.")
-            self.duplicate_print(f"You can use Ctrl-Break on Windows or Ctrl-C on macOS/Unix to halt the experiment at any time. Your progress will be saved to '{stngs.filename}' and you will be able to finish the experiment later.")
-            self.duplicate_print("You may type 'y' for yes (i.e. grammatical) and 'n' for no (ungrammatical). Press return when you are ready.")
-            # recycle input_thread if it's still running...
-            if input_thread and input_thread.is_alive():
-                input_thread.join()
-            else:
-                input()
-            # N.B. you can't do the following because you want to update the original test_set
-            #for i, item in enumerate(stngs.experiment_state.test_set):
-            for i in range(len(stngs.experiment_state.test_set)):
-                if stngs.experiment_state.test_set[i][2] is not None:
-                    # already answered in a previous session
-                    continue
-                clear()
-                self.duplicate_print(f"Test item #{i+1} out of {len(stngs.experiment_state.test_set)}. Is the following string grammatical? (y/n)")
-                self.duplicate_print(stngs.experiment_state.test_set[i][0])
-                answer = '_'
-                while answer[0] not in ['y', 'n']:
-                    answer = None
-                    while not answer:
-                        answer = input()
-                    answer = answer[0].lower()
-                    if answer == 'g':
-                        answer = 'y'
-                    elif answer == 'u':
-                        answer = 'n'
-                self.duplicate_print(answer, log_only=True)
-                stngs.experiment_state.test_set[i] = (stngs.experiment_state.test_set[i][0], stngs.experiment_state.test_set[i][1], answer)
-                # FIXME: need to call this manually because __setattr__ doesn't get called if you update a member variable in-place :(
-                stngs.save_all()
-            clear()
-            self.duplicate_print('Test phase finished. Hope you had fun!')
+            task_ = task.Task(gmr, stngs)
+            task_.run(stngs)
             if stngs.run_questionnaire:
                 self.duplicate_print('A few more questions if you feel like it:')
                 self.duplicate_print('How did you feel during the session?')

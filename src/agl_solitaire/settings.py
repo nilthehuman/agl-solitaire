@@ -23,7 +23,7 @@ _DEFAULT_TOML_FILENAME = 'settings.toml'
 
 
 GrammarClass = enum.StrEnum('GrammarClass', {name:name.lower() for name in ['REGULAR', 'PATTERN'] + custom_helpers.get_custom_experiment_names()})
-GrammarClass.custom = lambda self: self.name not in ['regular', 'pattern']
+GrammarClass.custom = lambda self: self.name.lower() not in ['regular', 'pattern']
 # thank God for StackOverflow
 GrammarClass.next = lambda self: (
     gc_names := [name for name in GrammarClass],
@@ -41,7 +41,7 @@ class Settings:
     class ExperimentState:
         """Current state of an experiment procedure, used to persistently save user's progress midway through."""
         settings:          typing.Optional[None] = None  # alas we cannot refer to the Settings type here :/
-        stages_finished:   int = 0
+        tasks_finished:    int = 0
         training_finished: typing.Optional[bool] = None # None means brand new, not even started
         training_set:      list[str] = dataclasses.field(default_factory = lambda: [])
         test_set:          list[(str, bool, typing.Optional[bool])] = dataclasses.field(default_factory = lambda: [])
@@ -63,7 +63,7 @@ class Settings:
                 if self.settings.autosave:
                     self.settings.save_all()
             except AttributeError:
-                # no settings set
+                # no self.settings set yet
                 pass
 
     filename:                   typing.Optional[str] = None
