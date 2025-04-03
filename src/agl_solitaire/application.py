@@ -255,9 +255,9 @@ class Application:
         else:
             print('You have loaded a previously completed experiment. Do you want to repeat the same experiment all over again? (y/n)')
             do_repeat = None
-            while not do_repeat or do_repeat[0] not in ['y', 'n']:
+            while not do_repeat or do_repeat[0].lower() not in ['y', 'n']:
                 do_repeat = input()
-            if 'y' != do_repeat[0]:
+            if 'y' != do_repeat[0].lower():
                 return
             def callback():
                 settings_and_gmr.experiment_state = settings.Settings.ExperimentState(settings_and_gmr)
