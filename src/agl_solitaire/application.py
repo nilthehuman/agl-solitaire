@@ -19,8 +19,6 @@ except ModuleNotFoundError:
         pass
 import smtplib
 import sys
-import threading
-import time
 
 from src.agl_solitaire import custom_helpers
 from src.agl_solitaire import grammar
