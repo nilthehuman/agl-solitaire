@@ -90,7 +90,7 @@ class Application:
         custom_names = custom_helpers.get_custom_experiment_names()
         for name in custom_names:
             try:
-                importlib.import_module('src.agl_solitaire.custom.' + name)
+                importlib.import_module(custom_helpers.CUSTOM_MODULE_PREFIX + name)
                 self.custom_experiments.append(name)
             except Exception:
                 # TODO: find out if this can happen for any reason
