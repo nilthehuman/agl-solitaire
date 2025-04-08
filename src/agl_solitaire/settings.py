@@ -228,6 +228,8 @@ class Settings:
         for section in config:
             for attr_name in config[section]:
                 self.process_loaded_entry(attr_name, config[section][attr_name])
+        if self.experiment_state is not None:
+            self.experiment_state.settings = self
         self.autosave = True
 
     if _TOMLLIB_AVAILABLE:
@@ -245,6 +247,8 @@ class Settings:
                         self.process_loaded_entry(subkey, settings_dict[key][subkey])
                 else:
                     self.process_loaded_entry(key, settings_dict[key])
+            if self.experiment_state is not None:
+                self.experiment_state.settings = self
             self.autosave = True
 
     def save_all(self, filename=None):
