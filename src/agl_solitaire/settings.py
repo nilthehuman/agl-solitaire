@@ -86,11 +86,12 @@ class Settings:
     grammar:                    typing.Optional[str] = None
     experiment_state:           typing.Optional[ExperimentState] = None
 
+    HOUSEKEEPING_MEMBERS = ['filename', 'grammar', 'experiment_state']
 
     def settings_equal(self, other):
         """Check if all options are equal except irrelevant ones."""
         for field in dataclasses.fields(self):
-            if field.name in ['filename', 'grammar', 'experiment_state']:
+            if field.name in self.HOUSEKEEPING_MEMBERS:
                 continue
             if getattr(self, field.name) != getattr(other, field.name):
                 return False
@@ -99,7 +100,7 @@ class Settings:
     def override(self, other):
         """Replace our settings, but not the grammar or the experiment state, with the other object's settings."""
         for field in dataclasses.fields(self):
-            if field.name in ['filename', 'grammar', 'experiment_state']:
+            if field.name in self.HOUSEKEEPING_MEMBERS:
                 continue
             setattr(self, field.name, getattr(other, field.name))
 
@@ -340,3 +341,9 @@ class Settings:
             except AttributeError:
                 pass  # that's fine
 
+
+### ### ### ### ### ### ### ###
+
+# generate SettingsEnabled class with all options turned into bool
+used_settings = [(f.name, bool, True) for f in dataclasses.fields(Settings) if f.name not in Settings.HOUSEKEEPING_MEMBERS]
+SettingsEnabled = dataclasses.make_dataclass('SettingsEnabled', used_settings)
