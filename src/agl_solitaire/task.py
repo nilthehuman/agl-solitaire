@@ -122,52 +122,53 @@ class Task:
         random.shuffle(self.settings.experiment_state.test_set)
         return True
 
-    def run(self, settings):
+    def run(self):
         """Let the user perform this generated task."""
+        assert self.settings.experiment_state
         assert self.settings.experiment_state.training_set
         assert self.settings.experiment_state.test_set
         # used for sleeping but keeping the keyboard awake
         input_thread = None
-        if not settings.experiment_state.training_finished:
-            if settings.training_one_at_a_time:
-                the_same = 'the same ' if 1 < settings.training_reps else ''
-                in_rounds = f"in {settings.training_reps} rounds " if 1 < settings.training_reps else ''
-                time_per_item = round(float(settings.training_time) / settings.training_strings, 2)
-                self.duplicate_print(f"The training phase will now begin. You will be presented with {the_same}{settings.training_strings} exemplars of the hidden grammar {in_rounds}for {time_per_item} seconds each.")
+        if not self.settings.experiment_state.training_finished:
+            if self.settings.training_one_at_a_time:
+                the_same = 'the same ' if 1 < self.settings.training_reps else ''
+                in_rounds = f"in {self.settings.training_reps} rounds " if 1 < self.settings.training_reps else ''
+                time_per_item = round(float(self.settings.training_time) / self.settings.training_strings, 2)
+                self.duplicate_print(f"The training phase will now begin. You will be presented with {the_same}{self.settings.training_strings} exemplars of the hidden grammar {in_rounds}for {time_per_item} seconds each.")
             else:
-                self.duplicate_print(f"The training phase will now begin. You will have {settings.training_time} seconds to study a list of {settings.training_strings} exemplars of the hidden grammar.")
+                self.duplicate_print(f"The training phase will now begin. You will have {self.settings.training_time} seconds to study a list of {self.settings.training_strings} exemplars of the hidden grammar.")
             self.duplicate_print('You can use Ctrl-Break on Windows or Ctrl-C on macOS/Unix to halt the experiment at any time.')
             self.duplicate_print('Please make sure your screen and terminal font are comfortable to read. Press return when you are ready.')
             input()
-            if settings.training_one_at_a_time:
-                for training_rep in range(1, settings.training_reps + 1):
-                    for string in settings.experiment_state.training_set:
+            if self.settings.training_one_at_a_time:
+                for training_rep in range(1, self.settings.training_reps + 1):
+                    for string in self.settings.experiment_state.training_set:
                         clear()
                         print()
                         self.duplicate_print(string)
-                        time.sleep(float(settings.training_time) / settings.training_strings)
-                    if training_rep < settings.training_reps:
+                        time.sleep(float(self.settings.training_time) / self.settings.training_strings)
+                    if training_rep < self.settings.training_reps:
                         clear()
-                        self.duplicate_print(f"Round {training_rep} out of {settings.training_reps} done. Press return to start round {training_rep+1}.")
+                        self.duplicate_print(f"Round {training_rep} out of {self.settings.training_reps} done. Press return to start round {training_rep+1}.")
                         input()
             else:
                 self.duplicate_print('Training phase started. Please study the following list of strings:')
                 print()
-                self.duplicate_print('\n'.join(settings.experiment_state.training_set))
+                self.duplicate_print('\n'.join(self.settings.experiment_state.training_set))
                 print()
                 input_thread = threading.Thread(target=input, daemon=True)
                 input_thread.start()
-                remaining_time = settings.training_time
+                remaining_time = self.settings.training_time
                 while input_thread.is_alive() and 0 < remaining_time:
                     print(f"\r{remaining_time} seconds remaining (press return to finish early)...  ", end='')
                     time.sleep(1)
                     remaining_time -= 1
             print('\rTraining phase finished.' + ' ' * 30)
             self.duplicate_print('Training phase finished.', log_only=True)
-            settings.experiment_state.training_finished = True
+            self.settings.experiment_state.training_finished = True
             clear()
-        self.duplicate_print(f"The test phase will now begin. You will be shown {len(settings.experiment_state.test_set)} new strings one at a time and prompted to judge the grammaticality of each.")
-        self.duplicate_print(f"You can use Ctrl-Break on Windows or Ctrl-C on macOS/Unix to halt the experiment at any time. Your progress will be saved to '{settings.filename}' and you will be able to finish the experiment later.")
+        self.duplicate_print(f"The test phase will now begin. You will be shown {len(self.settings.experiment_state.test_set)} new strings one at a time and prompted to judge the grammaticality of each.")
+        self.duplicate_print(f"You can use Ctrl-Break on Windows or Ctrl-C on macOS/Unix to halt the experiment at any time. Your progress will be saved to '{self.settings.filename}' and you will be able to finish the experiment later.")
         self.duplicate_print("You may type 'y' for yes (i.e. grammatical) and 'n' for no (ungrammatical). Press return when you are ready.")
         # recycle input_thread if it's still running...
         if input_thread and input_thread.is_alive():
@@ -175,14 +176,14 @@ class Task:
         else:
             input()
         # N.B. you can't do the following because you want to update the original test_set
-        #for i, item in enumerate(settings.experiment_state.test_set):
-        for i in range(len(settings.experiment_state.test_set)):
-            if settings.experiment_state.test_set[i][2] is not None:
+        #for i, item in enumerate(self.settings.experiment_state.test_set):
+        for i in range(len(self.settings.experiment_state.test_set)):
+            if self.settings.experiment_state.test_set[i][2] is not None:
                 # already answered in a previous session
                 continue
             clear()
-            self.duplicate_print(f"Test item #{i+1} out of {len(settings.experiment_state.test_set)}. Is the following string grammatical? (y/n)")
-            self.duplicate_print(settings.experiment_state.test_set[i][0])
+            self.duplicate_print(f"Test item #{i+1} out of {len(self.settings.experiment_state.test_set)}. Is the following string grammatical? (y/n)")
+            self.duplicate_print(self.settings.experiment_state.test_set[i][0])
             answer = '_'
             while answer[0] not in ['y', 'n']:
                 answer = None
@@ -194,9 +195,9 @@ class Task:
                 elif answer == 'u':
                     answer = 'n'
             self.duplicate_print(answer, log_only=True)
-            settings.experiment_state.test_set[i] = (settings.experiment_state.test_set[i][0], settings.experiment_state.test_set[i][1], answer)
+            self.settings.experiment_state.test_set[i] = (self.settings.experiment_state.test_set[i][0], self.settings.experiment_state.test_set[i][1], answer)
             # FIXME: need to call this manually because __setattr__ doesn't get called if you update a member variable in-place :(
-            settings.save_all()
+            self.settings.save_all()
         clear()
         self.duplicate_print('Test phase finished. Hope you had fun!')
 
