@@ -82,7 +82,7 @@ class Application:
 
     def __init__(self):
         self.settings = settings.Settings()
-        self.settings.load_all_from_ini()
+        self.settings.load_all()
         # load custom experiment scripts from the custom/ directory
         self.custom_experiments = []
         custom_names = custom_helpers.get_custom_experiment_names()
