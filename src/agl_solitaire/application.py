@@ -441,28 +441,14 @@ class Application:
                 pass
             assert stngs.experiment_state is not None
             assert stngs.experiment_state.test_set or gmr is not None
+            new_task = task.Task(gmr, stngs)
             if not stngs.experiment_state.test_set:
                 self.duplicate_print('Generating training strings and test strings based on the grammar...')
-                # TODO: get rid of duplication in task.Task
-                num_required_grammatical = stngs.training_strings + stngs.test_strings_grammatical
-                grammatical_strings = gmr.produce_grammatical(num_strings=num_required_grammatical,
-                                                              min_length=stngs.minimum_string_length,
-                                                              max_length=stngs.maximum_string_length)
-                if grammatical_strings is None:
+                success = new_task.prepare()
+                if not success:
                     self.duplicate_print('Sorry, it looks like the selected grammar cannot produce the required amount of different training and test strings.')
                     self.duplicate_print('Try lowering the number of strings to use and try again.')
                     return
-                grammatical_strings = list(grammatical_strings)
-                # partition grammatical_strings into two subsets
-                picked_for_training = random.sample(range(0,num_required_grammatical), k=stngs.training_strings)
-                stngs.experiment_state.training_set = [grammatical_strings[i] for i in picked_for_training]
-                stngs.experiment_state.test_set = [(grammatical_strings[i], 'y', None) for i in set(range(0,num_required_grammatical)) - set(picked_for_training)]
-                stngs.experiment_state.test_set += [(string, 'n', None) for string in gmr.produce_ungrammatical(num_strings=stngs.test_strings_ungrammatical,
-                                                                                                                min_length=stngs.minimum_string_length,
-                                                                                                                max_length=stngs.maximum_string_length)]
-                assert len(stngs.experiment_state.test_set) == stngs.test_strings_grammatical + stngs.test_strings_ungrammatical
-                # permute test_set
-                random.shuffle(stngs.experiment_state.test_set)
                 self.duplicate_print('Done.')
                 assert stngs.experiment_state.test_set
                 if stngs.run_questionnaire:
@@ -484,9 +470,9 @@ class Application:
             comments = '\n'.join(iter(input, ''))
             self.duplicate_print(comments, log_only=True)
             clear()
-            assert stngs.experiment_state
-            task_ = task.Task(gmr, stngs)
-            task_.run(stngs)
+            ### now perform the main part of the experiment ###
+            new_task.run()
+            ### ### ### ### ### ### ### ### ### ### ### ### ###
             if stngs.run_questionnaire:
                 self.duplicate_print('A few more questions if you feel like it:')
                 self.duplicate_print('How did you feel during the session?')

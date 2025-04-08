@@ -93,16 +93,34 @@ class Task:
         if ( self.settings.experiment_state.training_set and
              self.settings.experiment_state.test_set ):
             return
+        assert 0 < self.settings.training_strings
+        assert 0 < self.settings.test_strings_grammatical
+        assert 0 < self.settings.test_strings_ungrammatical
         num_required_grammatical = self.settings.training_strings + self.settings.test_strings_grammatical
-        grammatical_strings = list(self.grammar.produce_grammatical(num_required_grammatical))
-        ungrammatical_strings = self.grammar.produce_ungrammatical(num_strings=self.settings.test_strings_ungrammatical)
+        if not self.settings.grammar_class.custom():
+            grammatical_strings = self.grammar.produce_grammatical(num_strings=num_required_grammatical,
+                                                                   min_length=self.settings.minimum_string_length,
+                                                                   max_length=self.settings.maximum_string_length)
+        else:
+            grammatical_strings = self.grammar.produce_grammatical(num_required_grammatical)
+        if grammatical_strings is None:
+            return False
+        grammatical_strings = list(grammatical_strings)
+        if not self.settings.grammar_class.custom():
+            ungrammatical_strings = self.grammar.produce_ungrammatical(num_strings=self.settings.test_strings_ungrammatical,
+                                                                       min_length=self.settings.minimum_string_length,
+                                                                       max_length=self.settings.maximum_string_length)
+        else:
+            ungrammatical_strings = self.grammar.produce_ungrammatical(num_strings=self.settings.test_strings_ungrammatical)
         # partition grammatical_strings into two subsets
         picked_for_training = random.sample(range(0,num_required_grammatical), k=self.settings.training_strings)
         self.settings.experiment_state.training_set = [grammatical_strings[i] for i in picked_for_training]
         self.settings.experiment_state.test_set = [(grammatical_strings[i], 'y', None) for i in set(range(0,num_required_grammatical)) - set(picked_for_training)]
         self.settings.experiment_state.test_set += [(string, 'n', None) for string in ungrammatical_strings]
+        assert len(self.settings.experiment_state.test_set) == self.settings.test_strings_grammatical + self.settings.test_strings_ungrammatical
         # permute test set
         random.shuffle(self.settings.experiment_state.test_set)
+        return True
 
     def run(self, settings):
         """Let the user perform this generated task."""
