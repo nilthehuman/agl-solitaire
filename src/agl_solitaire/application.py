@@ -428,8 +428,8 @@ class Application:
                 # TODO call run_experiment
                 pass
             assert stngs.experiment_state is not None
-            assert stngs.experiment_state.training_finished is not None or gmr is not None
-            if stngs.experiment_state.training_finished is None:
+            assert stngs.experiment_state.test_set or gmr is not None
+            if not stngs.experiment_state.test_set:
                 self.duplicate_print('Generating training strings and test strings based on the grammar...')
                 # TODO: get rid of duplication in task.Task
                 num_required_grammatical = stngs.training_strings + stngs.test_strings_grammatical
