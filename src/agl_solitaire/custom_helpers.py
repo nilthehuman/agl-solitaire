@@ -1,5 +1,6 @@
 """Utilities for finding and enumerating the custom experiment scripts, found in their own directory."""
 
+import importlib
 import os
 import pathlib
 
@@ -17,3 +18,12 @@ def get_custom_experiment_names():
     custom_filenames = get_custom_experiment_filenames()
     return [pathlib.Path(filename).stem for filename in custom_filenames]
 
+def load_custom_experiments():
+    custom_exp_names = get_custom_experiment_names()
+    for name in custom_exp_names:
+        try:
+            importlib.import_module(CUSTOM_MODULE_PREFIX + name)
+        except Exception:
+            # TODO: find out if this can happen for any reason
+            pass
+    return custom_exp_names

@@ -2,7 +2,6 @@
 
 import copy
 import datetime
-import importlib
 import os
 os.system("")  # apparently makes Windows terminal handle ANSI escape sequences too
 import random
@@ -84,16 +83,7 @@ class Application:
         self.settings = settings.Settings()
         self.settings.load_all()
         # load custom experiment scripts from the custom/ directory
-        self.custom_experiments = []
-        custom_names = custom_helpers.get_custom_experiment_names()
-        for name in custom_names:
-            try:
-                importlib.import_module(custom_helpers.CUSTOM_MODULE_PREFIX + name)
-                self.custom_experiments.append(name)
-            except Exception:
-                # TODO: find out if this can happen for any reason
-                pass
-
+        self.custom_experiments = custom_helpers.load_custom_experiments()
     def duplicate_print(self, string, log_only=False):
         """Output the string on the screen and log it in a text file at the same time."""
         if not log_only:
