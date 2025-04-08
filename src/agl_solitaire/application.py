@@ -144,19 +144,24 @@ class Application:
         grammatical_strings = None
         max_grammar_attempts = 64
         max_oversize_attempts = 5
-        oversize_grammar = 0
+        oversize = 0
         print('Looking for a suitable random grammar...')
         # TODO: move this whole loop to the Grammar classes
-        while grammatical_strings is None and oversize_grammar <= max_oversize_attempts:
+        while grammatical_strings is None and oversize <= max_oversize_attempts:
             grammar_attempts = 0
             while grammatical_strings is None and grammar_attempts < max_grammar_attempts:
                 grammar_attempts += 1
                 if self.settings.grammar_class == settings.GrammarClass.REGULAR:
-                    gmr.randomize(min_states=gmr.MIN_STATES + oversize_grammar,
-                                  max_states=gmr.MAX_STATES + oversize_grammar)
+                    gmr.randomize(min_states=gmr.MIN_STATES + oversize,
+                                  max_states=gmr.MAX_STATES + oversize)
                 elif self.settings.grammar_class == settings.GrammarClass.PATTERN:
                     # TODO: oversize pattern grammar
-                    gmr.randomize()
+                    gmr.randomize(min_classes=gmr.MIN_CLASSES + int(oversize/2 + 0.5),
+                                  max_classes=gmr.MAX_CLASSES + int(oversize/2 + 0.5),
+                                  min_patterns=gmr.MIN_PATTERNS + int(oversize/2),
+                                  max_patterns=gmr.MAX_PATTERNS + int(oversize/2),
+                                  min_length=self.settings.minimum_string_length,
+                                  max_length=self.settings.maximum_string_length)
                 else:
                     assert False
                 if not self.settings.recursion and gmr.has_cycle():
@@ -164,9 +169,16 @@ class Application:
                 grammatical_strings = gmr.produce_grammatical(num_strings=num_required_strings,
                                                               min_length=self.settings.minimum_string_length,
                                                               max_length=self.settings.maximum_string_length)
-            oversize_grammar += 1
+            oversize += 1
             if grammatical_strings is None:
-                print(f"None found, expanding search to between {gmr.MIN_STATES+oversize_grammar} and {gmr.MAX_STATES+oversize_grammar} states...")
+                if self.settings.grammar_class == settings.GrammarClass.REGULAR:
+                    print(f"None found, expanding search to {gmr.MIN_STATES+oversize} to {gmr.MAX_STATES+oversize} states...")
+                elif self.settings.grammar_class == settings.GrammarClass.PATTERN:
+                    class_oversize = int(oversize/2 + 0.5)
+                    pattern_oversize = int(oversize/2)
+                    print(f"None found, expanding search to {gmr.MIN_CLASSES+class_oversize} to {gmr.MAX_CLASSES+class_oversize} word classes and {gmr.MIN_PATTERNS+pattern_oversize} to {gmr.MAX_PATTERNS+pattern_oversize} patterns...")
+                else:
+                    assert False
         if grammatical_strings is None:
             print('Sorry, no grammar found that would satisfy the current settings. Try relaxing some of your preferences.')
             return None, None
