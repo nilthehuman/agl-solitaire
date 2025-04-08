@@ -7,6 +7,7 @@ try:
 except ImportError:
     import pickle
 import enum
+import sys
 try:
     import tomllib
     _TOMLLIB_AVAILABLE = True
@@ -113,35 +114,59 @@ class Settings:
 
     def pretty_print(self):
         """Print all settings in an even more conveniently readable format."""
+        settings_used = SettingsEnabled()
+        if self.grammar_class.custom():
+            mod = sys.modules[custom_helpers.CUSTOM_MODULE_PREFIX + self.grammar_class.name]
+            settings_used = mod.CustomTask.settings_used
         pretty = ''
         pretty += f"Username: {self.username}\n"
         pretty += f"Grammar class: {self.grammar_class}\n"
-        pretty += f"Number of training strings: {self.training_strings}\n"
-        pretty += f"Time allotted for training: {self.training_time}\n"
-        pretty += f"Number of grammatical test strings: {self.test_strings_grammatical}\n"
-        pretty += f"Number of ungrammatical test strings: {self.test_strings_ungrammatical}\n"
-        pretty += f"Minimum string length: {self.minimum_string_length}\n"
-        pretty += f"Maximum string length: {self.maximum_string_length}\n"
-        pretty += f"Tokens to use in strings: {self.string_tokens}\n"
-        pretty += f"Recursion allowed in grammar: {self.recursion}\n"
+        if settings_used.training_strings:
+            pretty += f"Number of training strings: {self.training_strings}\n"
+        if settings_used.training_time:
+            pretty += f"Time allotted for training: {self.training_time}\n"
+        if settings_used.test_strings_grammatical:
+            pretty += f"Number of grammatical test strings: {self.test_strings_grammatical}\n"
+        if settings_used.test_strings_ungrammatical:
+            pretty += f"Number of ungrammatical test strings: {self.test_strings_ungrammatical}\n"
+        if settings_used.minimum_string_length:
+            pretty += f"Minimum string length: {self.minimum_string_length}\n"
+        if settings_used.maximum_string_length:
+            pretty += f"Maximum string length: {self.maximum_string_length}\n"
+        if settings_used.string_tokens:
+            pretty += f"Tokens to use in strings: {self.string_tokens}\n"
+        if settings_used.recursion:
+            pretty += f"Recursion allowed in grammar: {self.recursion}\n"
         pretty += f"Logfile to record session in: {self.logfile_filename}\n"
-        pretty += f"Show training strings one at a time: {self.training_one_at_a_time}\n"
-        pretty += f"Number of training rounds: {self.training_reps}\n"
+        if settings_used.training_one_at_a_time:
+            pretty += f"Show training strings one at a time: {self.training_one_at_a_time}\n"
+        if settings_used.training_reps:
+            pretty += f"Number of training rounds: {self.training_reps}\n"
         pretty += f"Run pre and post session questionnaire: {self.run_questionnaire}\n"
         pretty += f"Automatically email logs to author: {self.email_logs}\n"
         return pretty
 
     def pretty_short(self):
         """Only print settings relevant with a grammar loaded from file."""
+        settings_used = SettingsEnabled()
+        if self.grammar_class.custom():
+            mod = sys.modules[custom_helpers.CUSTOM_MODULE_PREFIX + self.grammar_class.name]
+            settings_used = mod.CustomTask.settings_used
         pretty = ''
         pretty += f"Username: {self.username}\n"
-        pretty += f"Number of training strings: {self.training_strings}\n"
-        pretty += f"Time allotted for training: {self.training_time}\n"
-        pretty += f"Number of grammatical test strings: {self.test_strings_grammatical}\n"
-        pretty += f"Number of ungrammatical test strings: {self.test_strings_ungrammatical}\n"
+        if settings_used.training_strings:
+            pretty += f"Number of training strings: {self.training_strings}\n"
+        if settings_used.training_time:
+            pretty += f"Time allotted for training: {self.training_time}\n"
+        if settings_used.test_strings_grammatical:
+            pretty += f"Number of grammatical test strings: {self.test_strings_grammatical}\n"
+        if settings_used.test_strings_ungrammatical:
+            pretty += f"Number of ungrammatical test strings: {self.test_strings_ungrammatical}\n"
         pretty += f"Logfile to record session in: {self.logfile_filename}\n"
-        pretty += f"Show training strings one at a time: {self.training_one_at_a_time}\n"
-        pretty += f"Number of training rounds: {self.training_reps}\n"
+        if settings_used.training_one_at_a_time:
+            pretty += f"Show training strings one at a time: {self.training_one_at_a_time}\n"
+        if settings_used.training_reps:
+            pretty += f"Number of training rounds: {self.training_reps}\n"
         pretty += f"Run pre and post session questionnaire: {self.run_questionnaire}\n"
         return pretty
 
@@ -330,6 +355,14 @@ class Settings:
         self.autosave = False
         callback()
         self.autosave = autosave_backup
+
+    def mask_unused(self, settings_enabled, mask_value=None):
+        """Remove settings that are currently not relevant according to the SettingsEnabled object."""
+        for field in dataclasses.fields(self):
+            if field.name in self.HOUSEKEEPING_MEMBERS:
+                continue
+            if not getattr(settings_enabled, field.name):
+                setattr(self, field.name, mask_value)
 
     def __setattr__(self, attr, value):
         """Save any and all settings changes automatically if required."""

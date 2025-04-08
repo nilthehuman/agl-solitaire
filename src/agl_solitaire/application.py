@@ -268,22 +268,32 @@ class Application:
         """Enable user to configure and adjust the experimental protocol."""
         while True:
             print('\n--------  SETTINGS  --------')
+            # used for disabling currently unavailable options
+            dummy_settings = copy.copy(self.settings)
+            dummy_settings.autosave = False
+            dummy_settings_display = copy.copy(self.settings)
+            dummy_settings_display.autosave = False
+            if self.settings.grammar_class.custom():
+                mod = sys.modules[custom_helpers.CUSTOM_MODULE_PREFIX + self.settings.grammar_class.name]
+                settings_used = mod.CustomTask.settings_used
+                dummy_settings.mask_unused(settings_used)
+                dummy_settings_display.mask_unused(settings_used, mask_value='--')
             options = [
-                f" 1: [u]sername (for the record):\t\t{self.settings.username}",
-                f" 2: grammar [c]lass:\t\t\t\t{self.settings.grammar_class}",
-                f" 3: number of training [s]trings:\t\t{self.settings.training_strings}",
-                f" 4: [t]ime allotted for training:\t\t{self.settings.training_time} seconds",
-                f" 5: number of [g]rammatical test strings:\t{self.settings.test_strings_grammatical}",
-                f" 6: number of [u]ngrammatical test strings:\t{self.settings.test_strings_ungrammatical}",
-                f" 7: mi[n]imum string length:\t\t\t{self.settings.minimum_string_length}",
-                f" 8: ma[x]imum string length:\t\t\t{self.settings.maximum_string_length}",
-                f" 9: [l]etters or words to use in strings:\t{self.settings.string_tokens}",
-                f"10: allow recursion in the grammar:\t\t{self.settings.recursion}",
-                f"11: log[f]ile to record sessions in:\t\t{self.settings.logfile_filename}",
-                f"12: show training strings [o]ne at a time:\t{self.settings.training_one_at_a_time}",
-                f"13: number of training [r]epetitions:\t\t{self.settings.training_reps} round(s)",
-                f"14: run pre and post session [q]uestionnaire:\t{self.settings.run_questionnaire}",
-                f"15: automatically [e]mail logs to author:\t{self.settings.email_logs}",
+                f" 1: [u]sername (for the record):\t\t{dummy_settings_display.username}",
+                f" 2: grammar [c]lass:\t\t\t\t{dummy_settings_display.grammar_class}",
+                f" 3: number of training [s]trings:\t\t{dummy_settings_display.training_strings}",
+                f" 4: [t]ime allotted for training:\t\t{dummy_settings_display.training_time} seconds",
+                f" 5: number of [g]rammatical test strings:\t{dummy_settings_display.test_strings_grammatical}",
+                f" 6: number of [u]ngrammatical test strings:\t{dummy_settings_display.test_strings_ungrammatical}",
+                f" 7: mi[n]imum string length:\t\t\t{dummy_settings_display.minimum_string_length}",
+                f" 8: ma[x]imum string length:\t\t\t{dummy_settings_display.maximum_string_length}",
+                f" 9: [l]etters or words to use in strings:\t{dummy_settings_display.string_tokens}",
+                f"10: allow recursion in the grammar:\t\t{dummy_settings_display.recursion}",
+                f"11: log[f]ile to record sessions in:\t\t{dummy_settings_display.logfile_filename}",
+                f"12: show training strings [o]ne at a time:\t{dummy_settings_display.training_one_at_a_time}",
+                f"13: number of training [r]epetitions:\t\t{dummy_settings_display.training_reps} round(s)",
+                f"14: run pre and post session [q]uestionnaire:\t{dummy_settings_display.run_questionnaire}",
+                f"15: automatically [e]mail logs to author:\t{dummy_settings_display.email_logs}",
                 ' 0: [b]ack to main menu'
             ]
             for i, option in enumerate(options):
@@ -305,6 +315,45 @@ class Application:
                 choice = input('what to change> ')
             if choice.isalpha():
                 choice = choice[0].lower()
+            choice_to_attr_name = {
+                '1'  : 'username',
+                'u'  : 'username',
+                '2'  : 'grammar_class',
+                'c'  : 'grammar_class',
+                '3'  : 'training_strings',
+                's'  : 'training_strings',
+                '4'  : 'training_time',
+                't'  : 'training_time',
+                '5'  : 'test_strings_grammatical',
+                'g'  : 'test_strings_grammatical',
+                '6'  : 'test_strings_ungrammatical',
+                'u'  : 'test_strings_ungrammatical',
+                '7'  : 'minimum_string_length',
+                'n'  : 'minimum_string_length',
+                '8'  : 'maximum_string_length',
+                'x'  : 'maximum_string_length',
+                '9'  : 'string_tokens',
+                'l'  : 'string_tokens',
+                '10' : 'recursion',
+                '11' : 'logfile_filename',
+                'f'  : 'logfile_filename',
+                '12' : 'training_one_at_a_time',
+                'o'  : 'training_one_at_a_time',
+                '13' : 'training_reps',
+                'r'  : 'training_reps',
+                '14' : 'run_questionnaire',
+                'q'  : 'run_questionnaire',
+                '15' : 'email_logs',
+                'e'  : 'email_logs'
+            }
+            try:
+                if not getattr(dummy_settings, choice_to_attr_name[choice]):
+                    print('error: that option is not available for this kind of grammar')
+                    choice = ''
+                    continue
+            except KeyError:
+                # fall through and let the logic below handle it
+                pass
             attr_to_change = None
             if choice in ['1', 'u']:
                 self.settings.username = input('username: ')

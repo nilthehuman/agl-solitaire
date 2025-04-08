@@ -76,6 +76,7 @@ class Task:
 
     grammar: Grammar
     settings: Settings
+    settings_used = SettingsEnabled()
 
     # FIXME: copypasta from Application :S
     def duplicate_print(self, string, log_only=False):
