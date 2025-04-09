@@ -379,4 +379,9 @@ class Settings:
 
 # generate SettingsEnabled class with all options turned into bool
 used_settings = [(f.name, bool, True) for f in dataclasses.fields(Settings) if f.name not in Settings.HOUSEKEEPING_MEMBERS]
-SettingsEnabled = dataclasses.make_dataclass('SettingsEnabled', used_settings)
+SettingsEnabled = dataclasses.make_dataclass('SettingsEnabled', used_settings) #, bases=(Settings,))
+def _mask_unused(self, other):
+    for field in dataclasses.fields(self):
+        new_value = getattr(self, field.name) and getattr(other, field.name)
+        setattr(self, field.name, new_value)
+SettingsEnabled.mask_unused = _mask_unused
