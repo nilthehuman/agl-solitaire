@@ -4,6 +4,7 @@ import dataclasses
 import random
 import threading
 import time
+import typing
 
 try:
     random.seeded
@@ -12,6 +13,7 @@ except AttributeError:
     random.seeded = True
 
 
+from src.agl_solitaire.grammar import Grammar
 from src.agl_solitaire.settings import Settings, SettingsEnabled
 from src.agl_solitaire.utils import print, input, clear, get_grammar_from_obfuscated_repr, Loggable
 
@@ -24,6 +26,7 @@ class Task(Loggable):
     custom Tasks."""
 
     settings: Settings
+    grammar:  typing.Optional[Grammar] = None
     # N.B.: class variable, not an object variable
     settings_used = SettingsEnabled()
 
