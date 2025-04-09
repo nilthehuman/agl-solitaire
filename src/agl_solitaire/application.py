@@ -23,6 +23,7 @@ from src.agl_solitaire import custom_helpers
 from src.agl_solitaire import grammar
 from src.agl_solitaire import task
 from src.agl_solitaire import settings
+from src.agl_solitaire import utils
 from src.agl_solitaire import version
 
 
@@ -130,7 +131,7 @@ class Application:
         elif self.settings.grammar_class == settings.GrammarClass.PATTERN:
             gmr = grammar.PatternGrammar(self.settings.string_tokens)
         else:
-            assert False
+            raise NotImplementedError
         num_required_strings = self.settings.training_strings + self.settings.test_strings_grammatical
         grammatical_strings = None
         max_grammar_attempts = 64
@@ -180,7 +181,11 @@ class Application:
 
     def generate_experiment(self):
         """Generate and serialize a new suitable grammar to file for later use."""
-        gmr, _ = self.generate_grammar()
+        try:
+            gmr, _ = self.generate_grammar()
+        except NotImplementedError:
+            print('error: saving custom grammars to file is not supported (yet)')
+            return
         if not gmr:
             return
         while True:
@@ -224,29 +229,20 @@ class Application:
             print('error: file does not include a grammar')
             return
         try:
-            if settings_and_gmr.grammar_class == settings.GrammarClass.REGULAR:
-                gmr = grammar.RegularGrammar.from_obfuscated_repr(settings_and_gmr.grammar)
-            else:
-                gmr = grammar.PatternGrammar.from_obfuscated_repr(settings_and_gmr.grammar)
-        except (IndexError, SyntaxError, TypeError):
+            gmr = utils.get_grammar_from_obfuscated_repr(settings_and_gmr)
+        except ValueError:
             print('error: loading grammar from file failed')
             return
         print(f"Experiment loaded from '{settings_and_gmr.filename}'.")
         if not self.settings.settings_equal(settings_and_gmr):
             print('warning: your current settings differ from those loaded from file:\n')
-            print(f"settings in {filename}:\n" + settings_and_gmr.diff(self.settings))
+            print(f"settings in '{filename}':\n" + settings_and_gmr.diff(self.settings))
             print(f"current settings:\n" + self.settings.diff(settings_and_gmr))
             choice = ''
             while not choice:
                 choice = input('use the current settings instead? (y/n)> ')
             if choice[0].lower() == 'y':
                 settings_and_gmr.override(self.settings)
-        # don't forget to reset tokens as well
-        try:
-            gmr.set_tokens(self.settings.string_tokens)
-        except ValueError as err:
-            print('\nerror: ' + str(err))
-            return
         if all(judgement is None for (_, _, judgement) in settings_and_gmr.experiment_state.test_set):
             self.duplicate_print('=' * 120, log_only=True)
             self.duplicate_print('You are now starting a previously generated experiment:')
@@ -263,7 +259,7 @@ class Application:
             def callback():
                 settings_and_gmr.experiment_state = settings.Settings.ExperimentState(settings_and_gmr)
             settings_and_gmr.without_autosave(callback)
-        self.run_experiment(gmr, settings_and_gmr)
+        self.run_experiment(settings_and_gmr)
 
     def settings_menu(self):
         """Enable user to configure and adjust the experimental protocol."""
@@ -473,16 +469,18 @@ class Application:
         self.duplicate_print('agl-solitaire session started with the following settings:')
         self.duplicate_print(self.settings.pretty_print())
         if not self.settings.grammar_class.custom():
-            gmr, grammatical_strings = self.generate_grammar()
+            gmr, _grammatical_strings = self.generate_grammar()
             if gmr is None:
                 return
             self.settings.experiment_state = settings.Settings.ExperimentState(self.settings)
-            self.run_experiment(gmr)
+            self.run_experiment()
         else:
             custom_module = sys.modules[custom_helpers.CUSTOM_MODULE_PREFIX + self.settings.grammar_class.name]
-            custom_module.run_experiment()
+            custom_task = custom_module.CustomTask()
+            custom_task.prepare()
+            custom_task.run()
 
-    def run_experiment(self, gmr, stngs=None):
+    def run_experiment(self, stngs=None):
         """Run one session of training and testing with a random grammar and record everything in the log file."""
         # wrap the whole function body in a try block to handle a keyboard interrupt
         try:
@@ -490,10 +488,10 @@ class Application:
                 stngs = self.settings
             if stngs.grammar_class.custom():
                 # TODO call run_experiment
-                pass
+                raise NotImplementedError
             assert stngs.experiment_state is not None
-            assert stngs.experiment_state.test_set or gmr is not None
-            new_task = task.Task(gmr, stngs)
+            assert stngs.experiment_state.test_set or stngs.grammar is not None
+            new_task = task.Task(stngs)
             if not stngs.experiment_state.test_set:
                 self.duplicate_print('Generating training strings and test strings based on the grammar...')
                 success = new_task.prepare()
@@ -538,6 +536,7 @@ class Application:
                 self.duplicate_print(answer, log_only=True)
             clear()
             self.duplicate_print(f"And now for the big reveal... Strings were generated using the following {stngs.grammar_class} grammar:")
+            gmr = utils.get_grammar_from_obfuscated_repr(stngs)
             self.duplicate_print(str(gmr))
             correct = sum(item[1] == item[2] for item in stngs.experiment_state.test_set)
             self.duplicate_print(f"You gave {correct} correct answers out of {len(stngs.experiment_state.test_set)} ({100 * correct/len(stngs.experiment_state.test_set):.4}%). The answers were the following:")

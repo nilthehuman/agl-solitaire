@@ -5,6 +5,7 @@ import datetime
 import os
 import random
 import re
+import threading
 
 try:
     random.seeded
@@ -13,8 +14,9 @@ except AttributeError:
     random.seed(time.time())
 
 
+from src.agl_solitaire import utils
 from src.agl_solitaire.grammar import Grammar
-from src.agl_solitaire.settings import Settings
+from src.agl_solitaire.settings import Settings, SettingsEnabled
 
 
 # FIXME: copypasta from Application :S
@@ -75,7 +77,6 @@ def clear():
 class Task:
     """Represents one AGL test to be done by the user, possibly in a series of several."""
 
-    grammar: Grammar
     settings: Settings
     settings_used = SettingsEnabled()
 
@@ -95,25 +96,27 @@ class Task:
         if ( self.settings.experiment_state.training_set and
              self.settings.experiment_state.test_set ):
             return
+        assert self.settings.grammar
         assert 0 < self.settings.training_strings
         assert 0 < self.settings.test_strings_grammatical
         assert 0 < self.settings.test_strings_ungrammatical
+        grammar = utils.get_grammar_from_obfuscated_repr(self.settings)
         num_required_grammatical = self.settings.training_strings + self.settings.test_strings_grammatical
         if not self.settings.grammar_class.custom():
-            grammatical_strings = self.grammar.produce_grammatical(num_strings=num_required_grammatical,
+            grammatical_strings = grammar.produce_grammatical(num_strings=num_required_grammatical,
                                                                    min_length=self.settings.minimum_string_length,
                                                                    max_length=self.settings.maximum_string_length)
         else:
-            grammatical_strings = self.grammar.produce_grammatical(num_required_grammatical)
+            grammatical_strings = grammar.produce_grammatical(num_required_grammatical)
         if grammatical_strings is None:
             return False
         grammatical_strings = list(grammatical_strings)
         if not self.settings.grammar_class.custom():
-            ungrammatical_strings = self.grammar.produce_ungrammatical(num_strings=self.settings.test_strings_ungrammatical,
+            ungrammatical_strings = grammar.produce_ungrammatical(num_strings=self.settings.test_strings_ungrammatical,
                                                                        min_length=self.settings.minimum_string_length,
                                                                        max_length=self.settings.maximum_string_length)
         else:
-            ungrammatical_strings = self.grammar.produce_ungrammatical(num_strings=self.settings.test_strings_ungrammatical)
+            ungrammatical_strings = grammar.produce_ungrammatical(num_strings=self.settings.test_strings_ungrammatical)
         # partition grammatical_strings into two subsets
         picked_for_training = random.sample(range(0,num_required_grammatical), k=self.settings.training_strings)
         self.settings.experiment_state.training_set = [grammatical_strings[i] for i in picked_for_training]
