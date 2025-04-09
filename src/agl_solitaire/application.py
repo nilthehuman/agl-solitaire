@@ -136,7 +136,7 @@ class Application:
         max_grammar_attempts = 64
         max_oversize_attempts = 5
         oversize = 0
-        print('Looking for a suitable random grammar...')
+        self.duplicate_print('Looking for a suitable random grammar...')
         # TODO: move this whole loop to the Grammar classes
         while grammatical_strings is None and oversize <= max_oversize_attempts:
             grammar_attempts = 0
@@ -163,19 +163,19 @@ class Application:
             oversize += 1
             if grammatical_strings is None:
                 if self.settings.grammar_class == settings.GrammarClass.REGULAR:
-                    print(f"None found, expanding search to {gmr.MIN_STATES+oversize} to {gmr.MAX_STATES+oversize} states...")
+                    self.duplicate_print(f"None found, expanding search to {gmr.MIN_STATES+oversize} to {gmr.MAX_STATES+oversize} states...")
                 elif self.settings.grammar_class == settings.GrammarClass.PATTERN:
                     class_oversize = int(oversize/2 + 0.5)
                     pattern_oversize = int(oversize/2)
-                    print(f"None found, expanding search to {gmr.MIN_CLASSES+class_oversize} to {gmr.MAX_CLASSES+class_oversize} word classes and {gmr.MIN_PATTERNS+pattern_oversize} to {gmr.MAX_PATTERNS+pattern_oversize} patterns...")
+                    self.duplicate_print(f"None found, expanding search to {gmr.MIN_CLASSES+class_oversize} to {gmr.MAX_CLASSES+class_oversize} word classes and {gmr.MIN_PATTERNS+pattern_oversize} to {gmr.MAX_PATTERNS+pattern_oversize} patterns...")
                 else:
                     assert False
         if grammatical_strings is None:
-            print('Sorry, no grammar found that would satisfy the current settings. Try relaxing some of your preferences.')
+            self.duplicate_print('Sorry, no grammar found that would satisfy the current settings. Try relaxing some of your preferences.')
             return None, None
         # TODO: this should especially be moved to the Grammars
         gmr.tokens = None
-        print('Grammar selected. The rules of the grammar will be revealed after the session.')
+        self.duplicate_print('Grammar selected. The rules of the grammar will be revealed after the session.')
         return gmr, list(grammatical_strings)
 
     def generate_experiment(self):
