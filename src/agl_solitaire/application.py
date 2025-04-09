@@ -400,6 +400,7 @@ class Application(Loggable):
             gmr, _grammatical_strings = self.generate_grammar()
             if gmr is None:
                 return
+            self.settings.grammar = gmr.obfuscated_repr()
             self.settings.experiment_state = settings.Settings.ExperimentState(self.settings)
             self.run_experiment()
         else:
