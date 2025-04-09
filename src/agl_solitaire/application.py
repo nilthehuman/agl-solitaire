@@ -410,7 +410,10 @@ class Application:
                 self.settings.recursion = not self.settings.recursion
             elif choice in ['11', 'f']:
                 new_filename = input('logfile name: ')
-                if os.path.exists(new_filename):
+                print('\'' + new_filename + '\'')
+                if not new_filename:
+                    continue  # nevermind
+                elif os.path.exists(new_filename):
                     if not os.path.isfile(new_filename):
                         print('error: not a file (maybe a folder?)')
                     with open(new_filename, 'r', encoding='UTF-8') as logfile:
