@@ -1,20 +1,17 @@
 """Class responsible for driving most of the actual experimental procedure."""
 
 import dataclasses
-import datetime
-import os
 import random
-import re
 import threading
+import time
 
 try:
     random.seeded
 except AttributeError:
-    import time
     random.seed(time.time())
+    random.seeded = True
 
 
-from src.agl_solitaire.grammar import Grammar
 from src.agl_solitaire.settings import Settings, SettingsEnabled
 from src.agl_solitaire.utils import print, input, clear, get_grammar_from_obfuscated_repr, Loggable
 
@@ -22,9 +19,12 @@ from src.agl_solitaire.utils import print, input, clear, get_grammar_from_obfusc
 # TODO: see if we can merge this with ExperimentState?
 @dataclasses.dataclass
 class Task(Loggable):
-    """Represents one AGL test to be done by the user, possibly in a series of several."""
+    """Represents one AGL test to be done by the user, possibly in a series of several.
+    This class provides a default implementation that may be overridden by more specific
+    custom Tasks."""
 
     settings: Settings
+    # N.B.: class variable, not an object variable
     settings_used = SettingsEnabled()
 
     def prepare(self):
@@ -142,3 +142,7 @@ class Task(Loggable):
         clear()
         self.duplicate_print('Test phase finished. Hope you had fun!')
 
+    def cleanup(self):
+        """Tie up any loose ends in terms of resources if we had to abandon the experiment
+        early in the middle of Task.run (e.g. because the user halted the experiment)."""
+        pass

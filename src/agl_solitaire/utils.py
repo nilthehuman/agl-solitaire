@@ -3,6 +3,16 @@
 import datetime
 import os
 import re
+try:
+    import readline
+except ModuleNotFoundError:
+    # try and fall back on pyreadline3
+    try:
+        from pyreadline3 import Readline
+        readline = Readline()
+    except ModuleNotFoundError:
+        # nevermind, input history won't be available but that's fine
+        pass
 
 from src.agl_solitaire import grammar
 from src.agl_solitaire import settings

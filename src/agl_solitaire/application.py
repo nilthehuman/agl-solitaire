@@ -3,18 +3,7 @@
 import copy
 import os
 os.system("")  # apparently makes Windows terminal handle ANSI escape sequences too
-import random
 import re
-try:
-    import readline
-except ModuleNotFoundError:
-    # try and fall back on pyreadline3
-    try:
-        from pyreadline3 import Readline
-        readline = Readline()
-    except ModuleNotFoundError:
-        # nevermind, input history won't be available but that's fine
-        pass
 import smtplib
 import sys
 
@@ -168,7 +157,7 @@ class Application(Loggable):
             print('error: file does not include a grammar')
             return
         try:
-            gmr = utils.get_grammar_from_obfuscated_repr(settings_and_gmr)
+            get_grammar_from_obfuscated_repr(settings_and_gmr)
         except ValueError:
             print('error: loading grammar from file failed')
             return
@@ -415,7 +404,7 @@ class Application(Loggable):
             self.run_experiment()
         else:
             custom_module = sys.modules[custom_helpers.CUSTOM_MODULE_PREFIX + self.settings.grammar_class.name]
-            custom_task = custom_module.CustomTask()
+            custom_task = custom_module.CustomTask(self.settings)
             custom_task.prepare()
             custom_task.run()
 
@@ -475,7 +464,7 @@ class Application(Loggable):
                 self.duplicate_print(answer, log_only=True)
             clear()
             self.duplicate_print(f"And now for the big reveal... Strings were generated using the following {stngs.grammar_class} grammar:")
-            gmr = utils.get_grammar_from_obfuscated_repr(stngs)
+            gmr = get_grammar_from_obfuscated_repr(stngs)
             self.duplicate_print(str(gmr))
             correct = sum(item[1] == item[2] for item in stngs.experiment_state.test_set)
             self.duplicate_print(f"You gave {correct} correct answers out of {len(stngs.experiment_state.test_set)} ({100 * correct/len(stngs.experiment_state.test_set):.4}%). The answers were the following:")
@@ -518,6 +507,8 @@ class Application(Loggable):
             print()
             self.duplicate_print(f"Experiment halted by user. Progress saved to '{stngs.filename}'.")
             # returning to main menu
+        finally:
+            new_task.cleanup()
 
 
 if __name__ == '__main__':

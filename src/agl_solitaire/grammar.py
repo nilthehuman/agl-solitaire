@@ -6,12 +6,13 @@ import itertools
 import math
 import random
 import re
-import time
 
 try:
     random.seeded
 except AttributeError:
+    import time
     random.seed(time.time())
+    random.seeded = True
 
 
 _MIN_STRING_LENGTH = 2
