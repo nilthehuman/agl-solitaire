@@ -1,7 +1,6 @@
 """The application's user interface including the terminal-based menu and the experimental procedure itself."""
 
 import copy
-import datetime
 import os
 os.system("")  # apparently makes Windows terminal handle ANSI escape sequences too
 import random
@@ -23,78 +22,18 @@ from src.agl_solitaire import custom_helpers
 from src.agl_solitaire import grammar
 from src.agl_solitaire import task
 from src.agl_solitaire import settings
-from src.agl_solitaire import utils
 from src.agl_solitaire import version
+from src.agl_solitaire.utils import print, input, clear, get_grammar_from_obfuscated_repr, Loggable
 
 
-_LEFT_MARGIN_WIDTH = 2
-
-_builtin_print = print
-
-def print(string='', end='\n'):
-    """Smarter print function, adds left margin and wraps long lines automatically."""
-    max_width = os.get_terminal_size().columns
-    wrapped_string = ''
-    string = str(string)
-    for line in string.split('\n'):
-        carriage_return = re.match(r'\r', line)
-        if carriage_return:
-            line = line[1:]
-        line = ' ' * _LEFT_MARGIN_WIDTH + line
-        if carriage_return:
-            line = '\r' + line
-        while max_width < len(line):
-            stop_at = max_width - 1
-            # back up to the nearest word boundary
-            while 0 <= stop_at and not line[stop_at].isspace():
-                stop_at -= 1
-            if -1 == stop_at:
-                # one giant word, we give up and leave it unwrapped
-                stop_at = len(line)
-            wrapped_string += line[:stop_at] + '\n'
-            line = line[stop_at+1:]
-            line = ' ' * _LEFT_MARGIN_WIDTH + line
-        wrapped_string += line + '\n'
-    # leave off the last newline
-    _builtin_print(wrapped_string[:-1], end=end)
-
-_builtin_input = input
-
-def input(prompt='> '):
-    """input function with constant left margin for improved readability."""
-    return _builtin_input(' ' * _LEFT_MARGIN_WIDTH + prompt)
-
-_which_clear = None
-
-def clear():
-    """Find the right clear screen command by trial-and-error and remember it."""
-    global which_clear
-    try:
-        which_clear
-    except NameError:
-        which_clear = 'cls'
-    if os.system(which_clear):
-        # non-zero exit code, try the other command
-        (which_clear,) = set(['cls', 'clear']) - set([which_clear])
-        os.system(which_clear)
-
-class Application:
-    """The main class responsible for basic user interactions and driving the procedure of the experiment."""
+class Application(Loggable):
+    """The main class responsible for basic user interactions and initiating experiments."""
 
     def __init__(self):
         self.settings = settings.Settings()
         self.settings.load_all()
         # load custom experiment scripts from the custom/ directory
         self.custom_experiments = custom_helpers.load_custom_experiments()
-    def duplicate_print(self, string, log_only=False):
-        """Output the string on the screen and log it in a text file at the same time."""
-        if not log_only:
-            print(string)
-        with open(self.settings.logfile_filename, 'a', encoding='UTF-8') as logfile:
-            # prepend timestamp
-            stamped_list = ['[' + str(datetime.datetime.now().replace(microsecond=0)) + '] ' + line.strip() for line in string.split('\n')]
-            stamped_string = '\n'.join(stamped_list)
-            logfile.write(stamped_string + '\n')
 
     def main_menu(self):
         """Show the starting menu screen."""
