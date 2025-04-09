@@ -92,7 +92,7 @@ class Settings:
     def settings_equal(self, other):
         """Check if all options are equal except irrelevant ones."""
         for field in dataclasses.fields(self):
-            if field.name in self.HOUSEKEEPING_MEMBERS:
+            if field.name in Settings.HOUSEKEEPING_MEMBERS:
                 continue
             if getattr(self, field.name) != getattr(other, field.name):
                 return False
@@ -101,7 +101,7 @@ class Settings:
     def override(self, other):
         """Replace our settings, but not the grammar or the experiment state, with the other object's settings."""
         for field in dataclasses.fields(self):
-            if field.name in self.HOUSEKEEPING_MEMBERS:
+            if field.name in Settings.HOUSEKEEPING_MEMBERS:
                 continue
             setattr(self, field.name, getattr(other, field.name))
 
@@ -359,10 +359,11 @@ class Settings:
     def mask_unused(self, settings_enabled, mask_value=None):
         """Remove settings that are currently not relevant according to the SettingsEnabled object."""
         for field in dataclasses.fields(self):
-            if field.name in self.HOUSEKEEPING_MEMBERS:
-                continue
-            if not getattr(settings_enabled, field.name):
-                setattr(self, field.name, mask_value)
+            try:
+                if not getattr(settings_enabled, field.name):
+                    setattr(self, field.name, mask_value)
+            except AttributeError:
+                assert field.name in Settings.HOUSEKEEPING_MEMBERS
 
     def __setattr__(self, attr, value):
         """Save any and all settings changes automatically if required."""
