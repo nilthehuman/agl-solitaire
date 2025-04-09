@@ -550,20 +550,32 @@ class Application:
             comments = '\n'.join(iter(input, ''))
             self.duplicate_print(comments, log_only=True)
             if stngs.email_logs:
-                print('Sending experiment logs to the author of the application...')
-                with open(stngs.logfile_filename, 'r') as fh:
-                    log_lines = fh.read().split('\n')
-                try:
-                    from_line = len(log_lines) - 1 - next(i for i, line in enumerate(log_lines[::-1]) if '====' in line)
-                except StopIteration:
-                    # oh well, let's just send the whole file
-                    from_line = 0
-                message_body = 'Subject: experiment logs\n\n' + '\n'.join(log_lines[from_line:])
-                with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
-                    # all in plaintext, probably not a good idea :(
-                    server.login('aglsolitaire@gmail.com', 'llot gfpy csfw wuyt')
-                    server.sendmail('aglsolitaire@gmail.com', 'aglsolitaire@gmail.com', message_body)
-                print('Success. Thank you for your contribution!')
+                go_ahead = True
+                while go_ahead:
+                    go_ahead = False
+                    print('Sending experiment logs to the author of the application...')
+                    with open(stngs.logfile_filename, 'r') as fh:
+                        log_lines = fh.read().split('\n')
+                    try:
+                        from_line = len(log_lines) - 1 - next(i for i, line in enumerate(log_lines[::-1]) if '====' in line)
+                    except StopIteration:
+                        # oh well, let's just send the whole file
+                        from_line = 0
+                    message_body = 'Subject: experiment logs\n\n' + '\n'.join(log_lines[from_line:])
+                    try:
+                        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+                            # all in plaintext, probably not a good idea :(
+                            server.login('aglsolitaire@gmail.com', 'llot gfpy csfw wuyt')
+                            server.sendmail('aglsolitaire@gmail.com', 'aglsolitaire@gmail.com', message_body)
+                        print('Success. Thank you for your contribution!')
+                    except OSError:
+                        print('Failed. Perhaps your internet connection is not working.')
+                        print('Do you want to try again? (y/n)')
+                        answer = input()
+                        if answer and answer[0].lower() == 'y':
+                            go_ahead = True
+                    except Exception:
+                        print('Failed, reason unknown. :(')
         except KeyboardInterrupt:
             print()
             self.duplicate_print(f"Experiment halted by user. Progress saved to '{stngs.filename}'.")
