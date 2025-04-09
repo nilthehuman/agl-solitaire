@@ -34,6 +34,7 @@ def print(string='', end='\n'):
     """Smarter print function, adds left margin and wraps long lines automatically."""
     max_width = os.get_terminal_size().columns
     wrapped_string = ''
+    string = str(string)
     for line in string.split('\n'):
         carriage_return = re.match(r'\r', line)
         if carriage_return:
