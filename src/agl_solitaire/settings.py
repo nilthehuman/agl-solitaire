@@ -26,12 +26,12 @@ _DEFAULT_TOML_FILENAME = 'settings.toml'
 
 GrammarClass = enum.StrEnum('GrammarClass', {name:name.lower() for name in ['REGULAR', 'PATTERN'] + custom_helpers.get_custom_experiment_names()})
 GrammarClass.custom = lambda self: self.name.lower() not in ['regular', 'pattern']
-# thank God for StackOverflow
-GrammarClass.next = lambda self: (
-    gc_names := [name for name in GrammarClass],
-    i := gc_names.index(self),
-    gc_names[i + 1] if i < len(gc_names) - 1 else gc_names[0]
-)[-1]
+def _next_gc(self):
+    gc_names = [name for name in GrammarClass]
+    i = gc_names.index(self)
+    next_name = gc_names[i + 1] if i < len(gc_names) - 1 else gc_names[0]
+    return next_name
+GrammarClass.next = _next_gc
 
 
 # TODO: split this into a leaner Settings base class and an ExperimentSession derived class
