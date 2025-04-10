@@ -76,7 +76,6 @@ class Application(Loggable):
                     gmr.randomize(min_states=gmr.MIN_STATES + oversize,
                                   max_states=gmr.MAX_STATES + oversize)
                 elif self.settings.grammar_class == settings.GrammarClass.PATTERN:
-                    # TODO: oversize pattern grammar
                     gmr.randomize(min_classes=gmr.MIN_CLASSES + int(oversize/2 + 0.5),
                                   max_classes=gmr.MAX_CLASSES + int(oversize/2 + 0.5),
                                   min_patterns=gmr.MIN_PATTERNS + int(oversize/2),
