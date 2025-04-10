@@ -215,7 +215,7 @@ class Application(Loggable):
                 settings_display.mask_unused(settings_used, mask_value='--')
             options = [
                 f" 1: [u]sername (for the record):\t\t{settings_display.username}",
-                f" 2: grammar [c]lass:\t\t\t\t{settings_display.grammar_class}",
+                f" 2: grammar [c]lass:\t\t\t\t{settings_display.grammar_class}{' (custom)' if self.settings.grammar_class.custom() else ''}",
                 f" 3: number of training [s]trings:\t\t{settings_display.training_strings}",
                 f" 4: [t]ime allotted for training:\t\t{settings_display.training_time} seconds",
                 f" 5: number of [g]rammatical test strings:\t{settings_display.test_strings_grammatical}",
