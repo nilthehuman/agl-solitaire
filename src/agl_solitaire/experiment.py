@@ -9,7 +9,7 @@ from src.agl_solitaire.utils import print, input, clear, get_grammar_from_obfusc
 
 
 @dataclasses.dataclass
-class Experiment:
+class Experiment(Loggable):
     """Container for one or more Tasks, responsible for preparing and running them."""
 
     settings: settings.Settings
