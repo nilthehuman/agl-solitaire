@@ -63,6 +63,11 @@ class FormalGrammar(Grammar):
     """The common interface to both kinds of simple formal grammar."""
 
     @abc.abstractmethod
+    def equal_mod_tokens(self, other):
+        """Check if the two grammars are isomorphic, i.e. produce the same sets of strings apart from the concrete tokens."""
+        raise NotImplementedError
+
+    @abc.abstractmethod
     def obfuscated_repr(self):
         """A marshalled representation of the grammar made unreadable for the purpose of repeat experiments."""
         raise NotImplementedError
@@ -201,6 +206,34 @@ class RegularGrammar(FormalGrammar):
 
     def __repr__(self):
         return str(self.transitions)
+
+    def equal_mod_tokens(self, other):
+        """Check if the two grammars are isomorphic, i.e. produce the same sets of strings apart from the concrete tokens."""
+        my_pairings = dict(zip(self.get_tokens_used(), itertools.repeat(None)))
+        others_pairings = dict(zip(other.get_tokens_used(), itertools.repeat(None)))
+        try:
+            for my_state, others_state in zip(self.transitions, other.transitions):
+                my_state_inverted = { v: k for k, v in my_state.items() }
+                others_state_inverted = { v: k for k, v in others_state.items() }
+                for to_state, my_token in my_state_inverted.items():
+                    if not to_state:
+                        continue
+                    if my_pairings[my_token]:
+                        if others_state_inverted[to_state] != my_pairings[my_token]:
+                            return False
+                    else:
+                        my_pairings[my_token] = others_state_inverted[to_state]
+                for to_state, others_token in others_state_inverted.items():
+                    if not to_state:
+                        continue
+                    if others_pairings[others_token]:
+                        if my_state_inverted[to_state] != others_pairings[others_token]:
+                            return False
+                    else:
+                        others_pairings[others_token] = my_state_inverted[to_state]
+        except KeyError:
+            return False
+        return True
 
     def obfuscated_repr(self):
         """A marshalled representation of the grammar made unreadable for the purpose of repeat experiments."""
@@ -468,6 +501,34 @@ class PatternGrammar(FormalGrammar):
         if not tokens:
             self.tokens = ['M', 'R', 'S', 'V', 'X']
         self.patterns = []
+
+    def equal_mod_tokens(self, other):
+        """Check if the two grammars are isomorphic, i.e. produce the same sets of strings apart from the concrete tokens."""
+        for others_patterns in itertools.permutations(other.patterns):
+            try:
+                for my_pattern, others_pattern in zip(self.patterns, other.patterns):
+                    my_pairings = dict([(frozenset(c), None) for c in my_pattern])
+                    others_pairings = dict([(frozenset(c), None) for c in others_pattern])
+                    # try:
+                    for my_class, others_class in zip(my_pattern, others_pattern):
+                        my_class_frozen = frozenset(my_class)
+                        others_class_frozen = frozenset(others_class)
+                        if my_pairings[my_class_frozen]:
+                            if others_class != my_pairings[my_class_frozen]:
+                                raise StopIteration
+                        else:
+                            my_pairings[my_class_frozen] = others_class
+                        if others_pairings[others_class_frozen]:
+                            if my_class != others_pairings[others_class_frozen]:
+                                raise StopIteration
+                        else:
+                            others_pairings[others_class_frozen] = my_class
+                return True
+            except (KeyError, StopIteration):
+                # proceed to next permutation
+                pass
+        return False
+
 
     def obfuscated_repr(self):
         """A marshalled representation of the grammar made unreadable for the purpose of repeat experiments."""
