@@ -418,30 +418,33 @@ class Application(Loggable):
             else:
                 custom_module = sys.modules[custom_helpers.CUSTOM_MODULE_PREFIX + self.settings.grammar_class.name]
                 experiment_to_run = custom_module.CustomExperiment(stngs)
-            if not stngs.experiment_state.test_set:
-                self.duplicate_print('Generating training strings and test strings based on the grammar...')
-                success = experiment_to_run.prepare()
-                if not success:
-                    self.duplicate_print('Sorry, it looks like the selected grammar cannot produce the required amount of different training and test strings.')
+            # TODO update this condition
+            if not self.settings.experiment_state.test_set:
+                self.duplicate_print('Generating training strings and test strings for the experiment...')
+                ### generate training and test material ###
+                prepare_successful = experiment_to_run.prepare()
+                ### ### ### ### ### ### ### ### ### ### ###
+            if not prepare_successful:
+                self.duplicate_print('Sorry, it looks like the selected grammar cannot produce the required number of different training and test strings.')
+                if stngs.test_strings_grammatical:
                     self.duplicate_print('Try lowering the number of strings to use and try again.')
-                    return
-                self.duplicate_print('Done.')
-                assert stngs.experiment_state.test_set
-                if stngs.run_questionnaire:
-                    self.duplicate_print('A few questions before we begin. Feel free to answer as briefly or in as much detail as you like.')
-                    self.duplicate_print('Your answers are going to be stored in the log file.')
-                    self.duplicate_print('Have you heard about artificial grammar learning experiments before?')
-                    answer = input()
-                    self.duplicate_print(answer, log_only=True)
-                    self.duplicate_print('What languages do you speak?')
-                    answer = input()
-                    self.duplicate_print(answer, log_only=True)
-                    self.duplicate_print('What is your profession if you care to share?')
-                    answer = input()
-                    self.duplicate_print(answer, log_only=True)
-                    self.duplicate_print(f"Out of {len(stngs.experiment_state.test_set)} questions what do you expect your score to be in this session?")
-                    answer = input()
-                    self.duplicate_print(answer, log_only=True)
+                self.duplicate_print('Setup failed. Aborting experiment.')
+                return
+            self.duplicate_print('Done.')
+            # TODO update this assert
+            assert self.settings.experiment_state.test_set
+            if self.settings.run_questionnaire:
+                self.duplicate_print('A few questions before we begin. Feel free to answer as briefly or in as much detail as you like.')
+                self.duplicate_print('Your answers are going to be stored in the log file.')
+                self.duplicate_print('Have you heard about artificial grammar learning experiments before?')
+                answer = input()
+                self.duplicate_print(answer, log_only=True)
+                self.duplicate_print('What languages do you speak?')
+                answer = input()
+                self.duplicate_print(answer, log_only=True)
+                self.duplicate_print('What is your profession if you care to share?')
+                answer = input()
+                self.duplicate_print(answer, log_only=True)
             self.duplicate_print(f"You may add any {'further ' if stngs.run_questionnaire else ''}notes or comments for the record before the training phase begins (optional). Please enter an empty line when you're done:")
             comments = '\n'.join(iter(input, ''))
             self.duplicate_print(comments, log_only=True)
@@ -449,32 +452,6 @@ class Application(Loggable):
             ### now perform the main part of the experiment ###
             experiment_to_run.run()
             ### ### ### ### ### ### ### ### ### ### ### ### ###
-            if stngs.run_questionnaire:
-                self.duplicate_print('A few more questions if you feel like it:')
-                self.duplicate_print('How did you feel during the session?')
-                answer = input()
-                self.duplicate_print(answer, log_only=True)
-                self.duplicate_print('Do you feel like you did well in this session?')
-                answer = input()
-                self.duplicate_print(answer, log_only=True)
-                self.duplicate_print('Did you seem to find any concrete giveaways or hints in the strings?')
-                answer = input()
-                self.duplicate_print(answer, log_only=True)
-            clear()
-            if not stngs.grammar_class.custom():
-                self.duplicate_print(f"And now for the big reveal... Strings were generated using the following {stngs.grammar_class} grammar:")
-                gmr = get_grammar_from_obfuscated_repr(stngs)
-                self.duplicate_print(str(gmr))
-            correct = sum(item[1] == item[2] for item in stngs.experiment_state.test_set)
-            self.duplicate_print(f"You gave {correct} correct answers out of {len(stngs.experiment_state.test_set)} ({100 * correct/len(stngs.experiment_state.test_set):.4}%). The answers were the following:")
-            # make table columns wider if needed
-            width = max(16, 2 + max(len(item[0]) for item in stngs.experiment_state.test_set))
-            self.duplicate_print(f"{'Test string':<{width}}{'Correct answer':<16}{'Your answer':<16}")
-            for item in stngs.experiment_state.test_set:
-                self.duplicate_print(f"{item[0]:<{width}}{'yes' if 'y' == item[1] else 'no':<16}{'yes' if 'y' == item[2] else 'no':<16}")
-            self.duplicate_print('You now have a chance to add any other post hoc notes or comments for the record if you wish. Please enter an empty line when you\'re done:')
-            comments = '\n'.join(iter(input, ''))
-            self.duplicate_print(comments, log_only=True)
             if stngs.email_logs:
                 go_ahead = True
                 while go_ahead:

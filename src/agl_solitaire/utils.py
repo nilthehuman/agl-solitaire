@@ -77,7 +77,7 @@ def get_grammar_from_obfuscated_repr(stngs):
     try:
         if stngs.grammar_class == settings.GrammarClass.REGULAR:
             gmr = grammar.RegularGrammar.from_obfuscated_repr(stngs.grammar)
-        elif stngs.grammar_class == settings.GrammarClass.REGULAR:
+        elif stngs.grammar_class == settings.GrammarClass.PATTERN:
             gmr = grammar.PatternGrammar.from_obfuscated_repr(stngs.grammar)
         else:
             # TODO: make custom grammars save/loadable eventually?
