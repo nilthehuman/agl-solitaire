@@ -16,6 +16,7 @@ except ImportError:
 import typing
 
 
+from src.agl_solitaire import experiment_state as es
 from src.agl_solitaire import custom_helpers
 
 
@@ -38,35 +39,6 @@ GrammarClass.next = lambda self: (
 class Settings:
     """User options for controlling the details of the experimental paradigm."""
 
-    @dataclasses.dataclass
-    class ExperimentState:
-        """Current state of an experiment procedure, used to persistently save user's progress midway through."""
-        settings:          typing.Optional[None] = None  # alas we cannot refer to the Settings type here :/
-        tasks_finished:    int = 0
-        training_finished: bool = False
-        training_set:      list[str] = dataclasses.field(default_factory = lambda: [])
-        test_set:          list[(str, bool, typing.Optional[bool])] = dataclasses.field(default_factory = lambda: [])
-
-        def __getstate__(self):
-            state = dict(self.__dict__)
-            # avoid pickling the settings reference
-            try:
-                del state['settings']
-            except KeyError:
-                # nevermind
-                pass
-            return state
-
-        def __setattr__(self, name, value):
-            super().__setattr__(name, value)
-            # propagate our changes to the owner object
-            try:
-                if self.settings.autosave:
-                    self.settings.save_all()
-            except AttributeError:
-                # no self.settings set yet
-                pass
-
     filename:                   typing.Optional[str] = None
     username:                   str = 'anonymous'
     grammar_class:              GrammarClass = GrammarClass.REGULAR
@@ -85,7 +57,7 @@ class Settings:
     run_questionnaire:          bool = True
     email_logs:                 bool = True
     grammar:                    typing.Optional[str] = None
-    experiment_state:           typing.Optional[ExperimentState] = None
+    experiment_state:           typing.Optional[es.ExperimentState] = None
 
     HOUSEKEEPING_MEMBERS = ['filename', 'grammar', 'experiment_state']
 
@@ -117,7 +89,7 @@ class Settings:
         settings_used = SettingsEnabled()
         if self.grammar_class.custom():
             mod = sys.modules[custom_helpers.CUSTOM_MODULE_PREFIX + self.grammar_class.name]
-            settings_used = mod.CustomTask.settings_used
+            settings_used = mod.CustomExperiment.settings_used
         pretty = ''
         pretty += f"Username: {self.username}\n"
         pretty += f"Grammar class: {self.grammar_class}\n"

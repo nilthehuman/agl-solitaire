@@ -11,6 +11,7 @@ except AttributeError:
     random.seed(time.time())
 
 
+from src.agl_solitaire.experiment import Experiment
 from src.agl_solitaire.grammar import CustomGrammar
 from src.agl_solitaire.settings import SettingsEnabled
 from src.agl_solitaire.task import Task
@@ -69,7 +70,7 @@ class NominalAgreementGrammar(CustomGrammar):
             'tonight'    : self.tokens[11],
         }
 
-    def produce_grammatical(self, num_sentences, polish=True):
+    def produce_grammatical(self, num_strings=1, polish=True):
         sentence_pattern_def = [
             [ 'the' ],
             [ 'lazy ', 'nice ', 'old ', 'young ' ],
@@ -85,11 +86,11 @@ class NominalAgreementGrammar(CustomGrammar):
             [ '', ' a lot', ' tonight' ]
         ]
         sentences_def = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_def)]
-        sentences_def = random.sample(sentences_def, int(num_sentences / 2 + 0.5))
+        sentences_def = random.sample(sentences_def, int(num_strings / 2 + 0.5))
         # Martian is fine, but space needed after English 'the'
         sentences_def = [(mar, (eng[0]+' ', eng[1],) + eng[3:]) for mar, eng in sentences_def]
         sentences_indef = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_indef)]
-        sentences_indef = random.sample(sentences_indef, int(num_sentences / 2 + 0.5))
+        sentences_indef = random.sample(sentences_indef, int(num_strings / 2 + 0.5))
         # Martian is fine, English needs an indefinite article
         sentences_indef = [(mar, ('a' + ('n' if eng[0].startswith('o') else '') + ' ',) + eng) for mar, eng in sentences_indef]
         sentences = sentences_def + sentences_indef
@@ -98,9 +99,9 @@ class NominalAgreementGrammar(CustomGrammar):
         random.shuffle(sentences)
         return sentences
 
-    def produce_ungrammatical(self, num_sentences, polish=True):
+    def produce_ungrammatical(self, num_strings=1, polish=True):
         ungrammatical_sentences = set()
-        while len(ungrammatical_sentences) < num_sentences:
+        while len(ungrammatical_sentences) < num_strings:
             sentence = self.produce_grammatical(1, polish=False)[0]
             done = False
             form, meaning = sentence
@@ -124,7 +125,7 @@ class NominalAgreementGrammar(CustomGrammar):
         return ungrammatical_sentences
 
 
-class CustomTask(Task):
+class CustomExperiment(Experiment):
 
     settings_used = SettingsEnabled()
     settings_used.minimum_string_length = False
@@ -132,15 +133,11 @@ class CustomTask(Task):
     settings_used.string_tokens = False
     settings_used.recursion = False
 
-    def run(self):
-        tasks = []
+    def __post_init__(self):
         # for...
         tokens = random.choice(TOKEN_SETS)
         random.shuffle(tokens)
-        nominal_agr_task = Task(NominalAgreementGrammar(tokens))
-        nominal_agr_task.training_set = nominal_agr_task.produce_grammatical(20)
-        nominal_agr_task.test_set = nominal_agr_task.produce_grammatical(5) + nominal_agr_task.produce_ungrammatical(5)
-        tasks.append(nominal_agr_task)
-        # proba :)
-        for t in tasks:
-            t.run_task()
+        nominal_agr_task = Task(self.settings)
+        nominal_agr_task.grammar = NominalAgreementGrammar(tokens)
+        nominal_agr_task.prepare()
+        self.tasks.append(nominal_agr_task)

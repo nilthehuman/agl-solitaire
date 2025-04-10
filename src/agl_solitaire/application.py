@@ -8,8 +8,9 @@ import smtplib
 import sys
 
 from src.agl_solitaire import custom_helpers
+from src.agl_solitaire import experiment
+from src.agl_solitaire import experiment_state
 from src.agl_solitaire import grammar
-from src.agl_solitaire import task
 from src.agl_solitaire import settings
 from src.agl_solitaire import version
 from src.agl_solitaire.utils import print, input, clear, get_grammar_from_obfuscated_repr, Loggable
@@ -130,7 +131,7 @@ class Application(Loggable):
                 settings_and_gmr = copy.copy(self.settings)
                 settings_and_gmr.autosave = False
                 settings_and_gmr.grammar = gmr.obfuscated_repr()
-                settings_and_gmr.experiment_state = settings.Settings.ExperimentState()
+                settings_and_gmr.experiment_state = experiment_state.ExperimentState()
                 settings_and_gmr.save_all(filename)
                 return
 
@@ -185,7 +186,7 @@ class Application(Loggable):
             if 'y' != do_repeat[0].lower():
                 return
             def callback():
-                settings_and_gmr.experiment_state = settings.Settings.ExperimentState(settings_and_gmr)
+                settings_and_gmr.experiment_state = experiment_state.ExperimentState(settings_and_gmr)
             settings_and_gmr.without_autosave(callback)
         self.run_experiment(settings_and_gmr)
 
@@ -209,7 +210,7 @@ class Application(Loggable):
             # custom experiments may disregard settings arbitrarily
             if self.settings.grammar_class.custom():
                 mod = sys.modules[custom_helpers.CUSTOM_MODULE_PREFIX + self.settings.grammar_class.name]
-                settings_used = mod.CustomTask.settings_used
+                settings_used = mod.CustomExperiment.settings_used
                 settings_enabled.mask_unused(settings_used)
                 settings_display.mask_unused(settings_used, mask_value='--')
             options = [
@@ -401,13 +402,8 @@ class Application(Loggable):
             if gmr is None:
                 return
             self.settings.grammar = gmr.obfuscated_repr()
-            self.settings.experiment_state = settings.Settings.ExperimentState(self.settings)
-            self.run_experiment()
-        else:
-            custom_module = sys.modules[custom_helpers.CUSTOM_MODULE_PREFIX + self.settings.grammar_class.name]
-            custom_task = custom_module.CustomTask(self.settings)
-            custom_task.prepare()
-            custom_task.run()
+        self.settings.experiment_state = experiment_state.ExperimentState(self.settings)
+        self.run_experiment()
 
     def run_experiment(self, stngs=None):
         """Run one session of training and testing with a random grammar and record everything in the log file."""
@@ -415,15 +411,16 @@ class Application(Loggable):
         try:
             if stngs is None:
                 stngs = self.settings
-            if stngs.grammar_class.custom():
-                # TODO call run_experiment
-                raise NotImplementedError
             assert stngs.experiment_state is not None
             assert stngs.experiment_state.test_set or stngs.grammar is not None
-            new_task = task.Task(stngs)
+            if not self.settings.grammar_class.custom():
+                experiment_to_run = experiment.Experiment(stngs)
+            else:
+                custom_module = sys.modules[custom_helpers.CUSTOM_MODULE_PREFIX + self.settings.grammar_class.name]
+                experiment_to_run = custom_module.CustomExperiment(stngs)
             if not stngs.experiment_state.test_set:
                 self.duplicate_print('Generating training strings and test strings based on the grammar...')
-                success = new_task.prepare()
+                success = experiment_to_run.prepare()
                 if not success:
                     self.duplicate_print('Sorry, it looks like the selected grammar cannot produce the required amount of different training and test strings.')
                     self.duplicate_print('Try lowering the number of strings to use and try again.')
@@ -450,7 +447,7 @@ class Application(Loggable):
             self.duplicate_print(comments, log_only=True)
             clear()
             ### now perform the main part of the experiment ###
-            new_task.run()
+            experiment_to_run.run()
             ### ### ### ### ### ### ### ### ### ### ### ### ###
             if stngs.run_questionnaire:
                 self.duplicate_print('A few more questions if you feel like it:')
@@ -464,9 +461,10 @@ class Application(Loggable):
                 answer = input()
                 self.duplicate_print(answer, log_only=True)
             clear()
-            self.duplicate_print(f"And now for the big reveal... Strings were generated using the following {stngs.grammar_class} grammar:")
-            gmr = get_grammar_from_obfuscated_repr(stngs)
-            self.duplicate_print(str(gmr))
+            if not stngs.grammar_class.custom():
+                self.duplicate_print(f"And now for the big reveal... Strings were generated using the following {stngs.grammar_class} grammar:")
+                gmr = get_grammar_from_obfuscated_repr(stngs)
+                self.duplicate_print(str(gmr))
             correct = sum(item[1] == item[2] for item in stngs.experiment_state.test_set)
             self.duplicate_print(f"You gave {correct} correct answers out of {len(stngs.experiment_state.test_set)} ({100 * correct/len(stngs.experiment_state.test_set):.4}%). The answers were the following:")
             # make table columns wider if needed
@@ -503,13 +501,16 @@ class Application(Loggable):
                         if answer and answer[0].lower() == 'y':
                             go_ahead = True
                     except Exception:
-                        print('Failed, reason unknown. :(')
+                        print('Failed, reason unknown. Sorry. :(')
         except KeyboardInterrupt:
             print()
             self.duplicate_print(f"Experiment halted by user. Progress saved to '{stngs.filename}'.")
             # returning to main menu
         finally:
-            new_task.cleanup()
+            try:
+                experiment_to_run.cleanup()
+            except UnboundLocalError:
+                pass
 
 
 if __name__ == '__main__':
