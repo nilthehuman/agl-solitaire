@@ -37,7 +37,8 @@ class Experiment(Loggable):
     def run(self):
         """Let the user perform all tasks of the experiment in order."""
         for i, task in enumerate(self.tasks):
-            self.duplicate_print(f"***  Welcome to Challenge #{i+1} out of {len(self.tasks)}  ***\n")
+            if 1 < len(selt.tasks):
+                self.duplicate_print(f"***  Welcome to Challenge #{i+1} out of {len(self.tasks)}  ***\n")
             ### ### ### ### ### ###
             task.run()
             ### ### ### ### ### ###
