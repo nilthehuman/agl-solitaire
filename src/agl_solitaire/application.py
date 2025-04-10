@@ -9,9 +9,9 @@ import sys
 
 from src.agl_solitaire import custom_helpers
 from src.agl_solitaire import experiment
-from src.agl_solitaire import experiment_state
 from src.agl_solitaire import grammar
 from src.agl_solitaire import settings
+from src.agl_solitaire import task_state
 from src.agl_solitaire import version
 from src.agl_solitaire.utils import print, input, clear, get_grammar_from_obfuscated_repr, Loggable
 
@@ -130,7 +130,8 @@ class Application(Loggable):
                 settings_and_gmr = copy.copy(self.settings)
                 settings_and_gmr.autosave = False
                 settings_and_gmr.grammar = gmr.obfuscated_repr()
-                settings_and_gmr.experiment_state = experiment_state.ExperimentState()
+                # FIXME: probably save to remove for good, right?
+                # settings_and_gmr.halted_task = task.Task()
                 settings_and_gmr.save_all(filename)
                 return
 
@@ -171,11 +172,11 @@ class Application(Loggable):
                 choice = input('use the current settings instead? (y/n)> ')
             if choice[0].lower() == 'y':
                 settings_and_gmr.override(self.settings)
-        if all(judgement is None for (_, _, judgement) in settings_and_gmr.experiment_state.test_set):
+        if all(judgement is None for (_, _, judgement) in settings_and_gmr.halted_task.test_set):
             self.duplicate_print('=' * 120, log_only=True)
             self.duplicate_print('You are now starting a previously generated experiment:')
             self.duplicate_print(settings_and_gmr.pretty_short())
-        elif any(judgement is None for (_, _, judgement) in settings_and_gmr.experiment_state.test_set):
+        elif any(judgement is None for (_, _, judgement) in settings_and_gmr.halted_task.test_set):
             self.duplicate_print('You are now resuming a previously paused session.')
         else:
             print('You have loaded a previously completed experiment. Do you want to repeat the same experiment all over again? (y/n)')
@@ -184,8 +185,9 @@ class Application(Loggable):
                 do_repeat = input()
             if 'y' != do_repeat[0].lower():
                 return
+            # FIXME: this is probably safe to remove right?
             def callback():
-                settings_and_gmr.experiment_state = experiment_state.ExperimentState(settings_and_gmr)
+                settings_and_gmr.halted_task = task_state.TaskState(settings_and_gmr)
             settings_and_gmr.without_autosave(callback)
         self.run_experiment(settings_and_gmr)
 
@@ -401,7 +403,7 @@ class Application(Loggable):
             if gmr is None:
                 return
             self.settings.grammar = gmr.obfuscated_repr()
-        self.settings.experiment_state = experiment_state.ExperimentState(self.settings)
+        self.settings.halted_task = None
         self.run_experiment()
 
     def run_experiment(self, stngs=None):
@@ -410,29 +412,26 @@ class Application(Loggable):
         try:
             if stngs is None:
                 stngs = self.settings
-            assert stngs.experiment_state is not None
-            assert stngs.experiment_state.test_set or stngs.grammar is not None
-            if not self.settings.grammar_class.custom():
+            assert stngs.halted_task is not None or stngs.grammar is not None
+            if not stngs.grammar_class.custom():
                 experiment_to_run = experiment.Experiment(stngs)
             else:
                 custom_module = sys.modules[custom_helpers.CUSTOM_MODULE_PREFIX + self.settings.grammar_class.name]
                 experiment_to_run = custom_module.CustomExperiment(stngs)
-            # TODO update this condition
-            if not self.settings.experiment_state.test_set:
+            if not experiment_to_run.ready():
                 self.duplicate_print('Generating training strings and test strings for the experiment...')
                 ### generate training and test material ###
                 prepare_successful = experiment_to_run.prepare()
                 ### ### ### ### ### ### ### ### ### ### ###
-            if not prepare_successful:
-                self.duplicate_print('Sorry, it looks like the selected grammar cannot produce the required number of different training and test strings.')
-                if stngs.test_strings_grammatical:
-                    self.duplicate_print('Try lowering the number of strings to use and try again.')
-                self.duplicate_print('Setup failed. Aborting experiment.')
-                return
+                if not prepare_successful:
+                    self.duplicate_print('Sorry, it looks like the selected grammar cannot produce the required number of different training and test strings.')
+                    if stngs.test_strings_grammatical:
+                        self.duplicate_print('Try lowering the number of strings to use and try again.')
+                    self.duplicate_print('Setup failed. Aborting experiment.')
+                    return
             self.duplicate_print('Done.')
-            # TODO update this assert
-            assert self.settings.experiment_state.test_set
-            if self.settings.run_questionnaire:
+            assert experiment_to_run.ready()
+            if stngs.run_questionnaire:
                 self.duplicate_print('A few questions before we begin. Feel free to answer as briefly or in as much detail as you like.')
                 self.duplicate_print('Your answers are going to be stored in the log file.')
                 self.duplicate_print('Have you heard about artificial grammar learning experiments before?')
