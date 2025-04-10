@@ -516,13 +516,11 @@ class PatternGrammar(FormalGrammar):
         # update tokens in patterns
         tr = dict(zip(old_tokens, new_tokens))
         tr[None] = None
+        new_patterns = []
         for pattern in self.patterns:
-            for cls in pattern:
-                for old_token in tr.keys():
-                    if old_token in cls:
-                        cls -= {old_token}
-                        new_token = tr[old_token]
-                        cls.add(new_token)
+            new_pattern = [ {tr[token] for token in cls} for cls in pattern ]
+            new_patterns.append(new_pattern)
+        self.patterns = new_patterns
 
     def randomize(self, min_classes=None, max_classes=None,
                         min_patterns=None, max_patterns=None,
