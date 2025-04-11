@@ -511,28 +511,25 @@ class PatternGrammar(FormalGrammar):
         for others_patterns in itertools.permutations(other.patterns):
             try:
                 for my_pattern, others_pattern in zip(self.patterns, other.patterns):
-                    my_pairings = dict([(frozenset(c), None) for c in my_pattern])
-                    others_pairings = dict([(frozenset(c), None) for c in others_pattern])
+                    my_pairings = dict([(c, None) for c in my_pattern])
+                    others_pairings = dict([(c, None) for c in others_pattern])
                     # try:
                     for my_class, others_class in zip(my_pattern, others_pattern):
-                        my_class_frozen = frozenset(my_class)
-                        others_class_frozen = frozenset(others_class)
-                        if my_pairings[my_class_frozen]:
-                            if others_class != my_pairings[my_class_frozen]:
+                        if my_pairings[my_class]:
+                            if others_class != my_pairings[my_class]:
                                 raise StopIteration
                         else:
-                            my_pairings[my_class_frozen] = others_class
-                        if others_pairings[others_class_frozen]:
-                            if my_class != others_pairings[others_class_frozen]:
+                            my_pairings[my_class] = others_class
+                        if others_pairings[others_class]:
+                            if my_class != others_pairings[others_class]:
                                 raise StopIteration
                         else:
-                            others_pairings[others_class_frozen] = my_class
+                            others_pairings[others_class] = my_class
                 return True
             except (KeyError, StopIteration):
                 # proceed to next permutation
                 pass
         return False
-
 
     def obfuscated_repr(self):
         """A marshalled representation of the grammar made unreadable for the purpose of repeat experiments."""
@@ -560,6 +557,8 @@ class PatternGrammar(FormalGrammar):
             repr_string += chr(32 + (ord(char) - 32 - coprimes[0] ** i % coprimes[1]) % 95)
         grammar = cls()
         grammar.patterns = eval(repr_string)
+        for pattern in grammar.patterns:
+            assert all(type(c) is frozenset for c in pattern)
         grammar.tokens = None
         return grammar
 
@@ -583,7 +582,7 @@ class PatternGrammar(FormalGrammar):
         tr[None] = None
         new_patterns = []
         for pattern in self.patterns:
-            new_pattern = [ {tr[token] for token in cls} for cls in pattern ]
+            new_pattern = [ frozenset({tr[token] for token in cls}) for cls in pattern ]
             new_patterns.append(new_pattern)
         self.patterns = new_patterns
 
@@ -614,6 +613,7 @@ class PatternGrammar(FormalGrammar):
             for cls in classes:
                 if not cls:
                     cls.add(random.choice(self.tokens))
+        classes = [frozenset(cls) for cls in classes]
         self.patterns = [[] for _ in range(random.randint(min_patterns, max_patterns))]
         for pattern in self.patterns:
             for _ in range(random.randint(min_length, max_length)):
