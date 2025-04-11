@@ -55,7 +55,7 @@ class CustomGrammar(Grammar):
             return self.lexicon[string]
         def tr(word):
             # disregard whitespace on either side
-            return re.sub(r"(\w+(\s*\w*)*\w)", lambda m: self.lexicon[m.group(1)], word)
+            return re.sub(r"(\w+(\s*?\w+?)*)", lambda m: self.lexicon[m.group(1)], word)
         return tuple(tr(x) for x in string)
 
 
