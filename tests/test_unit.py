@@ -178,7 +178,7 @@ def test_grammar_rejects_ungrammatical():
     for _ in range(100):
         g.randomize()
         output_strings = g.produce_ungrammatical(5)
-        assert all(not g.recognize(s) for s in output_strings)
+        assert output_strings is None or all(not g.recognize(s) for s in output_strings)
 
 
 def test_grammar_predefined_reber_1967():

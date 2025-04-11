@@ -156,6 +156,9 @@ class FormalGrammar(Grammar):
                 string = tokenized_string[:-1]
             else:
                 # change one token to break a grammatical string
+                if len(tokens) < 2:
+                    # this is obviously not going to work out
+                    continue
                 tokenized_string = tokenized(grammatical_string)
                 wrong_index = None
                 if error_type == ErrorType.WRONG_FIRST:
