@@ -63,14 +63,15 @@ class Application(Loggable):
             raise NotImplementedError
         num_required_strings = self.settings.training_strings + self.settings.test_strings_grammatical
         grammatical_strings = None
+        ungrammatical_strings = None
         max_grammar_attempts = 64
         max_oversize_attempts = 5
         oversize = 0
         self.duplicate_print('Looking for a suitable random grammar...')
         # TODO: move this whole loop to the Grammar classes
-        while grammatical_strings is None and oversize <= max_oversize_attempts:
+        while (grammatical_strings is None or ungrammatical_strings is None) and oversize <= max_oversize_attempts:
             grammar_attempts = 0
-            while grammatical_strings is None and grammar_attempts < max_grammar_attempts:
+            while (grammatical_strings is None or ungrammatical_strings is None) and grammar_attempts < max_grammar_attempts:
                 grammar_attempts += 1
                 if self.settings.grammar_class == settings.GrammarClass.REGULAR:
                     gmr.randomize(min_states=gmr.MIN_STATES + oversize,
@@ -89,8 +90,9 @@ class Application(Loggable):
                 grammatical_strings = gmr.produce_grammatical(num_strings=num_required_strings,
                                                               min_length=self.settings.minimum_string_length,
                                                               max_length=self.settings.maximum_string_length)
+                ungrammatical_strings = gmr.produce_ungrammatical(num_strings=self.settings.test_strings_ungrammatical)
             oversize += 1
-            if grammatical_strings is None:
+            if (grammatical_strings is None or ungrammatical_strings is None):
                 if self.settings.grammar_class == settings.GrammarClass.REGULAR:
                     self.duplicate_print(f"None found, expanding search to {gmr.MIN_STATES+oversize} to {gmr.MAX_STATES+oversize} states...")
                 elif self.settings.grammar_class == settings.GrammarClass.PATTERN:
@@ -99,18 +101,18 @@ class Application(Loggable):
                     self.duplicate_print(f"None found, expanding search to {gmr.MIN_CLASSES+class_oversize} to {gmr.MAX_CLASSES+class_oversize} word classes and {gmr.MIN_PATTERNS+pattern_oversize} to {gmr.MAX_PATTERNS+pattern_oversize} patterns...")
                 else:
                     assert False
-        if grammatical_strings is None:
+        if (grammatical_strings is None or ungrammatical_strings is None):
             self.duplicate_print('Sorry, no grammar found that would satisfy the current settings. Try relaxing some of your preferences.')
-            return None, None
+            return None, None, None
         # TODO: this should especially be moved to the Grammars
         gmr.tokens = None
         self.duplicate_print('Grammar selected. The rules of the grammar will be revealed after the session.')
-        return gmr, list(grammatical_strings)
+        return gmr, list(grammatical_strings), list(ungrammatical_strings)
 
     def generate_experiment(self):
         """Generate and serialize a new suitable grammar to file for later use."""
         try:
-            gmr, _ = self.generate_grammar()
+            gmr, _, _ = self.generate_grammar()
         except NotImplementedError:
             print('error: saving custom grammars to file is not supported (yet)')
             return
@@ -399,7 +401,7 @@ class Application(Loggable):
         self.duplicate_print('agl-solitaire session started with the following settings:')
         self.duplicate_print(self.settings.pretty_print())
         if not self.settings.grammar_class.custom():
-            gmr, _grammatical_strings = self.generate_grammar()
+            gmr, _grammatical_strings, _ungrammatical_strings = self.generate_grammar()
             if gmr is None:
                 return
             self.settings.grammar = gmr.obfuscated_repr()
