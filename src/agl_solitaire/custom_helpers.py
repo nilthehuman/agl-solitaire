@@ -23,7 +23,6 @@ def load_custom_experiments():
     for name in custom_exp_names:
         try:
             importlib.import_module(CUSTOM_MODULE_PREFIX + name)
-        except Exception:
-            # TODO: find out if this can happen for any reason
-            pass
+        except ModuleNotFoundError:
+            raise ModuleNotFoundError('failed to load custom experiment: ' + name)
     return custom_exp_names
