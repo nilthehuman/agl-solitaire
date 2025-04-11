@@ -18,6 +18,10 @@ from src.agl_solitaire import grammar
 from src.agl_solitaire import settings
 
 
+###  ###  ###  ###  ###  ###  ###  ###
+###     TEXT INPUT AND OUTPUT      ###
+###  ###  ###  ###  ###  ###  ###  ###
+
 _LEFT_MARGIN_WIDTH = 2
 
 _builtin_print = print
@@ -72,6 +76,52 @@ def clear():
         os.system(which_clear)
 
 
+class Loggable:
+    """For classes that want to write most of their output both to screen and to a file."""
+
+    def duplicate_print(self, string, log_only=False):
+        """Output the string on the screen and log it in a text file at the same time."""
+        if not log_only:
+            print(string)
+        with open(self.settings.logfile_filename, 'a', encoding='UTF-8') as logfile:
+            # prepend timestamp
+            stamped_list = ['[' + str(datetime.datetime.now().replace(microsecond=0)) + '] ' + line.strip() for line in string.split('\n')]
+            stamped_string = '\n'.join(stamped_list)
+            logfile.write(stamped_string + '\n')
+
+
+###  ###  ###  ###  ###  ###  ###  ###
+###      STRING MANIPULATION       ###
+###  ###  ###  ###  ###  ###  ###  ###
+
+def polish_sentences(sentences):
+    """Turn a set of stimuli into their final presentable form."""
+    def process(form, meaning):
+        # assemble from tuples
+        form = ''.join(form)
+        meaning = ''.join(meaning)
+        # pack superfluous spaces together
+        form = re.sub(r"\s+", ' ', form)
+        meaning = re.sub(r"\s+", ' ', meaning)
+        # make them look like actual sentences
+        form = form.capitalize() + "."
+        meaning = "'" + meaning.capitalize() + ".'"
+        return form, meaning
+    nice_sentences = [process(form, meaning) for form, meaning in sentences]
+    # returns a list of pairs
+    return nice_sentences
+
+def pad_sentences(sentences):
+    """Pad gaps between forms and meanings with spaces and join them."""
+    pad_width = 2 + max(len(form) for form, _ in sentences)
+    padded_sentences = [form + ' ' * (pad_width - len(form)) + meaning for form, meaning in sentences]
+    return padded_sentences
+
+
+###  ###  ###  ###  ###  ###  ###  ###
+###         MISCELLANEOUS          ###
+###  ###  ###  ###  ###  ###  ###  ###
+
 def get_grammar_from_obfuscated_repr(stngs):
     """Decode and return an object of any Grammar subclass that has an obfuscated representation."""
     try:
@@ -86,17 +136,3 @@ def get_grammar_from_obfuscated_repr(stngs):
         return gmr
     except (IndexError, SyntaxError, TypeError):
         raise ValueError
-
-
-class Loggable:
-    """For classes that want to write most of their output both to screen and to a file."""
-
-    def duplicate_print(self, string, log_only=False):
-        """Output the string on the screen and log it in a text file at the same time."""
-        if not log_only:
-            print(string)
-        with open(self.settings.logfile_filename, 'a', encoding='UTF-8') as logfile:
-            # prepend timestamp
-            stamped_list = ['[' + str(datetime.datetime.now().replace(microsecond=0)) + '] ' + line.strip() for line in string.split('\n')]
-            stamped_string = '\n'.join(stamped_list)
-            logfile.write(stamped_string + '\n')

@@ -15,6 +15,7 @@ from src.agl_solitaire.experiment import Experiment
 from src.agl_solitaire.grammar import CustomGrammar
 from src.agl_solitaire.settings import SettingsEnabled
 from src.agl_solitaire.task import Task
+from src.agl_solitaire.utils import polish_sentences
 
 
 TOKEN_SETS = [
@@ -28,26 +29,14 @@ TOKEN_SETS = [
     [ 'del', 'fy', 'fyyri', 'hel', 'ivi', 'kaha', 'ky', 'ma', 'min', 'porda', 'te', 'wek' ],
     [ 'atta', 'eve', 'henne', 'i', 'manba', 'mene', 'pon', 'raago', 'tor', 'tuu', 'uva', 'zoto' ],
     [ 'cir', 'daa', 'dyn', 'e', 'iti', 'men', 'ogho', 'shen', 'taal', 'urro', 'uzto', 'zeb' ],
-    [ 'aa', 'farra', 'ke', 'meze', 'mor', 'ne', 'ni', 'ob', 'ono', 'pur', 'tala', 'toyo' ],
-    [ 'aene', 'de', 'er', 'hin', 'lu', 'maata', 'melde', 'nii', 'olta', 'osso', 'pi', 'vent' ]
+    [ 'ata', 'farra', 'ke', 'meze', 'mor', 'ne', 'ni', 'ob', 'ono', 'pur', 'tala', 'toyo' ],
+    [ 'aene', 'de', 'er', 'hin', 'lu', 'maata', 'melde', 'nii', 'olta', 'osso', 'pi', 'vent' ],
+    [ 'ar', 'bo', 'da', 'echa', 'me', 'opo', 'oto', 'pau', 'sako', 'tau', 'ti', 'ud' ],
+    [ 'ben', 'e', 'far', 'hen', 'huu', 'mi', 'ne', 'op', 'pa', 'ro', 'tel', 'tum' ],
+    [ 'ava', 'ethi', 'gar', 'im', 'ippi', 'ka', 'miko', 'og', 'onno', 'pana', 'qon', 'va' ]
 ]
 for tokens in TOKEN_SETS:
     assert len(tokens) == 12
-
-
-def polish_sentence(sentence):
-    """Turn a stimulus into its final presentable form."""
-    form, meaning = sentence
-    # assemble from tuples
-    form = ''.join(form)
-    meaning = ''.join(meaning)
-    # pack superfluous spaces together
-    form = re.sub(r"\s+", ' ', form)
-    meaning = re.sub(r"\s+", ' ', meaning)
-    # make them look like actual sentences
-    form = form.capitalize()
-    meaning = meaning.capitalize()
-    return form + '.\t' + "'" + meaning + ".'"
 
 
 class NominalAgreementGrammar(CustomGrammar):
@@ -100,7 +89,8 @@ class NominalAgreementGrammar(CustomGrammar):
         sentences_indef = [(mar, ('a' + ('n' if eng[0].startswith('o') else '') + ' ',) + eng) for mar, eng in sentences_indef]
         sentences = sentences_def + sentences_indef
         if polish:
-            sentences = [polish_sentence(s) for s in sentences]
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographical form
+            sentences = polish_sentences(sentences)
         random.shuffle(sentences)
         return sentences
 
@@ -126,7 +116,8 @@ class NominalAgreementGrammar(CustomGrammar):
             sentence = (tuple(form), meaning)
             ungrammatical_sentences.add(sentence)
         if polish:
-            ungrammatical_sentences = [polish_sentence(s) for s in ungrammatical_sentences]
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographical form
+            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
         return ungrammatical_sentences
 
 
