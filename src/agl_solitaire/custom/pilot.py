@@ -56,7 +56,7 @@ class NominalAgreementGrammar(CustomGrammar):
     def __init__(self, tokens):
         super().__init__(tokens)
         def monosyll(string):
-            return 1 == len(list(filter(lambda x: x in 'aeiouAEIOU', string)))
+            return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
         assert any(monosyll(s) for s in self.tokens)
         while not monosyll(self.tokens[0]):
             random.shuffle(self.tokens)
