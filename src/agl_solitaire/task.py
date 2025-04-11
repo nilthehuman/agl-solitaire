@@ -22,6 +22,12 @@ from src.agl_solitaire.utils import print, input, clear, Loggable, pad_sentences
 # maybe something like this?
 # class Phase(enum.StrEnum):
 
+# Task lifecycle: (1.A and 1.B can happen in either order)
+#     0.  inactive
+#     1.A prepared (content generated)
+#     1.B active (state being tracked)
+#     2.  running
+#     3.  inactive
 
 @dataclasses.dataclass
 class Task(Loggable, TaskState):
@@ -31,12 +37,30 @@ class Task(Loggable, TaskState):
 
     settings: Settings
     grammar:  typing.Optional[Grammar] = None
+    active:   bool = False  # is this Task underway or queued up next?
 
     def __post_init__(self):
-        """Register ourselves in the Settings we belong to."""
-        if self.settings.halted_task is not None:
-            self.resume(self.settings.halted_task)
+        """If this is the currently active Task, register it in the Settings it belongs to."""
+        # this reads kinda backwards but I can't come up with a nicer way to phrase it
+        if self.active:
+            if self.settings.halted_task is not None:
+                self.resume(self.settings.halted_task)
+            self.activate()
+
+    def activate(self):
+        """Set this as the Task currently being (or about to be) performed. Keep track of
+        its state in the corresponding Settings object too."""
+        if self.active:
+            return
         self.settings.halted_task = self
+        self.active = True
+
+    def deactivate(self):
+        """Stop tracking the state of this Task in the Settings object."""
+        if not self.active:
+            return
+        self.settings.halted_task = None
+        self.active = False
 
     def resume(self, task_state):
         """Take up a previously halted Task to proceed with it later."""
@@ -101,8 +125,8 @@ class Task(Loggable, TaskState):
 
     def run(self):
         """Let the user perform this generated task."""
-        assert self.training_set
-        assert self.test_set
+        assert self.ready()
+        self.activate()
         # used for sleeping but keeping the keyboard awake
         input_thread = None
         if not self.training_finished:
@@ -176,6 +200,7 @@ class Task(Loggable, TaskState):
             self.settings.save_all()
         clear()
         self.duplicate_print('Test phase finished. Hope you had fun!')
+        self.deactivate()
 
     def cleanup(self):
         """Tie up any loose ends in terms of resources if we had to abandon the experiment

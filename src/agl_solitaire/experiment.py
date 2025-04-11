@@ -1,7 +1,6 @@
 """High-level control of task sequencing in the experiment procedure, I guess."""
 
 import dataclasses
-import typing
 
 from src.agl_solitaire import settings
 from src.agl_solitaire import task
@@ -21,7 +20,7 @@ class Experiment(Loggable):
 
     def __post_init__(self):
         """By default, create one vanilla default task, unless there's a paused task from before."""
-        self.tasks.append(task.Task(self.settings))
+        self.tasks.append(task.Task(settings=self.settings, active=True))
 
     def prepare(self):
         """Load all tasks with concrete generated material."""
@@ -39,12 +38,15 @@ class Experiment(Loggable):
 
     def run(self):
         """Let the user perform all tasks of the experiment in order."""
-        for i, task in list(enumerate(self.tasks))[self.tasks_done:]:
+        remaining_tasks = self.tasks[self.tasks_done:]
+        for i, task in enumerate(remaining_tasks):
             if 1 < len(self.tasks):
+                clear()
                 self.duplicate_print(f"***  Welcome to Challenge #{i+1} out of {len(self.tasks)}  ***\n")
             ### ### ### ### ### ###
             task.run()
             ### ### ### ### ### ###
+            self.tasks_done += 1
             if self.settings.run_questionnaire:
                 self.duplicate_print('A few more questions if you feel like it:')
                 self.duplicate_print('Did you feel like you got the hang of the grammar or were you just guessing?')
