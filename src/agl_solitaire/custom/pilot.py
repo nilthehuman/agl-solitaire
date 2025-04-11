@@ -150,8 +150,8 @@ class AccusativeMarkingAgreementGrammar(CustomGrammar):
         sentence_pattern_indef = [
             [ 'she ', 'he ' ],
             [ 'brought ', 'found ' ],
-            [ 'a ' ],
-            [ 'basket', 'chair', 'horse' ],
+            [ 'a' ],
+            [ ' basket', ' chair', ' horse' ],
             [ 'ACC' ]
         ]
         sentence_pattern_quant = [
@@ -189,7 +189,12 @@ class AccusativeMarkingAgreementGrammar(CustomGrammar):
                     form = form[:-1]
                     done = True
                 if random.choice([True, False]):
-                    form = form[0:3] + form[4:]
+                    if 'a' == meaning[2]:
+                        # indef sentence
+                        form = form[0:3] + ('ACC',) + form[3:]
+                    else:
+                        # quant sentence
+                        form = form[0:3] + form[4:]
                     done = True
             sentence = (tuple(form), meaning)
             ungrammatical_sentences.add(sentence)
