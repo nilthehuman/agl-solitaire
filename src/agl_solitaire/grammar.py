@@ -112,7 +112,7 @@ class FormalGrammar(Grammar):
         # empty otherwise
         return ''
 
-    def produce_ungrammatical(self, num_strings=1, min_length=_MIN_STRING_LENGTH, max_length=_MAX_STRING_LENGTH):
+    def produce_ungrammatical(self, num_strings=1, min_length=_MIN_STRING_LENGTH, max_length=_MAX_STRING_LENGTH, max_attempts=_MAX_ATTEMPTS):
         """Generate unacceptable strings loosely following Reber & Allen 1978's procedure."""
         class ErrorType(enum.Enum):
             """List of the different kinds of deviances we can introduce to make a string ungrammatical."""
@@ -134,7 +134,9 @@ class FormalGrammar(Grammar):
         }
         tokens = self.get_tokens_used()
         ungrammatical_strings = set()
-        while len(ungrammatical_strings) < num_strings:
+        attempts = 0
+        while len(ungrammatical_strings) < num_strings and attempts < max_attempts:
+            attempts += 1
             string = ''
             # pick a random way to create an ungrammatical string
             error_type = random.choices(list(ErrorType), weights=error_proportions.values())[0]
@@ -180,6 +182,8 @@ class FormalGrammar(Grammar):
                 # N.B. joining a plain string is a harmless null operation
                 string_reassembled = self.joiner().join(string)
                 ungrammatical_strings.add(string_reassembled)
+        if len(ungrammatical_strings) < num_strings:
+            return None
         return ungrammatical_strings
 
 
