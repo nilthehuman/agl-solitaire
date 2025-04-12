@@ -265,7 +265,6 @@ class VerbalAgreementGrammar(CustomGrammar):
         ungrammatical_sentences = set()
         while len(ungrammatical_sentences) < num_strings:
             sentence = self.produce_grammatical(1, polish=False)[0]
-            done = False
             form, meaning = sentence
             flipped = self.translate('FEM') if form[3] == self.translate('MASC') else self.translate('MASC')
             form = form[0:3] + (flipped,) + form[4:]
