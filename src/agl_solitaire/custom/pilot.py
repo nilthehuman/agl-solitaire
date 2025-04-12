@@ -87,7 +87,7 @@ class DefiniteArticleAgreementGrammar(CustomGrammar):
         sentences_indef = [(mar, ('a' + ('n' if eng[0].startswith('o') else '') + ' ',) + eng) for mar, eng in sentences_indef]
         sentences = sentences_def + sentences_indef
         if polish:
-            # assemble real(-looking) sentences from tuples, mold into pleasing orthographical form
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
             sentences = polish_sentences(sentences)
         random.shuffle(sentences)
         return sentences
@@ -114,7 +114,7 @@ class DefiniteArticleAgreementGrammar(CustomGrammar):
             sentence = (tuple(form), meaning)
             ungrammatical_sentences.add(sentence)
         if polish:
-            # assemble real(-looking) sentences from tuples, mold into pleasing orthographical form
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
             ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
         return ungrammatical_sentences
 
@@ -173,7 +173,7 @@ class AccusativeMarkingAgreementGrammar(CustomGrammar):
         sentences_quant = [(mar, eng[:-1] + (eng[-1]+'s',)) for mar, eng in sentences_quant]
         sentences = sentences_indef + sentences_quant
         if polish:
-            # assemble real(-looking) sentences from tuples, mold into pleasing orthographical form
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
             sentences = polish_sentences(sentences)
         random.shuffle(sentences)
         return sentences
@@ -191,7 +191,7 @@ class AccusativeMarkingAgreementGrammar(CustomGrammar):
                 if random.choice([True, False]):
                     if 'a' == meaning[2]:
                         # indef sentence
-                        form = form[0:3] + ('ACC',) + form[3:]
+                        form = form[0:3] + (self.translate('ACC'),) + form[3:]
                     else:
                         # quant sentence
                         form = form[0:3] + form[4:]
