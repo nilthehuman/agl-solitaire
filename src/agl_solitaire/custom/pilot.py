@@ -474,6 +474,90 @@ class WackernagelWordOrderGrammar(CustomGrammar):
         return ungrammatical_sentences
 
 
+class LeadingCopulaGrammar(CustomGrammar):
+    """A grammar fragment where all sentences start with a (vacuous) verb 'to be' and feature
+    a (similarly vacuous) particle in front of the main predicate."""
+
+    def __init__(self, tokens):
+        super().__init__(tokens)
+        def monosyll(string):
+            return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
+        assert any(monosyll(s) for s in self.tokens)
+        while not monosyll(self.tokens[7]):
+            random.shuffle(self.tokens)
+        self.lexicon = {
+            'is'         : self.tokens[0],
+            'are'        : self.tokens[1],
+            'the baker'  : self.tokens[2],
+            'the pirate' : self.tokens[3],
+            'we'         : self.tokens[4],
+            'they'       : self.tokens[5],
+            'also'       : self.tokens[6],
+            'YN'         : self.tokens[7],
+            'like'       : self.tokens[8],
+            'sell'       : self.tokens[9],
+            'bubble tea' : self.tokens[10],
+            'pancakes'   : self.tokens[11]
+        }
+
+    def produce_grammatical(self, num_strings=1, polish=True):
+        sentence_pattern_sg_subject = [
+            [ 'is ' ],
+            [ 'the baker ', 'the pirate ' ],
+            [ '', 'also ' ],
+            [ 'YN ' ],
+            [ 'like', 'sell' ],
+            [ ' bubble tea', ' pancakes' ]
+        ]
+        sentence_pattern_pl_subject = [
+            [ 'are ' ],
+            [ 'we ', 'they ' ],
+            [ '', 'also ' ],
+            [ 'YN ' ],
+            [ 'like', 'sell' ],
+            [ ' bubble tea', ' pancakes' ]
+        ]
+        try:
+            sentences_sg_subject = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_sg_subject)]
+            sentences_sg_subject = random.sample(sentences_sg_subject, int(num_strings / 2 + 0.5))
+            sentences_pl_subject = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_pl_subject)]
+            sentences_pl_subject = random.sample(sentences_pl_subject, int(num_strings / 2 + 0.5))
+        except ValueError:
+            return None
+        # Martian is fine, English needs number agreement
+        sentences_sg_subject = [(mar, eng[0:-2] + (eng[-2]+'s',) + eng[-1:]) for mar, eng in sentences_sg_subject]
+        sentences = sentences_sg_subject + sentences_pl_subject
+        # restore actual English word order
+        sentences = [(mar, eng[1:3] + eng[4:]) for mar, eng in sentences]
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            sentences = polish_sentences(sentences)
+        random.shuffle(sentences)
+        return sentences
+
+    def produce_ungrammatical(self, num_strings=1, polish=True):
+        ungrammatical_sentences = set()
+        while len(ungrammatical_sentences) < num_strings:
+            sentence = self.produce_grammatical(1, polish=False)[0]
+            done = False
+            form, meaning = sentence
+            while not done:
+                if random.choice([True, False]):
+                    # leave out the particle YN
+                    form = form[0:3] + form[4:]
+                    done = True
+                if random.choice([True, False]):
+                    # leave out the verb to be
+                    form = form[1:]
+                    done = True
+            sentence = (tuple(form), meaning)
+            ungrammatical_sentences.add(sentence)
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+        return ungrammatical_sentences
+
+
 class CustomExperiment(Experiment):
 
     settings_used = SettingsEnabled()
@@ -484,7 +568,8 @@ class CustomExperiment(Experiment):
 
     def __post_init__(self):
         my_grammars = [
-                        WackernagelWordOrderGrammar,
+                        LeadingCopulaGrammar
+                        #WackernagelWordOrderGrammar,
                         #VerbReduplicationGrammar,
                         #VerbalAgreementGrammar,
                         #AccusativeMarkingAgreementGrammar,
