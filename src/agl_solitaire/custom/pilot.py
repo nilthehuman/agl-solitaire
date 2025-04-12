@@ -276,6 +276,99 @@ class VerbalAgreementGrammar(CustomGrammar):
         return ungrammatical_sentences
 
 
+class VerbReduplicationGrammar(CustomGrammar):
+    """A grammar fragment where a verb is uttered twice, first before the object and then before an adverb."""
+
+    def __init__(self, tokens):
+        super().__init__(tokens)
+        def monosyll(string):
+            return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
+        assert any(monosyll(s) for s in self.tokens)
+        while not monosyll(self.tokens[11]):
+            random.shuffle(self.tokens)
+        self.lexicon = {
+            'your'      : self.tokens[0],
+            'their'     : self.tokens[1],
+            'mom'       : self.tokens[2],
+            'daughter'  : self.tokens[3],
+            'neighbor'  : self.tokens[4],
+            'speaks'    : self.tokens[5],
+            'plays'     : self.tokens[6],
+            'Dutch'     : self.tokens[7],
+            'the piano' : self.tokens[8],
+            'often'     : self.tokens[9],
+            'well'      : self.tokens[10],
+            'DE'        : self.tokens[11]
+        }
+
+    def produce_grammatical(self, num_strings=1, polish=True):
+        sentence_pattern_short = [
+            [ 'your ', 'their ' ],
+            [ 'mom ', 'daughter ', 'neighbor ' ],
+            [ 'speaks ', 'plays ' ],
+            [ 'Dutch ', 'the piano ' ]
+        ]
+        sentence_pattern_long = [
+            [ 'your ', 'their ' ],
+            [ 'mom ', 'daughter ', 'neighbor ' ],
+            [ 'speaks ', 'plays ' ],
+            [ 'Dutch ', 'the piano ' ],
+            [ 'speaks ', 'plays ' ],
+            [ 'DE ' ],
+            [ 'often', 'well' ]
+        ]
+        def object_makes_sense(sentence):
+            # let the verbs select for the correct type of object, obviously
+            if ((sentence[2] == 'plays '  and sentence[3] == 'the piano ') or
+                (sentence[2] == 'speaks ' and sentence[3] == 'Dutch ')):
+                try:
+                    if sentence[2] == sentence[4]:
+                        return True
+                    else:
+                        return False
+                except IndexError:
+                    return True
+            else:
+                return False
+        sentences_short = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_short) if object_makes_sense(s)]
+        sentences_short = random.sample(sentences_short, int(num_strings / 2 + 0.5))
+        sentences_long = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_long) if object_makes_sense(s)]
+        sentences_long = random.sample(sentences_long, int(num_strings / 2 + 0.5))
+        # erase reduplication from the English translations
+        sentences_long = [(mar, eng[0:4] + eng[6:]) for mar, eng in sentences_long]
+        sentences = sentences_short + sentences_long
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            sentences = polish_sentences(sentences)
+        random.shuffle(sentences)
+        return sentences
+
+    def produce_ungrammatical(self, num_strings=1, polish=True):
+        ungrammatical_sentences = set()
+        while len(ungrammatical_sentences) < num_strings:
+            sentence = self.produce_grammatical(1, polish=False)[0]
+            form, meaning = sentence
+            if len(form) < 5:
+                # short sentence, add a nonsense DE particle
+                form = form + (self.translate('DE'),)
+            else:
+                done = False
+                # long sentence, remove at least one of the reduplication bits
+                while not done:
+                    if random.choice([True, False]):
+                        form = form[0:5] + form[6:]
+                        done = True
+                    if random.choice([True, False]):
+                        form = form[0:4] + form[5:]
+                        done = True
+            sentence = (form, meaning)
+            ungrammatical_sentences.add(sentence)
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+        return ungrammatical_sentences
+
+
 class CustomExperiment(Experiment):
 
     settings_used = SettingsEnabled()
@@ -285,9 +378,11 @@ class CustomExperiment(Experiment):
     settings_used.recursion = False
 
     def __post_init__(self):
-        my_grammars = [ VerbalAgreementGrammar,
-                        AccusativeMarkingAgreementGrammar,
-                        DefiniteArticleAgreementGrammar
+        my_grammars = [
+                        VerbReduplicationGrammar,
+                        #VerbalAgreementGrammar,
+                        #AccusativeMarkingAgreementGrammar,
+                        #DefiniteArticleAgreementGrammar
                       ]
         first = True
         for grammar in my_grammars:
