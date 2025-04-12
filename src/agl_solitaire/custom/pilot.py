@@ -199,7 +199,80 @@ class AccusativeMarkingAgreementGrammar(CustomGrammar):
             sentence = (tuple(form), meaning)
             ungrammatical_sentences.add(sentence)
         if polish:
-            # assemble real(-looking) sentences from tuples, mold into pleasing orthographical form
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+        return ungrammatical_sentences
+
+
+class VerbalAgreementGrammar(CustomGrammar):
+    """A grammar fragment where subjects and verbs agree in gender."""
+
+    def __init__(self, tokens):
+        super().__init__(tokens)
+        def monosyll(string):
+            return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
+        assert any(monosyll(s) for s in self.tokens)
+        while (not monosyll(self.tokens[8]) or not monosyll(self.tokens[9]) or
+                   monosyll(self.tokens[10]) or monosyll(self.tokens[11])):
+            random.shuffle(self.tokens)
+        self.lexicon = {
+            'she'         : self.tokens[0],
+            'he'          : self.tokens[1],
+            'a girl'      : self.tokens[2],
+            'a boy'       : self.tokens[3],
+            'two girls'   : self.tokens[4] + ' ' + self.tokens[2],
+            'two boys'    : self.tokens[4] + ' ' + self.tokens[3],
+            'is'          : '',  # fix actual number agreement later on
+            'eating'      : self.tokens[6],
+            'baking'      : self.tokens[7],
+            'FEM'         : self.tokens[8],
+            'MASC'        : self.tokens[9],
+            'pizza'       : self.tokens[10],
+            'a cake'      : self.tokens[11]
+        }
+
+    def produce_grammatical(self, num_strings=1, polish=True):
+        sentence_pattern_fem = [
+            [ 'she ', 'a girl ', 'two girls ' ],
+            [ 'is ' ],
+            [ 'eating', 'baking' ],
+            [ 'FEM' ],
+            [ '', ' pizza', ' a cake' ]
+        ]
+        sentence_pattern_masc = [
+            [ 'he ', 'a boy ', 'two boys ' ],
+            [ 'is ' ],
+            [ 'eating', 'baking' ],
+            [ 'MASC' ],
+            [ '', ' pizza', ' a cake' ]
+        ]
+        sentences_fem = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_fem)]
+        sentences_fem = random.sample(sentences_fem, int(num_strings / 2 + 0.5))
+        sentences_masc = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_masc)]
+        sentences_masc = random.sample(sentences_masc, int(num_strings / 2 + 0.5))
+        sentences = sentences_fem + sentences_masc
+        # Martian is fine, English needs number agreement
+        sentences = [(mar, eng[0:1] + ('are ' if eng[0].startswith('two') else 'is ',) + eng[2:]) for mar, eng in sentences]
+        # erase gender markers from the English translations
+        sentences = [(mar, eng[0:3] + eng[4:]) for mar, eng in sentences]
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            sentences = polish_sentences(sentences)
+        random.shuffle(sentences)
+        return sentences
+
+    def produce_ungrammatical(self, num_strings=1, polish=True):
+        ungrammatical_sentences = set()
+        while len(ungrammatical_sentences) < num_strings:
+            sentence = self.produce_grammatical(1, polish=False)[0]
+            done = False
+            form, meaning = sentence
+            flipped = self.translate('FEM') if form[3] == self.translate('MASC') else self.translate('MASC')
+            form = form[0:3] + (flipped,) + form[4:]
+            sentence = (form, meaning)
+            ungrammatical_sentences.add(sentence)
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
             ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
         return ungrammatical_sentences
 
@@ -213,7 +286,10 @@ class CustomExperiment(Experiment):
     settings_used.recursion = False
 
     def __post_init__(self):
-        my_grammars = [AccusativeMarkingAgreementGrammar, DefiniteArticleAgreementGrammar]
+        my_grammars = [ VerbalAgreementGrammar,
+                        AccusativeMarkingAgreementGrammar,
+                        DefiniteArticleAgreementGrammar
+                      ]
         first = True
         for grammar in my_grammars:
             tokens = random.choice(TOKEN_SETS)
