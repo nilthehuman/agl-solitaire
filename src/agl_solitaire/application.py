@@ -92,7 +92,7 @@ class Application(Loggable):
                                                               max_length=self.settings.maximum_string_length)
                 ungrammatical_strings = gmr.produce_ungrammatical(num_strings=self.settings.test_strings_ungrammatical)
             oversize += 1
-            if (grammatical_strings is None or ungrammatical_strings is None):
+            if (grammatical_strings is None or ungrammatical_strings is None) and oversize <= max_oversize_attempts:
                 if self.settings.grammar_class == settings.GrammarClass.REGULAR:
                     self.duplicate_print(f"None found, expanding search to {gmr.MIN_STATES+oversize} to {gmr.MAX_STATES+oversize} states...")
                 elif self.settings.grammar_class == settings.GrammarClass.PATTERN:
