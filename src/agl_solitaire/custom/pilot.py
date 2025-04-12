@@ -298,7 +298,7 @@ class VerbReduplicationGrammar(CustomGrammar):
         self.lexicon = {
             'your'      : self.tokens[0],
             'their'     : self.tokens[1],
-            'mom'       : self.tokens[2],
+            'friend'    : self.tokens[2],
             'daughter'  : self.tokens[3],
             'neighbor'  : self.tokens[4],
             'speaks'    : self.tokens[5],
@@ -313,13 +313,13 @@ class VerbReduplicationGrammar(CustomGrammar):
     def produce_grammatical(self, num_strings=1, polish=True):
         sentence_pattern_short = [
             [ 'your ', 'their ' ],
-            [ 'mom ', 'daughter ', 'neighbor ' ],
+            [ 'friend ', 'daughter ', 'neighbor ' ],
             [ 'speaks ', 'plays ' ],
             [ 'Dutch ', 'the piano ' ]
         ]
         sentence_pattern_long = [
             [ 'your ', 'their ' ],
-            [ 'mom ', 'daughter ', 'neighbor ' ],
+            [ 'friend ', 'daughter ', 'neighbor ' ],
             [ 'speaks ', 'plays ' ],
             [ 'Dutch ', 'the piano ' ],
             [ 'speaks ', 'plays ' ],
