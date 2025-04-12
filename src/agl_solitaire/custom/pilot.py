@@ -381,6 +381,99 @@ class VerbReduplicationGrammar(CustomGrammar):
         return ungrammatical_sentences
 
 
+class WackernagelWordOrderGrammar(CustomGrammar):
+    """A grammar fragment where a pronoun is always in the 2nd slot of the sentence."""
+
+    def __init__(self, tokens):
+        super().__init__(tokens)
+        def monosyll(string):
+            return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
+        assert any(monosyll(s) and ('m' in s or 'n' in s) for s in self.tokens)
+        assert any(monosyll(s) and ('m' not in s) for s in self.tokens)
+        me_clitic = [s for s in self.tokens if monosyll(s) and ('m' in s or 'n' in s)][0]
+        him_clitic = [s for s in self.tokens if monosyll(s) and ('m' not in s)][0]
+        print("me_clitic:")
+        print(me_clitic)
+        print("him_clitic:")
+        print(him_clitic)
+        input()
+        remaining_tokens = list(set(self.tokens) - set({me_clitic, him_clitic}))
+        while not monosyll(remaining_tokens[4]) or not monosyll(remaining_tokens[5]):
+            random.shuffle(remaining_tokens)
+        self.lexicon = {
+            'you'          : remaining_tokens[0],
+            'they'         : remaining_tokens[1],
+            'found'        : remaining_tokens[2],
+            'left'         : remaining_tokens[3],
+            'me'           : me_clitic,
+            'him'          : him_clitic,
+            'a'            : remaining_tokens[4],
+            'the'          : remaining_tokens[5],
+            'password'     : remaining_tokens[6],
+            'room'         : remaining_tokens[7],
+            'empty'        : remaining_tokens[8],
+            'immediately'  : remaining_tokens[9]
+        }
+
+    def produce_grammatical(self, num_strings=1, polish=True):
+        sentence_pattern_nom_object = [
+            [ 'you ', 'they ' ],
+            [ 'found ', 'left ' ],
+            [ 'a ', 'the ' ],
+            [ 'password ', 'room ' ],
+            [ '', 'empty', 'immediately' ]
+        ]
+        sentence_pattern_pro_object = [
+            [ 'you ', 'they ' ],
+            [ 'me ', 'him ' ],
+            [ 'found ', 'left ' ]
+        ]
+        sentence_pattern_ditransitive = [
+            [ 'you ', 'they ' ],
+            [ 'me ', 'him ' ],
+            [ 'found ', 'left ' ],
+            [ 'a ', 'the ' ],
+            [ 'password ', 'room ' ],
+            [ '', 'immediately' ]
+        ]
+        try:
+            sentences_nom_object = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_nom_object)]
+            sentences_nom_object = random.sample(sentences_nom_object, int(num_strings / 3 + 0.67))
+            sentences_pro_object = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_pro_object)]
+            sentences_pro_object = random.sample(sentences_pro_object, int(num_strings / 3 + 0.67))
+            sentences_dtr_object = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_ditransitive)]
+            sentences_dtr_object = random.sample(sentences_dtr_object, int(num_strings / 3 + 0.67))
+        except ValueError:
+            return None
+        # restore actual English word order
+        sentences_pro_object = [(mar, eng[0:1] + eng[2:3] + eng[1:2]) for mar, eng in sentences_pro_object]
+        sentences_dtr_object = [(mar, eng[0:1] + eng[2:3] + eng[1:2] + eng[3:]) for mar, eng in sentences_dtr_object]
+        sentences = sentences_nom_object + sentences_pro_object + sentences_dtr_object
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            sentences = polish_sentences(sentences)
+        random.shuffle(sentences)
+        return sentences
+
+    def produce_ungrammatical(self, num_strings=1, polish=True):
+        ungrammatical_sentences = set()
+        while len(ungrammatical_sentences) < num_strings:
+            sentence = self.produce_grammatical(1, polish=False)[0]
+            form, meaning = sentence
+            if form[1] in ['found ', 'left ']:
+                # no pro object, flip verb and object
+                form = form[0:1] + form[2:4] + form[1:2] + form[4:]
+            else:
+                # pro object, flip object and verb
+                form = form[0:1] + form[2:3] + form[1:2] + form[3:]
+            sentence = (form, meaning)
+            ungrammatical_sentences.add(sentence)
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+        return ungrammatical_sentences
+
+
 class CustomExperiment(Experiment):
 
     settings_used = SettingsEnabled()
@@ -391,7 +484,8 @@ class CustomExperiment(Experiment):
 
     def __post_init__(self):
         my_grammars = [
-                        VerbReduplicationGrammar,
+                        WackernagelWordOrderGrammar,
+                        #VerbReduplicationGrammar,
                         #VerbalAgreementGrammar,
                         #AccusativeMarkingAgreementGrammar,
                         #DefiniteArticleAgreementGrammar
