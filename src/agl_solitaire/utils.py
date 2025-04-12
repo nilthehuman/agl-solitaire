@@ -103,9 +103,14 @@ def polish_sentences(sentences):
         # pack superfluous spaces together
         form = re.sub(r"\s+", ' ', form)
         meaning = re.sub(r"\s+", ' ', meaning)
+        # get rid of leading/trailing spaces
+        form = form.strip()
+        meaning = meaning.strip()
         # make them look like actual sentences
-        form = form.capitalize() + "."
-        meaning = "'" + meaning.capitalize() + ".'"
+        def capitalized(string):
+            return string[0].upper() + string[1:]
+        form = capitalized(form) + "."
+        meaning = "'" + capitalized(meaning) + ".'"
         return form, meaning
     nice_sentences = [process(form, meaning) for form, meaning in sentences]
     # returns a list of pairs
