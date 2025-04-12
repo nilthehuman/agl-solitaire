@@ -77,14 +77,17 @@ class DefiniteArticleAgreementGrammar(CustomGrammar):
             [ 'is running', 'is reading' ],
             [ '', ' a lot', ' tonight' ]
         ]
-        sentences_def = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_def)]
-        sentences_def = random.sample(sentences_def, int(num_strings / 2 + 0.5))
-        # Martian is fine, but space needed after English 'the'
-        sentences_def = [(mar, (eng[0]+' ', eng[1],) + eng[3:]) for mar, eng in sentences_def]
-        sentences_indef = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_indef)]
-        sentences_indef = random.sample(sentences_indef, int(num_strings / 2 + 0.5))
-        # Martian is fine, English needs an indefinite article
-        sentences_indef = [(mar, ('a' + ('n' if eng[0].startswith('o') else '') + ' ',) + eng) for mar, eng in sentences_indef]
+        try:
+            sentences_def = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_def)]
+            sentences_def = random.sample(sentences_def, int(num_strings / 2 + 0.5))
+            # Martian is fine, but space needed after English 'the'
+            sentences_def = [(mar, (eng[0]+' ', eng[1],) + eng[3:]) for mar, eng in sentences_def]
+            sentences_indef = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_indef)]
+            sentences_indef = random.sample(sentences_indef, int(num_strings / 2 + 0.5))
+            # Martian is fine, English needs an indefinite article
+            sentences_indef = [(mar, ('a' + ('n' if eng[0].startswith('o') else '') + ' ',) + eng) for mar, eng in sentences_indef]
+        except ValueError:
+            return None
         sentences = sentences_def + sentences_indef
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
@@ -162,10 +165,13 @@ class AccusativeMarkingAgreementGrammar(CustomGrammar):
             [ ' basket', ' chair', ' horse' ],
             [ 'ACC' ]
         ]
-        sentences_indef = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_indef)]
-        sentences_indef = random.sample(sentences_indef, int(num_strings / 2 + 0.5))
-        sentences_quant = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_quant)]
-        sentences_quant = random.sample(sentences_quant, int(num_strings / 2 + 0.5))
+        try:
+            sentences_indef = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_indef)]
+            sentences_indef = random.sample(sentences_indef, int(num_strings / 2 + 0.5))
+            sentences_quant = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_quant)]
+            sentences_quant = random.sample(sentences_quant, int(num_strings / 2 + 0.5))
+        except ValueError:
+            return None
         # erase ACC from the English translations
         sentences_indef = [(mar, eng[:-1]) for mar, eng in sentences_indef]
         sentences_quant = [(mar, eng[0:3] + eng[4:5]) for mar, eng in sentences_quant]
@@ -246,10 +252,13 @@ class VerbalAgreementGrammar(CustomGrammar):
             [ 'MASC' ],
             [ '', ' pizza', ' a cake' ]
         ]
-        sentences_fem = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_fem)]
-        sentences_fem = random.sample(sentences_fem, int(num_strings / 2 + 0.5))
-        sentences_masc = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_masc)]
-        sentences_masc = random.sample(sentences_masc, int(num_strings / 2 + 0.5))
+        try:
+            sentences_fem = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_fem)]
+            sentences_fem = random.sample(sentences_fem, int(num_strings / 2 + 0.5))
+            sentences_masc = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_masc)]
+            sentences_masc = random.sample(sentences_masc, int(num_strings / 2 + 0.5))
+        except ValueError:
+            return None
         sentences = sentences_fem + sentences_masc
         # Martian is fine, English needs number agreement
         sentences = [(mar, eng[0:1] + ('are ' if eng[0].startswith('two') else 'is ',) + eng[2:]) for mar, eng in sentences]
@@ -330,10 +339,13 @@ class VerbReduplicationGrammar(CustomGrammar):
                     return True
             else:
                 return False
-        sentences_short = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_short) if object_makes_sense(s)]
-        sentences_short = random.sample(sentences_short, int(num_strings / 2 + 0.5))
-        sentences_long = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_long) if object_makes_sense(s)]
-        sentences_long = random.sample(sentences_long, int(num_strings / 2 + 0.5))
+        try:
+            sentences_short = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_short) if object_makes_sense(s)]
+            sentences_short = random.sample(sentences_short, int(num_strings / 2 + 0.5))
+            sentences_long = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_long) if object_makes_sense(s)]
+            sentences_long = random.sample(sentences_long, int(num_strings / 2 + 0.5))
+        except ValueError:
+            return None
         # erase reduplication from the English translations
         sentences_long = [(mar, eng[0:4] + eng[6:]) for mar, eng in sentences_long]
         sentences = sentences_short + sentences_long
