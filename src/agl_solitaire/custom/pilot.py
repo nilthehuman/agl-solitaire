@@ -303,7 +303,7 @@ class VerbReduplicationGrammar(CustomGrammar):
             'neighbor'  : self.tokens[4],
             'speaks'    : self.tokens[5],
             'plays'     : self.tokens[6],
-            'Dutch'     : self.tokens[7],
+            'Dutch'     : self.tokens[7].capitalize(),
             'the piano' : self.tokens[8],
             'often'     : self.tokens[9],
             'well'      : self.tokens[10],
