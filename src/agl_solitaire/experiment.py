@@ -64,7 +64,7 @@ class Experiment(Loggable):
                 gmr = get_grammar_from_obfuscated_repr(self.settings)
                 self.duplicate_print(str(gmr))
             correct = sum(item[1] == item[2] for item in task.test_set)
-            self.duplicate_print(f"You gave {correct} correct answers out of {len(task.test_set)} ({100 * correct/len(task.test_set):.4}%). The answers were the following:")
+            self.duplicate_print(f"You gave {correct} correct answers out of {len(task.test_set)} ({100 * correct/len(task.test_set):.0f}%). The answers were the following:")
             # make table columns wider if needed
             width = max(16, 2 + max(len(item[0]) for item in task.test_set))
             self.duplicate_print(f"{'Test string':<{width}}{'Correct answer':<16}{'Your answer':<16}")
