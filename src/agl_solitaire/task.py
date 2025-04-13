@@ -188,7 +188,8 @@ class Task(Loggable, TaskState):
                 # already answered in a previous session
                 continue
             clear()
-            self.duplicate_print(f"Test item #{i+1} out of {len(self.test_set)}. Is the following string grammatical? (y/n)\n")
+            self.duplicate_print(f"Test item #{i+1} out of {len(self.test_set)}. Is the following string grammatical? (y/n)")
+            print()
             self.duplicate_print(self.test_set[i][0])
             answer = '_'
             while answer[0] not in ['y', 'n']:
