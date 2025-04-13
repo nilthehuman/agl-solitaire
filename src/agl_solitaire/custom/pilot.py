@@ -767,6 +767,69 @@ class EvidentialGrammar(CustomGrammar):
         return ungrammatical_sentences
 
 
+class EchoMorphologyGrammar(CustomGrammar):
+    """A grammar fragment where each word's first vowel is redoubled after a common consonant."""
+
+    def __init__(self, tokens):
+        super().__init__(tokens)
+        consonant = random.choice(['g', 'm', 't'])
+        def redouble_first(string):
+            # reduplicate first syllable, kinda
+            return re.sub(r"\b([^aeiouy]*)([aeiouy]+)", r"\1\2" + consonant + r"\2", string)
+        self.unechoed_lexicon = {
+            'all'         : self.tokens[0],
+            'dogs'        : self.tokens[1],
+            'ninjas'      : self.tokens[2],
+            'robots'      : self.tokens[3],
+            'can'         : self.tokens[4],
+            'should'      : self.tokens[5],
+            'like to'     : self.tokens[6],
+            'swim'        : self.tokens[7],
+            'help others' : self.tokens[8] + ' ' + self.tokens[9]
+        }
+        self.lexicon = {eng : redouble_first(mar) for eng, mar in self.unechoed_lexicon.items()}
+
+    def produce_grammatical(self, num_strings=1, polish=True):
+        sentence_pattern = [
+            [ '', 'all ' ],
+            [ 'dogs ', 'ninjas ', 'robots ' ],
+            [ 'can ', 'should ', 'like to ' ],
+            [ 'swim', 'help others' ]
+        ]
+        try:
+            sentences = [(self.translate(s), s) for s in itertools.product(*sentence_pattern)]
+            sentences = random.sample(sentences, num_strings)
+        except ValueError:
+            return None
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            sentences = polish_sentences(sentences)
+        random.shuffle(sentences)
+        return sentences
+
+    def produce_ungrammatical(self, num_strings=1, polish=True):
+        ungrammatical_sentences = set()
+        while len(ungrammatical_sentences) < num_strings:
+            sentence = self.produce_grammatical(1, polish=False)[0]
+            form, meaning = sentence
+            done = False
+            while not done:
+                # revert a few words to their "unechoed" forms
+                for i in range(len(form)):
+                    if random.choice([True, False, False]):
+                        try:
+                            form = form[0:i] + self.translate([meaning[i]], lexicon=self.unechoed_lexicon) + form[i+1:]
+                            done = True
+                        except KeyError:
+                            pass  # form is the empty string, go on
+            sentence = (tuple(form), meaning)
+            ungrammatical_sentences.add(sentence)
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+        return ungrammatical_sentences
+
+
 class CustomExperiment(Experiment):
 
     settings_used = SettingsEnabled()
@@ -777,7 +840,8 @@ class CustomExperiment(Experiment):
 
     def __post_init__(self):
         my_grammars = [
-                        EvidentialGrammar
+                        EchoMorphologyGrammar
+                        #EvidentialGrammar,
                         #PresentParticipleGrammar,
                         #LeadingCopulaGrammar,
                         #WackernagelWordOrderGrammar,
