@@ -16,7 +16,13 @@ except AttributeError:
 from src.agl_solitaire.grammar import Grammar
 from src.agl_solitaire.settings import Settings
 from src.agl_solitaire.task_state import TaskState
-from src.agl_solitaire.utils import print, input, clear, Loggable, pad_sentences, get_grammar_from_obfuscated_repr
+from src.agl_solitaire.utils import (print,
+                                     input,
+                                     _builtin_input,
+                                     clear,
+                                     Loggable,
+                                     pad_sentences,
+                                     get_grammar_from_obfuscated_repr)
 
 
 # maybe something like this?
@@ -37,7 +43,7 @@ class Task(Loggable, TaskState):
 
     settings: Settings
     grammar:  typing.Optional[Grammar] = None
-    active:   bool = False  # is this Task underway or queued up next?
+    active:   bool = False  # is this Task underway (or queued up next)
 
     def __post_init__(self):
         """If this is the currently active Task, register it in the Settings it belongs to."""
@@ -156,7 +162,7 @@ class Task(Loggable, TaskState):
                 print()
                 self.duplicate_print('\n'.join(self.training_set))
                 print()
-                input_thread = threading.Thread(target=input, daemon=True)
+                input_thread = threading.Thread(target=_builtin_input, daemon=True)
                 input_thread.start()
                 remaining_time = self.settings.training_time
                 while input_thread.is_alive() and 0 < remaining_time:
