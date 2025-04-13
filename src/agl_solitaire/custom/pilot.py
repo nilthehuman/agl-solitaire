@@ -688,6 +688,5 @@ class CustomExperiment(Experiment):
             random.shuffle(tokens)
             custom_task = Task(settings=self.settings, active=True if first else False)
             custom_task.grammar = grammar(tokens)
-            custom_task.prepare()
             self.tasks.append(custom_task)
             first = False
