@@ -431,7 +431,7 @@ class Application(Loggable):
                         self.duplicate_print('Try lowering the number of strings to use and try again.')
                     self.duplicate_print('Setup failed. Aborting experiment.')
                     return
-            self.duplicate_print('Done.')
+                self.duplicate_print('Done.')
             assert experiment_to_run.ready()
             if stngs.run_questionnaire:
                 self.duplicate_print('A few questions before we begin. Feel free to answer as briefly or in as much detail as you like.')
