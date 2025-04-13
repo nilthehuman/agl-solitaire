@@ -558,6 +558,112 @@ class LeadingCopulaGrammar(CustomGrammar):
         return ungrammatical_sentences
 
 
+class PresentParticipleGrammar(CustomGrammar):
+    """A grammar fragment where adjectival present participles are morphologically marked,
+    as opposed to present progressive finite verb forms, which are unmarked."""
+
+    def __init__(self, tokens):
+        super().__init__(tokens)
+        def monosyll(string):
+            return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
+        assert any(monosyll(s) for s in self.tokens)
+        while not monosyll(self.tokens[2]) or monosyll(self.tokens[6]) or monosyll(self.tokens[7]) or not monosyll(self.tokens[8]):
+            random.shuffle(self.tokens)
+        self.lexicon = {
+            'the'      : '',
+            'postman'  : self.tokens[0],
+            'tourists' : self.tokens[1],
+            'is'       : self.tokens[2],
+            'are'      : self.tokens[2], # make Martian copula invariant
+            'still'    : self.tokens[3],
+            'bored'    : self.tokens[4],
+            'happy'    : self.tokens[5],
+            'talking'  : self.tokens[6],
+            'waiting'  : self.tokens[7],
+            'APRT'     : self.tokens[8]
+        }
+
+    def produce_grammatical(self, num_strings=1, polish=True):
+        sentence_pattern_no_prt = [
+            [ 'the ' ],
+            [ '', '', 'bored', 'happy' ],  # sic, two empty strings intentional
+            [ ' postman ', ' tourists ' ],
+            [ 'is ', 'are ' ],
+            [ '', 'still ' ],
+            [ 'bored', 'happy', 'talking', 'waiting' ]
+        ]
+        sentence_pattern_prt = [
+            [ 'the ' ],
+            [ 'talking', 'waiting' ],
+            [ 'APRT' ],
+            [ ' postman ', ' tourists ' ],
+            [ 'is ', 'are ' ],
+            [ '', 'still ' ],
+            [ 'bored', 'happy', 'talking', 'waiting' ]
+        ]
+        def num_agrees(sentence):
+            # check if the copula is conjugated right
+            if ((sentence[-4] == ' postman '  and sentence[-3] == 'is ') or
+                (sentence[-4] == ' tourists ' and sentence[-3] == 'are ')):
+                return True
+            return False
+        try:
+            while True:
+                sentences_no_prt = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_no_prt) if num_agrees(s)]
+                sentences_no_prt = random.sample(sentences_no_prt, int(num_strings / 2 + 0.5))
+                # we might have got the same sentence twice on account of the double empty string in slot #2
+                if len(sentences_no_prt) == len(set(sentences_no_prt)):
+                    break
+            sentences_prt = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_prt) if num_agrees(s)]
+            sentences_prt = random.sample(sentences_prt, int(num_strings / 2 + 0.5))
+        except ValueError:
+            return None
+        # erase special participle marker from English translations
+        sentences_prt = [(mar, eng[0:2] + eng[3:]) for mar, eng in sentences_prt]
+        sentences = sentences_no_prt + sentences_prt
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            sentences = polish_sentences(sentences)
+        random.shuffle(sentences)
+        return sentences
+
+    def produce_ungrammatical(self, num_strings=1, polish=True):
+        ungrammatical_sentences = set()
+        while len(ungrammatical_sentences) < num_strings:
+            sentence = self.produce_grammatical(1, polish=False)[0]
+            form, meaning = sentence
+            if meaning[1].endswith('ing'):
+                # has present participle
+                done = False
+                form, meaning = sentence
+                while not done:
+                    if random.choice([True, False]):
+                        # add faulty APRT marker to verb
+                        form = form + (self.translate('APRT'),)
+                        done = True
+                    if random.choice([True, False]):
+                        # remove APRT marker from participle
+                        form = form[0:2] + form[3:]
+                        done = True
+            else:
+                # no present participle
+                if meaning[-1].endswith('ing'):
+                    # add faulty APRT marker to verb
+                    form = form + (self.translate('APRT'),)
+                elif len(meaning[1]):
+                    # add nonsense APRT marker to plain adjective
+                    form = form[0:2] + (self.translate('APRT'),) + form[2:]
+                else:
+                    # sentence too simple, try again
+                    continue
+            sentence = (tuple(form), meaning)
+            ungrammatical_sentences.add(sentence)
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+        return ungrammatical_sentences
+
+
 class CustomExperiment(Experiment):
 
     settings_used = SettingsEnabled()
@@ -568,7 +674,8 @@ class CustomExperiment(Experiment):
 
     def __post_init__(self):
         my_grammars = [
-                        LeadingCopulaGrammar
+                        PresentParticipleGrammar
+                        #LeadingCopulaGrammar,
                         #WackernagelWordOrderGrammar,
                         #VerbReduplicationGrammar,
                         #VerbalAgreementGrammar,
