@@ -1,6 +1,7 @@
 """High-level control of task sequencing in the experiment procedure, I guess."""
 
 import dataclasses
+import random
 
 from src.agl_solitaire import settings
 from src.agl_solitaire import task
@@ -30,6 +31,7 @@ class Experiment(Loggable):
             ### ### ### ### ### ###
             if not success:
                 return False
+        random.shuffle(self.tasks)
         return True
 
     def ready(self):
