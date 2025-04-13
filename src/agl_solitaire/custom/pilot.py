@@ -17,24 +17,31 @@ from src.agl_solitaire.utils import polish_sentences
 
 
 TOKEN_SETS = [
-    [ 'an', 'ar', 'bobo', 'dal', 'eli', 'kuu', 'mamo', 'mele', 'nu', 'pul', 'teng', 'ze' ],
-    [ 'a', 'ava', 'ele', 'il', 'kon', 'moda', 'me', 'punnu', 'shii', 'tam', 'va', 'zen' ],
-    [ 'amura', 'es', 'ilani', 'gova', 'khen', 'li', 'oba', 'pol', 'ter', 'to', 'xe', 'zo' ],
-    [ 'ado', 'hovo', 'kere', 'loa', 'pavo', 'saso', 'sil', 'tir', 'mod', 'muma', 'nog', 'wa' ],
-    [ 'bo', 'bunna', 'ebbe', 'enta', 'haaru', 'kaal', 'ki', 'sawa', 'sor', 'tama', 'tean', 'zaal' ],
+    [ 'an', 'ar', 'bobo', 'dal', 'eli', 'kuu', 'ma', 'mele', 'nu', 'pul', 'teng', 'ze' ],
+    [ 'a', 'ele', 'il', 'kon', 'moda', 'me', 'nigi', 'punnu', 'shii', 'tam', 'va', 'zen' ],
+    [ 'amura', 'es', 'ilani', 'gova', 'khen', 'li', 'ni', 'oba', 'pol', 'so', 'to', 'xe' ],
+    [ 'ado', 'hovo', 'kere', 'loa', 'mod', 'muma', 'nog', 'pavo', 'saso', 'sil', 'tir', 'wa' ],
+    [ 'bo', 'bunna', 'ebbe', 'enta', 'haaru', 'kaal', 'ki', 'ma', 'sawa', 'sor', 'tama', 'zaal' ],
     [ 'amo', 'avadi', 'bint', 'esse', 'gorra', 'ikka', 'min', 'mula', 'ol', 'teti', 've', 'voro' ],
     [ 'ateme', 'en', 'felle', 'gora', 'khiad', 'myna', 'mu', 'o', 'soro', 'xind', 'yko', 'ylmo' ],
-    [ 'del', 'fy', 'fyyri', 'hel', 'ivi', 'kaha', 'ky', 'ma', 'min', 'porda', 'te', 'wek' ],
-    [ 'atta', 'eve', 'henne', 'i', 'manba', 'mene', 'pon', 'raago', 'tor', 'tuu', 'uva', 'zoto' ],
-    [ 'cir', 'daa', 'dyn', 'e', 'iti', 'men', 'ogho', 'shen', 'taal', 'urro', 'uzto', 'zeb' ],
-    [ 'ata', 'farra', 'ke', 'meze', 'mor', 'ne', 'ni', 'ob', 'ono', 'pur', 'tala', 'toyo' ],
-    [ 'aene', 'de', 'er', 'hin', 'lu', 'maata', 'melde', 'nii', 'olta', 'osso', 'pi', 'vent' ],
+    [ 'del', 'fy', 'fyyri', 'hel', 'ivi', 'kaha', 'ky', 'mamo', 'min', 'porda', 'te', 'wek' ],
+    [ 'atta', 'eve', 'henne', 'i', 'manba', 'men', 'pon', 'raago', 'tor', 'tuu', 'uva', 'zoto' ],
+    [ 'daa', 'dyn', 'e', 'iti', 'mene', 'nu', 'ogho', 'shen', 'taal', 'urro', 'uzto', 'zo' ],
+    [ 'ata', 'cir', 'farra', 'ke', 'meze', 'mor', 'nibi', 'ob', 'ono', 'pur', 'tala', 'toyo' ],
+    [ 'aene', 'de', 'er', 'hin', 'lu', 'maata', 'melde', 'ni', 'olta', 'osso', 'pi', 'vent' ],
     [ 'ar', 'bo', 'da', 'echa', 'me', 'opo', 'oto', 'pau', 'sako', 'tau', 'ti', 'ud' ],
-    [ 'ben', 'e', 'far', 'hen', 'huu', 'mi', 'ne', 'op', 'pa', 'ro', 'tel', 'tum' ],
-    [ 'ava', 'ethi', 'gar', 'im', 'ippi', 'ka', 'miko', 'og', 'onno', 'pana', 'qon', 'va' ]
+    [ 'ben', 'e', 'fir', 'hen', 'huu', 'mi', 'ne', 'opi', 'pa', 'ro', 'tel', 'tum' ],
+    [ 'ava', 'eti', 'gar', 'im', 'ka', 'miko', 'na', 'og', 'onno', 'pana', 'quon', 'va' ],
+    [ 'baa', 'ber', 'dem', 'koko', 'mem', 'nuo', 'pin', 'sa', 'sil', 'tan', 'usu', 'yppo' ],
+    [ 'atta', 'bara', 'de', 'hi', 'lo', 'mbe', 'ope', 'pek', 'tunde', 'u', 'vym', 'wal' ],
+    [ 'an', 'fer', 'ho', 'je', 'mata', 'nin', 'ob', 'pirra', 'samu', 'ten', 'toma', 'wu' ]
 ]
 for tokens in TOKEN_SETS:
     assert len(tokens) == 12
+RHYMES = [
+    ('borna', 'lorna'), ('fairu', 'tairu'), ('gulla', 'mulla'), ('helto', 'nelto'), ('ippo', 'pippo'),
+    ('kolo', 'tolo'), ('mahi', 'vahi'), ('lede', 'nede'), ('sende', 'vende'), ('tuko', 'zuko')
+]
 
 
 class DefiniteArticleAgreementGrammar(CustomGrammar):
