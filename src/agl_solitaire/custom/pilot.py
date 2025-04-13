@@ -39,8 +39,8 @@ TOKEN_SETS = [
 for tokens in TOKEN_SETS:
     assert len(tokens) == 12
 RHYMES = [
-    ('borna', 'lorna'), ('fairu', 'tairu'), ('gulla', 'mulla'), ('helto', 'nelto'), ('ippo', 'pippo'),
-    ('kolo', 'tolo'), ('mahi', 'vahi'), ('lede', 'nede'), ('sende', 'vende'), ('tuko', 'zuko')
+    ('borna', 'lorna'), ('fairu', 'tairu'), ('gullam', 'mullam'), ('helto', 'nelto'), ('ippo', 'pippo'),
+    ('kolo', 'tolo'), ('mahi', 'vahi'), ('ledek', 'nedek'), ('sendu', 'vendu'), ('tuko', 'zuko')
 ]
 
 
@@ -830,6 +830,162 @@ class EchoMorphologyGrammar(CustomGrammar):
         return ungrammatical_sentences
 
 
+class RhymingGrammar(CustomGrammar):
+    """A grammar fragment where the two clauses of a conditional construction need to rhyme."""
+
+    def __init__(self, tokens, rhymes):
+        super().__init__(tokens, rhymes)
+        def monosyll(string):
+            return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
+        assert any(monosyll(s) for s in self.tokens)
+        while not monosyll(self.tokens[1]) or not monosyll(self.tokens[3]):
+            random.shuffle(self.tokens)
+        self.lexicon = {
+            'if'       : self.tokens[0],
+            'you'      : self.tokens[1],
+            'feed'     : self.tokens[2],
+            'your'     : self.tokens[1],
+            'my'       : self.tokens[3],
+            'hamster'  : self.tokens[4],
+            'parrot'   : self.tokens[5],
+            'seeds'    : self.rhymes[0][0],
+            'snacks'   : self.rhymes[1][0],
+            'it'       : '',
+            'will'     : self.tokens[6],
+            'be happy' : self.rhymes[0][1],
+            'get fat'  : self.rhymes[1][1],
+
+            'we'       : self.tokens[7],
+            'leave'    : self.tokens[8],
+            'early'    : self.rhymes[2][0],
+            'now'      : self.rhymes[3][0],
+            'arrive on time'   : self.tokens[9] + ' ' + self.rhymes[2][1],
+            'beat the traffic' : self.tokens[10] + ' ' + self.rhymes[3][1]
+        }
+
+    def produce_grammatical(self, num_strings=1, polish=True):
+        sentence_pattern_feed_1 = [
+            [ 'if ' ],
+            [ 'you ', 'we ' ],
+            [ 'feed ' ],
+            [ 'your ', 'my ' ],
+            [ 'hamster ', 'parrot ' ],
+            [ 'seeds ' ],  # this word...
+            [ 'it ' ],
+            [ 'will ' ],
+            [ 'be happy' ] # ...will rhyme with this
+        ]
+        sentence_pattern_feed_2 = [
+            [ 'if ' ],
+            [ 'you ', 'we ' ],
+            [ 'feed ' ],
+            [ 'your ', 'my ' ],
+            [ 'hamster ', 'parrot ' ],
+            [ 'snacks ' ], # this word...
+            [ 'it ' ],
+            [ 'will ' ],
+            [ 'get fat' ]  # ...will rhyme with this
+        ]
+        sentence_pattern_leave_1 = [
+            [ 'if ' ],
+            [ 'you ', 'we ' ],
+            [ 'leave ' ],
+            [ 'early ' ],        # this word...
+            [ 'you ', 'we ' ],
+            [ 'will ' ],
+            [ 'arrive on time' ] # ...will rhyme with this
+        ]
+        sentence_pattern_leave_2 = [
+            [ 'if ' ],
+            [ 'you ', 'we ' ],
+            [ 'leave ' ],
+            [ 'now ' ],            # this word...
+            [ 'you ', 'we ' ],
+            [ 'will ' ],
+            [ 'beat the traffic' ] # ...will rhyme with this
+        ]
+        try:
+            sentences_leave_1 = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_leave_1)]
+            sentences_leave_2 = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_leave_2)]
+            num_to_go = num_strings - len(sentences_leave_1) - len(sentences_leave_2)
+            sentences_feed_1 = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_feed_1)]
+            sentences_feed_1 = random.sample(sentences_feed_1, int(num_to_go / 2 + 0.5))
+            sentences_feed_2 = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_feed_2)]
+            sentences_feed_2 = random.sample(sentences_feed_2, int(num_to_go / 2 + 0.5))
+        except ValueError:
+            return None
+        sentences = sentences_feed_1 + sentences_feed_2 + sentences_leave_1 + sentences_leave_2
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            sentences = polish_sentences(sentences)
+        random.shuffle(sentences)
+        return sentences
+
+    def produce_ungrammatical(self, num_strings=1, polish=True):
+        nonrhyming_pattern_feed_1 = [
+            [ 'if ' ],
+            [ 'you ', 'we ' ],
+            [ 'feed ' ],
+            [ 'your ', 'my ' ],
+            [ 'hamster ', 'parrot ' ],
+            [ 'seeds ' ],
+            [ 'it ' ],
+            [ 'will ' ],
+            [ 'get fat' ]
+        ]
+        nonrhyming_pattern_feed_2 = [
+            [ 'if ' ],
+            [ 'you ', 'we ' ],
+            [ 'feed ' ],
+            [ 'your ', 'my ' ],
+            [ 'hamster ', 'parrot ' ],
+            [ 'snacks ' ],
+            [ 'it ' ],
+            [ 'will ' ],
+            [ 'be happy' ]
+        ]
+        nonrhyming_pattern_leave_1 = [
+            [ 'if ' ],
+            [ 'you ', 'we ' ],
+            [ 'leave ' ],
+            [ 'early ' ],
+            [ 'you ', 'we ' ],
+            [ 'will ' ],
+            [ 'beat the traffic' ]
+        ]
+        nonrhyming_pattern_leave_2 = [
+            [ 'if ' ],
+            [ 'you ', 'we ' ],
+            [ 'leave ' ],
+            [ 'now ' ],
+            [ 'you ', 'we ' ],
+            [ 'will ' ],
+            [ 'arrive on time' ]
+        ]
+        nonrhyming_feed_1 = [(self.translate(s), s) for s in itertools.product(*nonrhyming_pattern_feed_1)]
+        nonrhyming_feed_2 = [(self.translate(s), s) for s in itertools.product(*nonrhyming_pattern_feed_2)]
+        nonrhyming_leave_1 = [(self.translate(s), s) for s in itertools.product(*nonrhyming_pattern_leave_1)]
+        nonrhyming_leave_2 = [(self.translate(s), s) for s in itertools.product(*nonrhyming_pattern_leave_2)]
+        nonrhyming = nonrhyming_feed_1 + nonrhyming_feed_2 + nonrhyming_leave_1 + nonrhyming_leave_2
+        ungrammatical_sentences = set(random.sample(nonrhyming, k=num_strings))
+        while len(ungrammatical_sentences) < num_strings:
+            sentence = self.produce_grammatical(1, polish=False)[0]
+            form, meaning = sentence
+            index = random.choice([-4, -1])
+            while True:
+                bad_rhyme = random.choice(self.rhymes)
+                if form[index] not in bad_rhyme:
+                    bad_rhyme = random.choice(bad_rhyme)
+                    break
+            form = form[0:index] + (bad_rhyme,) + form[index+1:]
+            sentence = (tuple(form), meaning)
+            ungrammatical_sentences.add(sentence)
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+        return ungrammatical_sentences
+
+
 class CustomExperiment(Experiment):
 
     settings_used = SettingsEnabled()
@@ -840,7 +996,8 @@ class CustomExperiment(Experiment):
 
     def __post_init__(self):
         my_grammars = [
-                        EchoMorphologyGrammar
+                        RhymingGrammar
+                        #EchoMorphologyGrammar,
                         #EvidentialGrammar,
                         #PresentParticipleGrammar,
                         #LeadingCopulaGrammar,
@@ -854,6 +1011,10 @@ class CustomExperiment(Experiment):
         for grammar, tokens in zip(my_grammars, random.sample(TOKEN_SETS, k=len(my_grammars))):
             random.shuffle(tokens)
             custom_task = Task(settings=self.settings, active=True if first else False)
-            custom_task.grammar = grammar(tokens)
+            try:
+                custom_task.grammar = grammar(tokens)
+            except TypeError:
+                random.shuffle(RHYMES)
+                custom_task.grammar = grammar(tokens=tokens, rhymes=RHYMES)
             self.tasks.append(custom_task)
             first = False

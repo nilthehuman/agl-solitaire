@@ -45,8 +45,9 @@ class Grammar(abc.ABC):
 class CustomGrammar(Grammar):
     """Base class for non-trivial grammars (as opposed to simple formal grammars)."""
 
-    def __init__(self, tokens=None):
+    def __init__(self, tokens=None, rhymes=None):
         self.tokens = tokens
+        self.rhymes = rhymes
 
     def translate(self, string, lexicon=None):
         """Map English sentence chunks to the token set of this grammar."""
