@@ -666,6 +666,107 @@ class PresentParticipleGrammar(CustomGrammar):
         return ungrammatical_sentences
 
 
+class EvidentialGrammar(CustomGrammar):
+    """A grammar fragment that distinguishes three kinds of evidentiality, all overtly marked:
+    direct knowledge, hearsay, and circumstantial inference."""
+
+    def __init__(self, tokens):
+        super().__init__(tokens)
+        def monosyll(string):
+            return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
+        assert any(monosyll(s) for s in self.tokens)
+        while not monosyll(self.tokens[0]) or monosyll(self.tokens[10]) or monosyll(self.tokens[11]):
+            random.shuffle(self.tokens)
+        self.lexicon = {
+            'the'       : self.tokens[0],
+            'dwarves'   : self.tokens[1],
+            'monkeys'   : self.tokens[2],
+            'are'       : self.tokens[3],
+            'have'      : self.tokens[4],
+            'building'  : self.tokens[5], # tense/aspect morphologically unmarked
+            'built'     : self.tokens[5], # tense/aspect morphologically unmarked
+            'occupying' : self.tokens[6], # tense/aspect morphologically unmarked
+            'occupied'  : self.tokens[6], # tense/aspect morphologically unmarked
+            'DIR'       : self.tokens[7],
+            'HEAR'      : self.tokens[8],
+            'INF'       : self.tokens[9],
+            'a castle'  : self.tokens[10],
+            'a tavern'  : self.tokens[11]
+        }
+
+    def produce_grammatical(self, num_strings=1, polish=True):
+        sentence_pattern_dir = [
+            [ 'the ' ],
+            [ 'dwarves ', 'monkeys ' ],
+            [ 'are', 'have' ],
+            [ ' building', ' built', ' occupying', ' occupied' ],
+            [ 'DIR' ],
+            [ ' a castle', ' a tavern' ]
+        ]
+        sentence_pattern_hear = [
+            [ 'the ' ],
+            [ 'dwarves ', 'monkeys ' ],
+            [ 'are', 'have' ],
+            [ ' building', ' built', ' occupying', ' occupied' ],
+            [ 'HEAR' ],
+            [ ' a castle', ' a tavern' ]
+        ]
+        sentence_pattern_inf = [
+            [ 'the ' ],
+            [ 'dwarves ', 'monkeys ' ],
+            [ 'are', 'have' ],
+            [ ' building', ' built', ' occupying', ' occupied' ],
+            [ 'INF' ],
+            [ ' a castle', ' a tavern' ]
+        ]
+        def aux_correct(sentence):
+            # check if the auxiliary matches the intended tense
+            if 'are' == sentence[2]:
+                if sentence[3] in [' building', ' occupying']:
+                    return True
+            else:
+                if sentence[3] in [' built', ' occupied']:
+                    return True
+            return False
+        try:
+            sentences_dir = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_dir) if aux_correct(s)]
+            sentences_dir = random.sample(sentences_dir, int(num_strings / 3 + 0.67))
+            sentences_hear = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_hear) if aux_correct(s)]
+            sentences_hear = random.sample(sentences_hear, int(num_strings / 3 + 0.67))
+            sentences_inf = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_inf) if aux_correct(s)]
+            sentences_inf = random.sample(sentences_inf, int(num_strings / 3 + 0.67))
+        except ValueError:
+            return None
+        # remove grammatical evidentiality marker, add a matrix phrase in English
+        sentences_dir = [(mar, ('I saw that ',) + eng[0:4] + eng[5:]) for mar, eng in sentences_dir]
+        sentences_hear = [(mar, ('I heard that ',) + eng[0:4] + eng[5:]) for mar, eng in sentences_hear]
+        sentences_inf = [(mar, ('It looks like ',) + eng[0:4] + eng[5:]) for mar, eng in sentences_inf]
+        sentences = sentences_dir + sentences_hear + sentences_inf
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            sentences = polish_sentences(sentences)
+        random.shuffle(sentences)
+        return sentences
+
+    def produce_ungrammatical(self, num_strings=1, polish=True):
+        ungrammatical_sentences = set()
+        while len(ungrammatical_sentences) < num_strings:
+            sentence = self.produce_grammatical(1, polish=False)[0]
+            form, meaning = sentence
+            # remove evidentiality marker from lexical (main) verb
+            evid = form[4]
+            form = form[0:4] + form[5:]
+            if random.choice([True, False]):
+                # drop it on the auxiliary verb for kicks
+                form = form[0:2] + (form[2] + evid,) + form[3:]
+            sentence = (tuple(form), meaning)
+            ungrammatical_sentences.add(sentence)
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+        return ungrammatical_sentences
+
+
 class CustomExperiment(Experiment):
 
     settings_used = SettingsEnabled()
@@ -676,7 +777,8 @@ class CustomExperiment(Experiment):
 
     def __post_init__(self):
         my_grammars = [
-                        PresentParticipleGrammar
+                        EvidentialGrammar
+                        #PresentParticipleGrammar,
                         #LeadingCopulaGrammar,
                         #WackernagelWordOrderGrammar,
                         #VerbReduplicationGrammar,
