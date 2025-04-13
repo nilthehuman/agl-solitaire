@@ -48,14 +48,16 @@ class CustomGrammar(Grammar):
     def __init__(self, tokens=None):
         self.tokens = tokens
 
-    def translate(self, string):
+    def translate(self, string, lexicon=None):
         """Map English sentence chunks to the token set of this grammar."""
-        assert self.lexicon
+        if lexicon is None:
+            assert self.lexicon
+            lexicon = self.lexicon
         if type(string) is str:
-            return self.lexicon[string]
+            return lexicon[string]
         def tr(word):
-            # disregard whitespace on either side
-            return re.sub(r"(\w+(\s*?\w+?)*)", lambda m: self.lexicon[m.group(1)], word)
+                # disregard whitespace on either side
+            return re.sub(r"(\w+(\s*?\w+?)*)", lambda m: lexicon[m.group(1)], word)
         return tuple(tr(x) for x in string)
 
 
