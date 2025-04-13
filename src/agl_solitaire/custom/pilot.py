@@ -399,11 +399,6 @@ class WackernagelWordOrderGrammar(CustomGrammar):
         assert any(monosyll(s) and ('m' not in s) for s in self.tokens)
         me_clitic = [s for s in self.tokens if monosyll(s) and ('m' in s or 'n' in s)][0]
         him_clitic = [s for s in self.tokens if monosyll(s) and ('m' not in s)][0]
-        print("me_clitic:")
-        print(me_clitic)
-        print("him_clitic:")
-        print(him_clitic)
-        input()
         remaining_tokens = list(set(self.tokens) - set({me_clitic, him_clitic}))
         while not monosyll(remaining_tokens[4]) or not monosyll(remaining_tokens[5]):
             random.shuffle(remaining_tokens)
