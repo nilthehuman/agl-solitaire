@@ -787,8 +787,7 @@ class CustomExperiment(Experiment):
                         #DefiniteArticleAgreementGrammar
                       ]
         first = True
-        for grammar in my_grammars:
-            tokens = random.choice(TOKEN_SETS)
+        for grammar, tokens in zip(my_grammars, random.sample(TOKEN_SETS, k=len(my_grammars))):
             random.shuffle(tokens)
             custom_task = Task(settings=self.settings, active=True if first else False)
             custom_task.grammar = grammar(tokens)
