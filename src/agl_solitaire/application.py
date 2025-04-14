@@ -156,7 +156,7 @@ class Application(Loggable):
         except Exception:
             print('error: loading experiment from file failed')
             return
-        if settings_and_gmr.halted_task is None or not settings_and_gmr.halted_task.ready():
+        if settings_and_gmr.halted_task is None or not settings_and_gmr.halted_task.test_set:
             if settings_and_gmr.grammar is None:
                 print('error: file does not include a grammar or a paused experiment')
                 return
@@ -176,7 +176,6 @@ class Application(Loggable):
                 choice = input('use the current settings instead? (y/n)> ')
             if choice[0].lower() == 'y':
                 settings_and_gmr.override(self.settings)
-        # TODO: rephrase this condition in terms of Task.ready?
         if all(judgement is None for (_, _, judgement) in settings_and_gmr.halted_task.test_set):
             self.duplicate_print('=' * 120, log_only=True)
             self.duplicate_print('You are now starting a previously generated experiment:')
@@ -190,10 +189,13 @@ class Application(Loggable):
                 do_repeat = input()
             if 'y' != do_repeat[0].lower():
                 return
-            # FIXME: this is probably safe to remove right?
-            def callback():
-                settings_and_gmr.halted_task = task_state.TaskState(settings_and_gmr)
-            settings_and_gmr.without_autosave(callback)
+            if settings_and_gmr.grammar is None:
+                print('warning: no grammar found in file, the old strings will be used to repeat the experiment')
+                settings_and_gmr.halted_task.test_set = [(string, correct, None) for (string, correct, _) in settings_and_gmr.halted_task.test_set]
+            else:
+                def callback():
+                    settings_and_gmr.halted_task = task_state.TaskState(settings_and_gmr)
+                settings_and_gmr.without_autosave(callback)
         self.run_experiment(settings_and_gmr)
 
     def settings_menu(self):
