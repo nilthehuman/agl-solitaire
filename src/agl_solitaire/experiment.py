@@ -61,7 +61,7 @@ class Experiment(Loggable):
                 answer = input()
                 self.duplicate_print(answer, log_only=True)
             clear()
-            if not self.settings.grammar_class.custom():
+            if not self.settings.grammar_class.custom() and self.settings.grammar is not None:
                 self.duplicate_print(f"And now for the big reveal... Strings were generated using the following {self.settings.grammar_class} grammar:")
                 gmr = get_grammar_from_obfuscated_repr(self.settings)
                 self.duplicate_print(str(gmr))

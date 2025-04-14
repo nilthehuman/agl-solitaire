@@ -176,6 +176,7 @@ class Application(Loggable):
                 choice = input('use the current settings instead? (y/n)> ')
             if choice[0].lower() == 'y':
                 settings_and_gmr.override(self.settings)
+        # TODO: rephrase this condition in terms of Task.ready?
         if all(judgement is None for (_, _, judgement) in settings_and_gmr.halted_task.test_set):
             self.duplicate_print('=' * 120, log_only=True)
             self.duplicate_print('You are now starting a previously generated experiment:')
