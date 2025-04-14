@@ -30,7 +30,7 @@ TOKEN_SETS = [
     [ 'ata', 'cir', 'farra', 'ke', 'meze', 'mor', 'nibi', 'ob', 'ono', 'pur', 'tala', 'toyo' ],
     [ 'aene', 'de', 'er', 'hin', 'lu', 'maata', 'melde', 'ni', 'olta', 'osso', 'pi', 'vent' ],
     [ 'ar', 'bo', 'da', 'echa', 'me', 'opo', 'oto', 'pau', 'sako', 'tau', 'ti', 'ud' ],
-    [ 'ben', 'e', 'fir', 'hen', 'huu', 'mi', 'ne', 'opi', 'pa', 'ro', 'tel', 'tum' ],
+    [ 'ben', 'e', 'firno', 'hen', 'huu', 'mi', 'ne', 'opi', 'pa', 'ro', 'tel', 'tum' ],
     [ 'ava', 'eti', 'gar', 'im', 'ka', 'miko', 'na', 'og', 'onno', 'pana', 'quon', 'va' ],
     [ 'baa', 'ber', 'dem', 'koko', 'mem', 'nuo', 'pin', 'sa', 'sil', 'tan', 'usu', 'yppo' ],
     [ 'atta', 'bara', 'de', 'hi', 'lo', 'mbe', 'ope', 'pek', 'tunde', 'u', 'vym', 'wal' ],
