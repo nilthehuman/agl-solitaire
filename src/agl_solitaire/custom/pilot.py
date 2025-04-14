@@ -986,6 +986,85 @@ class RhymingGrammar(CustomGrammar):
         return ungrammatical_sentences
 
 
+class PalindromeDemonstrativeGrammar(CustomGrammar):
+    """A grammar fragment where the form of the word 'that' is always its noun reversed."""
+
+    def __init__(self, tokens, rhymes):
+        super().__init__(tokens, rhymes)
+        def monosyll(string):
+            return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
+        while monosyll(self.tokens[2]) or monosyll(self.tokens[3]) or monosyll(self.tokens[4]):
+            random.shuffle(self.tokens)
+        assert(not all(t == t[::-1] for t in [self.tokens[2], self.tokens[3], self.tokens[4]]))
+        self.lexicon = {
+            'that'      : 'THAT',
+            'the left'  : self.tokens[0],
+            'the right' : self.tokens[1],
+            'bird'      : self.tokens[2],
+            'image'     : self.tokens[3],
+            'totem'     : self.tokens[4],
+            'colors'    : self.tokens[5],
+            'nice'      : self.tokens[6],
+            'strange'   : self.tokens[7],
+            'symbolizes': self.tokens[8],
+            'freedom'   : self.tokens[9],
+            'luck'      : self.tokens[10]
+        }
+
+    def produce_grammatical(self, num_strings=1, polish=True):
+        sentence_pattern_colors = [
+            [ ' that ', 'the left ', 'the right ' ],
+            [ 'bird ', 'image ', 'totem ' ],
+            [ 'colors ' ],
+            [ 'nice ', 'strange ' ]
+        ]
+        sentence_pattern_symbol = [
+            [ ' that ', 'the left ', 'the right ' ],
+            [ 'bird ', 'image ', 'totem ' ],
+            [ 'symbolizes ' ],
+            [ 'freedom', 'luck' ]
+        ]
+        try:
+            sentences_colors = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_colors)]
+            sentences_colors = random.sample(sentences_colors, int(num_strings / 2 + 0.5))
+            sentences_symbol = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_symbol)]
+            sentences_symbol = random.sample(sentences_symbol, int(num_strings / 2 + 0.5))
+        except ValueError:
+            return None
+        # correct English word order
+        sentences_colors = [(mar, eng[0:2] + ('has ',) + eng[3:4] + eng[2:3]) for mar, eng in sentences_colors]
+        sentences = sentences_colors + sentences_symbol
+        # render Martian demonstrative
+        sentences = [((mar[1][::-1]+' ' if 'THAT' in mar[0] else mar[0],) + mar[1:], eng) for mar, eng in sentences]
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            sentences = polish_sentences(sentences)
+        random.shuffle(sentences)
+        return sentences
+
+    def produce_ungrammatical(self, num_strings=1, polish=True):
+        ungrammatical_sentences = set()
+        while len(ungrammatical_sentences) < num_strings:
+            sentence = self.produce_grammatical(1, polish=False)[0]
+            form, meaning = sentence
+            if meaning[0] == ' that ':
+                if random.choice([True, False]):
+                    # use noun phrase head without reversing it
+                    form = (form[1]+' ',) + form[1:]
+                else:
+                    # use last remaining token, not seen in training data
+                    form = (self.tokens[11]+' ',) + form[1:]
+            else:
+                # reduplicate noun phrase head without reversing it
+                form = (form[1]+' ',) + form[1:]
+            sentence = (tuple(form), meaning)
+            ungrammatical_sentences.add(sentence)
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+        return ungrammatical_sentences
+
+
 class CustomExperiment(Experiment):
 
     settings_used = SettingsEnabled()
@@ -996,16 +1075,17 @@ class CustomExperiment(Experiment):
 
     def __post_init__(self):
         my_grammars = [
-                        RhymingGrammar
-                        #EchoMorphologyGrammar,
-                        #EvidentialGrammar,
-                        #PresentParticipleGrammar,
-                        #LeadingCopulaGrammar,
-                        #WackernagelWordOrderGrammar,
-                        #VerbReduplicationGrammar,
-                        #VerbalAgreementGrammar,
-                        #AccusativeMarkingAgreementGrammar,
-                        #DefiniteArticleAgreementGrammar
+                        PalindromeDemonstrativeGrammar
+                        # RhymingGrammar,
+                        # EchoMorphologyGrammar,
+                        # EvidentialGrammar,
+                        # PresentParticipleGrammar,
+                        # LeadingCopulaGrammar,
+                        # WackernagelWordOrderGrammar,
+                        # VerbReduplicationGrammar,
+                        # VerbalAgreementGrammar,
+                        # AccusativeMarkingAgreementGrammar,
+                        # DefiniteArticleAgreementGrammar
                       ]
         first = True
         for grammar, tokens in zip(my_grammars, random.sample(TOKEN_SETS, k=len(my_grammars))):
