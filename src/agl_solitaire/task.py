@@ -56,8 +56,6 @@ class Task(Loggable, TaskState):
     def activate(self):
         """Set this as the Task currently being (or about to be) performed. Keep track of
         its state in the corresponding Settings object too."""
-        if self.active:
-            return
         self.settings.halted_task = self
         self.active = True
 
