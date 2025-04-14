@@ -157,8 +157,6 @@ class AccusativeMarkingAgreementGrammar(CustomGrammar):
             'ACC'        : self.tokens[11]
         }
 
-    # cool idea: [ 'a ', 'a ', 'a ', 'two ' ],  # skewing determiners' rate of occurrence
-
     def produce_grammatical(self, num_strings=1, polish=True):
         sentence_pattern_indef = [
             [ 'she ', 'he ' ],
@@ -1068,6 +1066,130 @@ class PalindromeDemonstrativeGrammar(CustomGrammar):
         return ungrammatical_sentences
 
 
+class PalindromePastGrammar(CustomGrammar):
+    """A grammar fragment where the past tense is indicated by the whole sentence
+    being the same read forwards and backwards."""
+
+    def __init__(self, tokens, rhymes):
+        super().__init__(tokens, rhymes)
+        def monosyll(string):
+            return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
+        while (monosyll(self.tokens[0]) or monosyll(self.tokens[1]) or monosyll(self.tokens[2])
+               or not monosyll(self.tokens[6]) or not monosyll(self.tokens[7])):
+            random.shuffle(self.tokens)
+        self.lexicon = {
+            'the mayor'          : self.tokens[0],
+            'the fortune-teller' : self.tokens[1],
+            'the sheriff'        : self.tokens[2],
+            'arrive'             : self.tokens[3],
+            'arrived'            : self.tokens[3],
+            'come'               : self.tokens[4],
+            'came'               : self.tokens[4],
+            'FUT'                : self.tokens[5],
+            'alone'              : self.tokens[6] + self.rev(self.tokens[6]),
+            'as well'            : self.tokens[7] + self.rev(self.tokens[7]),
+            'from'               : self.rev(self.tokens[4]),
+            'to'                 : self.rev(self.tokens[3]),
+            'the north'          : self.rev(self.tokens[2]),
+            'the south'          : self.rev(self.tokens[1]),
+            'the town square'    : self.rev(self.tokens[0])
+        }
+
+    def rev(_self, string):
+        """Return the same string backwards."""
+        rev_string = string[::-1]
+        rev_string = re.sub('hc', 'ch', rev_string)
+        rev_string = re.sub('hs', 'sh', rev_string)
+        rev_string = re.sub('hk', 'kh', rev_string)
+        return rev_string
+
+    def produce_grammatical(self, num_strings=1, polish=True):
+        subject_with_place = [
+            ('the mayor ', 'the town square'),
+            ('the sheriff ', 'the north'),
+            ('the fortune-teller ', 'the south')
+        ]
+        verb_with_direction = [
+            ('arrived ', ' to '),
+            ('came ', ' from ')
+        ]
+        adverb = [ '', '', ' alone', ' as well' ]
+        try:
+            while True:
+                sentences_past = [(sp[0], vd[0], a, vd[1], sp[1]) for sp, vd, a in itertools.product(subject_with_place, verb_with_direction, adverb)]
+                sentences_past = [(self.translate(s), s) for s in sentences_past]
+                sentences_past = random.sample(sentences_past, int(num_strings / 2 + 0.5))
+                # we might have got the same sentence twice on account of the double empty string
+                if len(sentences_past) == len(set(sentences_past)):
+                    break
+            sentence_pattern_fut = [
+                [ 'the mayor ', 'the sheriff ', 'the fortune-teller ' ],
+                [ 'arrive', 'come' ],
+                [ 'FUT' ],
+                [ '', '', ' alone ', ' as well ' ],
+                [ ' from ', ' to ' ],
+                [ 'the north', 'the south', 'the town square' ]
+            ]
+            while True:
+                sentences_fut = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_fut)]
+                sentences_fut = random.sample(sentences_fut, int(num_strings / 2 + 0.5))
+                # we might have got the same sentence twice on account of the double empty string
+                if len(sentences_fut) == len(set(sentences_fut)):
+                    break
+        except ValueError:
+            return None
+        # Martian is fine, rearrange English translations
+        sentences_past = [(mar, eng[0:2] + eng[3:] + (eng[2],)) for mar, eng in sentences_past]
+        sentences_fut = [(mar, eng[0:1] + ('will ',) + eng[1:2] + eng[4:] + (eng[3],)) for mar, eng in sentences_fut]
+        sentences = sentences_past + sentences_fut
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            sentences = polish_sentences(sentences)
+        random.shuffle(sentences)
+        return sentences
+
+    def produce_ungrammatical(self, num_strings=1, polish=True):
+        bad_pattern_past = [
+            [ 'the mayor ', 'the sheriff ', 'the fortune-teller ' ],
+            [ 'arrived', 'came' ],
+            [ '', '', ' alone ', ' as well ' ],
+            [ ' from ', ' to ' ],
+            [ 'the north', 'the south', 'the town square' ]
+        ]
+        def check_bad(sentence):
+            subject_with_place = [
+                ('the mayor ', 'the town square'),
+                ('the sheriff ', 'the north'),
+                ('the fortune-teller ', 'the south')
+            ]
+            verb_with_direction = [
+                ('arrived ', ' to '),
+                ('came ', ' from ')
+            ]
+            if (sentence[0], sentence[4]) in subject_with_place and (sentence[1], sentence[3]) in verb_with_direction:
+                return False
+            return True
+        bad_past_sentences = [(self.translate(s), s) for s in itertools.product(*bad_pattern_past) if check_bad(s)]
+        # Martian is fine, rearrange English translations
+        bad_past_sentences = [(mar, eng[0:2] + eng[3:] + (eng[2],)) for mar, eng in bad_past_sentences]
+        ungrammatical_sentences = set(random.sample(bad_past_sentences, k=int((num_strings+1)/2)))
+        while len(ungrammatical_sentences) < num_strings:
+            sentence = self.produce_grammatical(1, polish=False)[0]
+            form, meaning = sentence
+            if self.translate('FUT') not in form:
+                # try again
+                continue
+            assert form[2] == self.translate('FUT')
+            # put FUT morpheme on subject instead of the verb
+            form = (form[0][:-1],) + (form[2]+' ',) + form[1:2] + form[3:]
+            sentence = (tuple(form), meaning)
+            ungrammatical_sentences.add(sentence)
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+        return ungrammatical_sentences
+
+
 class CustomExperiment(Experiment):
 
     settings_used = SettingsEnabled()
@@ -1078,7 +1200,8 @@ class CustomExperiment(Experiment):
 
     def __post_init__(self):
         my_grammars = [
-                        PalindromeDemonstrativeGrammar
+                        PalindromePastGrammar
+                        # PalindromeDemonstrativeGrammar,
                         # RhymingGrammar,
                         # EchoMorphologyGrammar,
                         # EvidentialGrammar,
