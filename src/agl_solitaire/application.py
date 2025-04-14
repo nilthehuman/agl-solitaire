@@ -435,7 +435,7 @@ class Application(Loggable):
             assert experiment_to_run.ready()
             if stngs.run_questionnaire:
                 self.duplicate_print('A few questions before we begin. Feel free to answer as briefly or in as much detail as you like.')
-                self.duplicate_print('Your answers are going to be stored in the log file.')
+                self.duplicate_print('Your answers are going to be recorded in the log file.')
                 self.duplicate_print('Have you heard about artificial grammar learning experiments before?')
                 answer = input()
                 self.duplicate_print(answer, log_only=True)
