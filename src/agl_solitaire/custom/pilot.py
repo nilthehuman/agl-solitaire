@@ -1190,6 +1190,124 @@ class PalindromePastGrammar(CustomGrammar):
         return ungrammatical_sentences
 
 
+class RecursiveGrammar(CustomGrammar):
+    """A grammar fragment where possession needs to be overtly marked, and btw
+    the possessive structure can be self-nested arbitrarily deep."""
+
+    def __init__(self, tokens, rhymes):
+        super().__init__(tokens, rhymes)
+        def monosyll(string):
+            return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
+        while not monosyll(self.tokens[2]):
+            random.shuffle(self.tokens)
+        self.lexicon = {
+            'we'         : self.tokens[0],
+            'they'       : self.tokens[1],
+            'the'        : '',
+            'with the'   : '',
+            '\'s'        : self.tokens[2],
+            'archrival'  : self.tokens[3],
+            'brother'    : self.tokens[4],
+            'dog'        : self.tokens[5],
+            'friend'     : self.tokens[6],
+            'student'    : self.tokens[7],
+            'teacher'    : self.tokens[8],
+            'is brewing' : self.tokens[9],
+            'are brewing': self.tokens[9],
+            'is having'  : self.tokens[10],
+            'are having' : self.tokens[10],
+            'coffee'     : self.tokens[11],
+            'with us'    : self.tokens[0],
+            'with them'  : self.tokens[1]
+        }
+
+    def produce_grammatical(self, num_strings=1, polish=True):
+        recursables = [ 'archrival', 'brother', 'dog', 'friend', 'student', 'teacher' ]
+        sentence_pattern_sg_subject = [
+            [ 'the ' ],
+            recursables,
+            [ ' coffee ' ],
+            [ ' is brewing', ' is having' ],
+            [ ' with us', ' with them' ]
+        ]
+        sentence_pattern_pl_subject = [
+            [ 'we ', 'they ' ],
+            [ ' coffee ' ],
+            [ ' are brewing', ' are having' ],
+            [ ' with the '],
+            recursables
+        ]
+        def expand(sentence):
+            # expand the recursive structure
+            recursables_remaining = set(recursables)
+            if sentence[0] == 'the ':
+                recursables_remaining.remove(sentence[1])
+            else:
+                recursables_remaining.remove(sentence[4])
+            while random.choice([True, True, True, False]):
+                if not recursables_remaining:
+                    break
+                new_noun = random.choice(list(recursables_remaining))
+                if sentence[0] == 'the ':
+                    assert sentence[1] in recursables
+                    sentence = sentence[0:1] + (new_noun, '\'s ') + sentence[1:]
+                    recursables_remaining.remove(new_noun)
+                else:
+                    assert sentence[4] in recursables
+                    sentence = sentence[0:4] + (new_noun, '\'s ') + sentence[4:]
+                    recursables_remaining.remove(new_noun)
+            return sentence
+        sentences_sg_subject_basic = itertools.product(*sentence_pattern_sg_subject)
+        sentences_pl_subject_basic = itertools.product(*sentence_pattern_pl_subject)
+        sentences_sg_subject = set()
+        sentences_pl_subject = set()
+        sentences = set()
+        while len(sentences) < num_strings:
+            more_sentences_sg_subject = [expand(s) for s in sentences_sg_subject_basic]
+            sentences_sg_subject.update({(self.translate(s), s) for s in more_sentences_sg_subject})
+            # Martian is fine, reorder English translations
+            sentences_sg_subject = {(mar, (eng[0:-3] + (eng[-2],) + (eng[-3],) + eng[-1:])) for mar, eng in sentences_sg_subject}
+            more_sentences_pl_subject = [expand(s) for s in sentences_pl_subject_basic]
+            sentences_pl_subject.update({(self.translate(s), s) for s in more_sentences_pl_subject})
+            # Martian is fine, reorder English translations
+            sentences_pl_subject = {(mar, (eng[0:1] + (eng[2],) + (eng[1],) + eng[3:])) for mar, eng in sentences_pl_subject}
+            sentences = sentences_sg_subject.union(sentences_pl_subject)
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            sentences = polish_sentences(sentences)
+        sentences = list(sentences)
+        random.shuffle(sentences)
+        return sentences
+
+    def produce_ungrammatical(self, num_strings=1, polish=True):
+        ungrammatical_sentences = set()
+        while len(ungrammatical_sentences) < num_strings:
+            sentence = self.produce_grammatical(1, polish=False)[0]
+            form, meaning = sentence
+            done = False
+            while not done:
+                # remove at least one of the possessive morphemes
+                possessives = list(filter(lambda i: self.translate('\'s') == form[i].strip(), range(len(form))))
+                leave_possessive = [random.choice([True, True, True, False]) if i in possessives else True for i in range(len(form))]
+                done = not all(leave_possessive)
+                form = tuple([form[i] if leave_possessive[i] else ' ' for i in range(len(form))])
+                if random.choice([True, False, False, False]):
+                    # attach unnecessary possessive morpheme to the actual head
+                    recursables_in_martian = [self.translate(s) for s in ['archrival', 'brother', 'dog', 'friend', 'student', 'teacher']]
+                    for i in range(len(form)-1, 0, -1):
+                        if form[i] in recursables_in_martian:
+                            break
+                    assert form[i] in recursables_in_martian
+                    form = form[0:i+1] + (self.translate('\'s'),) + form[i+1:] # off by one?
+                    done = True
+            sentence = (tuple(form), meaning)
+            ungrammatical_sentences.add(sentence)
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+        return ungrammatical_sentences
+
+
 class CustomExperiment(Experiment):
 
     settings_used = SettingsEnabled()
@@ -1200,19 +1318,20 @@ class CustomExperiment(Experiment):
 
     def __post_init__(self):
         my_grammars = [
-                        PalindromePastGrammar
-                        # PalindromeDemonstrativeGrammar,
-                        # RhymingGrammar,
-                        # EchoMorphologyGrammar,
-                        # EvidentialGrammar,
-                        # PresentParticipleGrammar,
-                        # LeadingCopulaGrammar,
-                        # WackernagelWordOrderGrammar,
-                        # VerbReduplicationGrammar,
-                        # VerbalAgreementGrammar,
-                        # AccusativeMarkingAgreementGrammar,
-                        # DefiniteArticleAgreementGrammar
-                      ]
+            #DefiniteArticleAgreementGrammar,
+            #AccusativeMarkingAgreementGrammar,
+            #VerbalAgreementGrammar,
+            #VerbReduplicationGrammar,
+            #WackernagelWordOrderGrammar,
+            #LeadingCopulaGrammar,
+            #PresentParticipleGrammar,
+            #EvidentialGrammar,
+            #EchoMorphologyGrammar,
+            #RhymingGrammar,
+            #PalindromeDemonstrativeGrammar,
+            #PalindromePastGrammar,
+            RecursiveGrammar
+        ]
         first = True
         for grammar, tokens in zip(my_grammars, random.sample(TOKEN_SETS, k=len(my_grammars))):
             random.shuffle(tokens)
