@@ -156,14 +156,16 @@ class Application(Loggable):
         except Exception:
             print('error: loading experiment from file failed')
             return
-        if settings_and_gmr.grammar is None:
-            print('error: file does not include a grammar')
-            return
-        try:
-            get_grammar_from_obfuscated_repr(settings_and_gmr)
-        except ValueError:
-            print('error: loading grammar from file failed')
-            return
+        if settings_and_gmr.halted_task is None or not settings_and_gmr.halted_task.ready():
+            if settings_and_gmr.grammar is None:
+                print('error: file does not include a grammar or a paused experiment')
+                return
+            try:
+                get_grammar_from_obfuscated_repr(settings_and_gmr)
+            except ValueError:
+                print('error: loading grammar from file failed')
+                return
+            settings_and_gmr.halted_task = task_state.TaskState(settings_and_gmr)
         print(f"Experiment loaded from '{settings_and_gmr.filename}'.")
         if not self.settings.settings_equal(settings_and_gmr):
             print('warning: your current settings differ from those loaded from file:\n')
