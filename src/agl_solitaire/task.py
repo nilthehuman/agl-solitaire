@@ -61,9 +61,8 @@ class Task(Loggable, TaskState):
 
     def deactivate(self):
         """Stop tracking the state of this Task in the Settings object."""
-        if not self.active:
-            return
-        self.settings.halted_task = None
+        # sic: keep last Task in Settings in case user wants to repeat it
+        #self.settings.halted_task = None
         self.active = False
 
     def resume(self, task_state):
