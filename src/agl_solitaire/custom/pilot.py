@@ -1318,18 +1318,18 @@ class CustomExperiment(Experiment):
 
     def __post_init__(self):
         my_grammars = [
-            #DefiniteArticleAgreementGrammar,
-            #AccusativeMarkingAgreementGrammar,
-            #VerbalAgreementGrammar,
-            #VerbReduplicationGrammar,
-            #WackernagelWordOrderGrammar,
-            #LeadingCopulaGrammar,
-            #PresentParticipleGrammar,
-            #EvidentialGrammar,
-            #EchoMorphologyGrammar,
-            #RhymingGrammar,
-            #PalindromeDemonstrativeGrammar,
-            #PalindromePastGrammar,
+            DefiniteArticleAgreementGrammar,
+            AccusativeMarkingAgreementGrammar,
+            VerbalAgreementGrammar,
+            VerbReduplicationGrammar,
+            WackernagelWordOrderGrammar,
+            LeadingCopulaGrammar,
+            PresentParticipleGrammar,
+            EvidentialGrammar,
+            EchoMorphologyGrammar,
+            RhymingGrammar,
+            PalindromeDemonstrativeGrammar,
+            PalindromePastGrammar,
             RecursiveGrammar
         ]
         first = True
