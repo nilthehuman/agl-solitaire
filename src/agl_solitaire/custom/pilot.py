@@ -1163,8 +1163,8 @@ class PalindromePastGrammar(CustomGrammar):
                 ('the fortune-teller ', 'the south')
             ]
             verb_with_direction = [
-                ('arrived ', ' to '),
-                ('came ', ' from ')
+                ('arrived', ' to '),
+                ('came', ' from ')
             ]
             if (sentence[0], sentence[4]) in subject_with_place and (sentence[1], sentence[3]) in verb_with_direction:
                 return False
