@@ -16,6 +16,8 @@ class Experiment(Loggable):
     tasks:      list[task.Task] = dataclasses.field(default_factory = lambda: [])
     tasks_done: int = 0
 
+    # TODO:
+    #recommended_settings = None
     # N.B.: class variable, not an object variable
     settings_used = settings.SettingsEnabled()
 
