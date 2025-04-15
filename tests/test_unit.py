@@ -280,3 +280,6 @@ def test_grammar_predefined_knowlton_squire_1994_II():
     assert not grammar.KNOWLTON_SQUIRE_1994_II.recognize("PTSF")
     assert not grammar.KNOWLTON_SQUIRE_1994_II.recognize("TFT")
     assert not grammar.KNOWLTON_SQUIRE_1994_II.recognize("TPTPPT")
+
+
+# TODO: Settings badly needs some unit tests, especially for saving/loading

@@ -303,12 +303,15 @@ class Settings:
                     elif 'halted_task' == field.name and self.halted_task is None:
                         continue
                     value = getattr(self, field.name)
-                    # string_tokens may be a list of strings or a list of individual letters
-                    if 'string_tokens' == field.name:
-                        config['DEFAULT'][field.name] = ' '.join(self.string_tokens)
+                    if 'grammar_class' == field.name:
+                        # writing grammar class without quotes causes loading to fail
+                        value = str(value)
+                    elif 'string_tokens' == field.name:
+                        # string_tokens may be a list of strings or a list of individual letters
+                        value = ' '.join(self.string_tokens)
                     elif 'halted_task' == field.name:
                         # serialize to byte string
-                        config['DEFAULT'][field.name] = str(pickle.dumps(self.halted_task))
+                        value = str(pickle.dumps(self.halted_task))
                     if type(value) is str:
                         # N.B.: can't use repr(value) because Python and TOML treat single quotes
                         # differently: Python interpolates inside single quotes but TOML does not
