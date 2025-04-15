@@ -36,7 +36,7 @@ TOKEN_SETS = [
     [ 'atta', 'bara', 'de', 'hi', 'lo', 'mbe', 'ope', 'pek', 'tunde', 'u', 'vym', 'wal' ],
     [ 'an', 'fer', 'ho', 'je', 'mata', 'nin', 'ob', 'pirra', 'samu', 'ten', 'toma', 'wu' ],
     [ 'bevish', 'el', 'go', 'kabu', 'mbene', 'milen', 'nau', 'nish', 'ruu', 'ter', 'tin', 'vi' ],
-    [ 'anga', 'bara', 'gii', 'hol', 'lato', 'momma', 'pede', 'pau', 'polo', 'se', 'tai', 'to' ],
+    [ 'anga', 'bara', 'em', 'gii', 'hol', 'lato', 'momma', 'pede', 'polo', 'se', 'tai', 'to' ],
     [ 'bi', 'chari', 'kon', 'koro', 'ma', 'mata', 'nga', 'por', 'ru', 'tolo', 'vende', 'ye' ]
 ]
 for tokens in TOKEN_SETS:
