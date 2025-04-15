@@ -33,7 +33,10 @@ class Experiment(Loggable):
             ### ### ### ### ### ###
             if not success:
                 return False
-        random.shuffle(self.tasks)
+        unanchored_tasks = [t for t in self.tasks if not t.anchored_to_end]
+        anchored_tasks   = [t for t in self.tasks if t.anchored_to_end]
+        random.shuffle(unanchored_tasks)
+        self.tasks = unanchored_tasks + anchored_tasks
         return True
 
     def ready(self):
@@ -46,7 +49,8 @@ class Experiment(Loggable):
         for i, task in enumerate(remaining_tasks):
             if 1 < len(self.tasks):
                 clear()
-                self.duplicate_print(f"***  Welcome to Challenge #{i+1} out of {len(self.tasks)}  ***\n")
+                num_challenges = len([t for t in self.tasks if not t.anchored_to_end])
+                self.duplicate_print(f"***  Welcome to Challenge #{i+1} out of {num_challenges}  ***\n")
             ### ### ### ### ### ###
             task.run()
             ### ### ### ### ### ###
@@ -67,13 +71,14 @@ class Experiment(Loggable):
                 self.duplicate_print(f"And now for the big reveal... Strings were generated using the following {self.settings.grammar_class} grammar:")
                 gmr = get_grammar_from_obfuscated_repr(self.settings)
                 self.duplicate_print(str(gmr))
-            correct = sum(item[1] == item[2] for item in task.test_set)
-            self.duplicate_print(f"You gave {correct} correct answers out of {len(task.test_set)} ({100 * correct/len(task.test_set):.0f}%). The answers were the following:")
-            # make table columns wider if needed
-            width = max(16, 2 + max(len(item[0]) for item in task.test_set))
-            self.duplicate_print(f"{'Test string':<{width}}{'Correct answer':<16}{'Your answer':<16}")
-            for item in task.test_set:
-                self.duplicate_print(f"{item[0]:<{width}}{'yes' if 'y' == item[1] else 'no':<16}{'yes' if 'y' == item[2] else 'no':<16}")
+            if task.test_set:
+                correct = sum(item[1] == item[2] for item in task.test_set)
+                self.duplicate_print(f"You gave {correct} correct answers out of {len(task.test_set)} ({100 * correct/len(task.test_set):.0f}%). The answers were the following:")
+                # make table columns wider if needed
+                width = max(16, 2 + max(len(item[0]) for item in task.test_set))
+                self.duplicate_print(f"{'Test string':<{width}}{'Correct answer':<16}{'Your answer':<16}")
+                for item in task.test_set:
+                    self.duplicate_print(f"{item[0]:<{width}}{'yes' if 'y' == item[1] else 'no':<16}{'yes' if 'y' == item[2] else 'no':<16}")
             self.duplicate_print('You now have a chance to add any other post hoc notes or comments for the record if you wish. Please enter an empty line when you\'re done:')
             comments = '\n'.join(iter(input, ''))
             self.duplicate_print(comments, log_only=True)

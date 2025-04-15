@@ -41,9 +41,10 @@ class Task(Loggable, TaskState):
     This class provides a default implementation that may be overridden by more specific
     custom Tasks."""
 
-    settings: Settings
-    grammar:  typing.Optional[Grammar] = None
-    active:   bool = False  # is this Task underway (or queued up next)
+    settings:        Settings
+    grammar:         typing.Optional[Grammar] = None
+    active:          bool = False  # is this Task underway (or queued up next)
+    anchored_to_end: bool = False  # is this Task to be performed after the main part
 
     def __post_init__(self):
         """If this is the currently active Task, register it in the Settings it belongs to."""
