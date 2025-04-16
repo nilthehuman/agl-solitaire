@@ -422,8 +422,8 @@ class Application(Loggable):
         try:
             if stngs is None:
                 stngs = self.settings
-            assert stngs.halted_task is not None or stngs.grammar is not None
             if not stngs.grammar_class.custom():
+                assert stngs.halted_task is not None or stngs.grammar is not None
                 experiment_to_run = experiment.Experiment(stngs)
             else:
                 custom_module = sys.modules[custom_helpers.CUSTOM_MODULE_PREFIX + self.settings.grammar_class.name]
