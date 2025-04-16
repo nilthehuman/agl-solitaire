@@ -22,7 +22,9 @@ class Experiment(Loggable):
     settings_used = settings.SettingsEnabled()
 
     def __post_init__(self):
-        """By default, create one vanilla default task, unless there's a paused task from before."""
+        """By default, create one vanilla default task."""
+        if self.settings.halted_task is not None:
+            self.tasks_done = self.settings.tasks_done
         self.tasks.append(task.Task(settings=self.settings, active=True))
 
     def prepare(self):
@@ -46,7 +48,7 @@ class Experiment(Loggable):
     def run(self):
         """Let the user perform all tasks of the experiment in order."""
         remaining_tasks = self.tasks[self.tasks_done:]
-        for i, task in enumerate(remaining_tasks):
+        for i, task in [(n + self.tasks_done, t) for n, t in enumerate(remaining_tasks)]:
             if 1 < len(self.tasks):
                 clear()
                 num_challenges = len([t for t in self.tasks if not t.anchored_to_end])
@@ -55,6 +57,7 @@ class Experiment(Loggable):
             task.run()
             ### ### ### ### ### ###
             self.tasks_done += 1
+            self.settings.tasks_done += 1
             if self.settings.run_questionnaire:
                 self.duplicate_print('A few more questions if you feel like it:')
                 self.duplicate_print('Did you feel like you got the hang of the grammar or were you just guessing?')

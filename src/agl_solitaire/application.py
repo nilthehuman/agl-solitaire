@@ -166,6 +166,7 @@ class Application(Loggable):
                 print('error: loading grammar from file failed')
                 return
             settings_and_gmr.halted_task = task_state.TaskState(settings_and_gmr)
+            settings_and_gmr.tasks_done = 0
         print(f"Experiment loaded from '{settings_and_gmr.filename}'.")
         if not self.settings.settings_equal(settings_and_gmr):
             print('warning: your current settings differ from those loaded from file:\n')
@@ -195,6 +196,7 @@ class Application(Loggable):
             else:
                 def callback():
                     settings_and_gmr.halted_task = task_state.TaskState(settings_and_gmr)
+                    settings_and_gmr.tasks_done = 0
                 settings_and_gmr.without_autosave(callback)
         self.run_experiment(settings_and_gmr)
 
@@ -411,6 +413,7 @@ class Application(Loggable):
                 return
             self.settings.grammar = gmr.obfuscated_repr()
         self.settings.halted_task = None
+        self.settings.tasks_done = 0
         self.run_experiment()
 
     def run_experiment(self, stngs=None):

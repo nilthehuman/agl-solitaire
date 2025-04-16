@@ -58,8 +58,9 @@ class Settings:
     email_logs:                 bool = True
     grammar:                    typing.Optional[str] = None
     halted_task:                typing.Optional[TaskState] = None
+    tasks_done:                 int = 0
 
-    HOUSEKEEPING_MEMBERS = ['filename', 'grammar', 'halted_task']
+    HOUSEKEEPING_MEMBERS = ['filename', 'grammar', 'halted_task', 'tasks_done']
 
     def settings_equal(self, other):
         """Check if all options are equal except irrelevant ones."""
@@ -123,7 +124,7 @@ class Settings:
         settings_used = SettingsEnabled()
         if self.grammar_class.custom():
             mod = sys.modules[custom_helpers.CUSTOM_MODULE_PREFIX + self.grammar_class.name]
-            settings_used = mod.CustomTask.settings_used
+            settings_used = mod.CustomExperiment.settings_used
         pretty = ''
         pretty += f"Username: {self.username}\n"
         if settings_used.training_strings:

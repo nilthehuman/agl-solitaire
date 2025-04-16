@@ -1317,6 +1317,7 @@ class CustomExperiment(Experiment):
     settings_used.recursion = False
 
     def __post_init__(self):
+        super().__post_init__()
         my_grammars = [
             DefiniteArticleAgreementGrammar,
             AccusativeMarkingAgreementGrammar,
@@ -1332,14 +1333,15 @@ class CustomExperiment(Experiment):
             PalindromePastGrammar,
             RecursiveGrammar
         ]
-        first = True
+        # remove default Task created by base class
+        self.tasks = []
         for grammar, tokens in zip(my_grammars, random.sample(TOKEN_SETS, k=len(my_grammars))):
             random.shuffle(tokens)
-            custom_task = Task(settings=self.settings, active=True if first else False)
+            custom_task = Task(settings=self.settings, active=True if self.tasks_done == len(self.tasks) else False)
             try:
                 custom_task.grammar = grammar(tokens)
             except TypeError:
                 random.shuffle(RHYMES)
                 custom_task.grammar = grammar(tokens=tokens, rhymes=RHYMES)
             self.tasks.append(custom_task)
-            first = False
+        assert all(task.grammar is not None for task in self.tasks)
