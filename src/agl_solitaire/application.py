@@ -441,7 +441,8 @@ class Application(Loggable):
                     return
                 self.duplicate_print('Done.')
             assert experiment_to_run.ready()
-            if stngs.run_questionnaire:
+            # FIXME: the latter condition is too broad, you need to use a specific variable here
+            if stngs.run_questionnaire and (not experiment_to_run.tasks_done and not experiment_to_run.tasks[0].training_finished):
                 self.duplicate_print('A few questions before we begin. Feel free to answer as briefly or in as much detail as you like.')
                 self.duplicate_print('Your answers are going to be recorded in the log file.')
                 self.duplicate_print('Have you heard about artificial grammar learning experiments before?')
