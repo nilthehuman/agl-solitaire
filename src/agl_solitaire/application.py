@@ -487,6 +487,8 @@ class Application(Loggable):
                             go_ahead = True
                     except Exception:
                         print('Failed, reason unknown. Sorry. :(')
+            print()
+            self.duplicate_print('Experiment finished. Thank you for playing!')
         except KeyboardInterrupt:
             print()
             self.duplicate_print(f"Experiment halted by user. Progress saved to '{stngs.filename}'.")
