@@ -181,7 +181,8 @@ class Application(Loggable):
             self.duplicate_print('=' * 120, log_only=True)
             self.duplicate_print('You are now starting a previously generated experiment:')
             self.duplicate_print(settings_and_gmr.pretty_short())
-        elif any(judgement is None for (_, _, judgement) in settings_and_gmr.halted_task.test_set):
+        # FIXME: avoid else branch for now because we don't have the right apparatus for these conditions
+        elif True or any(judgement is None for (_, _, judgement) in settings_and_gmr.halted_task.test_set):
             self.duplicate_print('You are now resuming a previously paused session.')
         else:
             print('You have loaded a previously completed experiment. Do you want to repeat the same experiment all over again? (y/n)')
