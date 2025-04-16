@@ -35,10 +35,6 @@ class Experiment(Loggable):
             ### ### ### ### ### ###
             if not success:
                 return False
-        unanchored_tasks = [t for t in self.tasks if not t.anchored_to_end]
-        anchored_tasks   = [t for t in self.tasks if t.anchored_to_end]
-        random.shuffle(unanchored_tasks)
-        self.tasks = unanchored_tasks + anchored_tasks
         return True
 
     def ready(self):
