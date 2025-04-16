@@ -42,18 +42,18 @@ class Settings:
     filename:                   typing.Optional[str] = None
     username:                   str = 'anonymous'
     grammar_class:              GrammarClass = GrammarClass.REGULAR
-    training_strings:           int = 20
-    training_time:              int = 300
+    training_strings:           int = 15
+    training_time:              int = 180
     training_reps:              int = 1
-    test_strings_grammatical:   int = 20
-    test_strings_ungrammatical: int = 20
+    test_strings_grammatical:   int = 5
+    test_strings_ungrammatical: int = 5
     minimum_string_length:      int = 2
     maximum_string_length:      int = 8
     string_tokens:              list[str] = dataclasses.field(default_factory = lambda: ['M', 'R', 'S', 'V', 'X'])
     recursion:                  bool = True
     # idea: test_strings_reuse_from_training?
     logfile_filename:           str = 'agl_sessions.log'
-    training_one_at_a_time:     bool = True
+    training_one_at_a_time:     bool = False
     run_questionnaire:          bool = True
     email_logs:                 bool = True
     grammar:                    typing.Optional[str] = None
