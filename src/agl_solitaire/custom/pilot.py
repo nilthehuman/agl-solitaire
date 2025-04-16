@@ -35,9 +35,9 @@ TOKEN_SETS = [
     [ 'baa', 'ber', 'dem', 'koko', 'mem', 'nuo', 'pin', 'sa', 'sil', 'tan', 'usu', 'yppo' ],
     [ 'atta', 'bara', 'de', 'hi', 'lo', 'mbe', 'ope', 'pek', 'tunde', 'u', 'vym', 'wal' ],
     [ 'an', 'fer', 'ho', 'je', 'mata', 'nin', 'ob', 'pirra', 'samu', 'ten', 'toma', 'wu' ],
-    [ 'bevish', 'el', 'go', 'kabu', 'mbene', 'milen', 'nau', 'nish', 'ruu', 'ter', 'tin', 'vi' ],
+    [ 'bevish', 'el', 'go', 'kabu', 'mata', 'milen', 'nau', 'nish', 'ruu', 'ter', 'tin', 'vi' ],
     [ 'anga', 'bara', 'em', 'gii', 'hol', 'lato', 'momma', 'pede', 'polo', 'se', 'tai', 'to' ],
-    [ 'bi', 'chari', 'kon', 'koro', 'ma', 'mata', 'nga', 'por', 'ru', 'tolo', 'vende', 'ye' ]
+    [ 'bi', 'chari', 'kon', 'koro', 'ma', 'mbene', 'nga', 'por', 'ru', 'tolo', 'vende', 'ye' ]
 ]
 for tokens in TOKEN_SETS:
     assert len(tokens) == 12
