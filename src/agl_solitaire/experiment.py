@@ -45,8 +45,8 @@ class Experiment(Loggable):
         """Let the user perform all tasks of the experiment in order."""
         remaining_tasks = self.tasks[self.tasks_done:]
         for i, task in [(n + self.tasks_done, t) for n, t in enumerate(remaining_tasks)]:
-            if 1 < len(self.tasks):
-                clear()
+            clear()
+            if 1 < len(self.tasks) and not task.anchored_to_end:
                 num_challenges = len([t for t in self.tasks if not t.anchored_to_end])
                 self.duplicate_print(f"***  Welcome to Challenge #{i+1} out of {num_challenges}  ***\n")
             ### ### ### ### ### ###
@@ -54,7 +54,7 @@ class Experiment(Loggable):
             ### ### ### ### ### ###
             self.tasks_done += 1
             self.settings.tasks_done += 1
-            if self.settings.run_questionnaire:
+            if self.settings.run_questionnaire and not task.anchored_to_end:
                 self.duplicate_print('A few more questions if you feel like it:')
                 self.duplicate_print('Did you feel like you got the hang of the grammar or were you just guessing?')
                 answer = input()

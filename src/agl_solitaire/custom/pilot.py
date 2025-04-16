@@ -13,7 +13,7 @@ from src.agl_solitaire.experiment import Experiment
 from src.agl_solitaire.grammar import CustomGrammar
 from src.agl_solitaire.settings import SettingsEnabled
 from src.agl_solitaire.task import Task
-from src.agl_solitaire.utils import polish_sentences
+from src.agl_solitaire.utils import clear, input, polish_sentences, Loggable
 
 
 TOKEN_SETS = [
@@ -1308,12 +1308,42 @@ class RecursiveGrammar(CustomGrammar):
         return ungrammatical_sentences
 
 
-# class NaturalnessJudgementTask(Task):
-#     def ready(self):
-#         return True
-#     def run(self):
-#         # TODO
-#         print("NaturalnessJudgementTask :)")
+class NaturalnessJudgementTask(Task, Loggable):
+    """See how participant rates a few plain English stimuli."""
+
+    def ready(self):
+        return True
+
+    def run(self):
+        sentences = [
+            'You caught me off guard.',
+            'Little do they know, I have my own plans for these giraffes.',
+            'Taco cat has a cool look.',
+            'Tough though the subject matter is, it is universally relevant.',
+            'Our flowers bloom outside the room.',
+            'Madam in Eden, I\'m Adam.',
+            'Silent stood the ancient trees.'
+        ]
+        self.duplicate_print(
+'''And now for the easiest part! You will be asked to rate a few different English sentences as to how natural they sound on
+a scale of 1 to 7. Feel free to include any further comments alongside a number, e.g. '3, sounds odd' or similar.'''
+        )
+        self.duplicate_print(f"You will be shown {len(sentences)} sentences total and then you're done. Press return when you are ready.")
+        input()
+        for i, sentence in enumerate(sentences):
+            clear()
+            self.duplicate_print(f"Sentence #{i+1} out of {len(sentences)}. How natural would you rate the following sentence on a scale of 1 to 7?")
+            print()
+            self.duplicate_print(sentence)
+            while True:
+                answer = ''
+                while not answer:
+                    answer = input()
+                self.duplicate_print(answer, log_only=True)
+                if not any(c.isdigit() for c in answer):
+                    self.duplicate_print('Please include a numerical rating in your answer.')
+                else:
+                    break
 
 
 class CustomExperiment(Experiment):
@@ -1369,10 +1399,10 @@ class CustomExperiment(Experiment):
                 custom_task.grammar = grammar(tokens=tokens, rhymes=RHYMES)
             self.tasks.append(custom_task)
         assert all(task.grammar is not None for task in self.tasks)
-        # naturalness_task = NaturalnessJudgementTask(settings=(self.settings),
-        #                                             active=True if self.tasks_done == 13 else False,
-        #                                             anchored_to_end=True)
-        # self.tasks.append(naturalness_task)
+        naturalness_task = NaturalnessJudgementTask(settings=(self.settings),
+                                                    active=True if self.tasks_done == 13 else False,
+                                                    anchored_to_end=True)
+        self.tasks.append(naturalness_task)
         # unanchored_tasks = [t for t in self.tasks if not t.anchored_to_end]
         # anchored_tasks   = [t for t in self.tasks if t.anchored_to_end]
         # random.shuffle(unanchored_tasks)
