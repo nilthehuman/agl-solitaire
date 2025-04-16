@@ -28,6 +28,15 @@ _builtin_print = print
 
 def print(string='', end='\n'):
     """Smarter print function, adds left margin and wraps long lines automatically."""
+    # add some color to make settings keys and error messages pop too
+    if type(string) is str:
+        try:
+            string = re.sub(r"\[(\w)\]", r'[\033[94m\1\033[0m]', string)  # light blue
+            string = re.sub(r"warning:", r'\033[33mwarning:\033[0m', string)  # yellow
+            string = re.sub(r"error:", r'\033[31merror:\033[0m', string)  # red
+        except re.PatternError:
+            # pattern not found, that's fine
+            pass
     max_width = os.get_terminal_size().columns
     wrapped_string = ''
     string = str(string)
