@@ -7,6 +7,7 @@ try:
 except ImportError:
     import pickle
 import enum
+import os.path
 import sys
 try:
     import tomllib
@@ -21,8 +22,9 @@ from src.agl_solitaire import version
 from src.agl_solitaire.experiment_state import TaskState, ExperimentState
 
 
-_DEFAULT_INI_FILENAME  = 'settings.ini'
-_DEFAULT_TOML_FILENAME = 'settings.toml'
+_PROJECT_ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '..'))
+_DEFAULT_INI_FILENAME  = os.path.join(_PROJECT_ROOT_DIR, 'settings.ini')
+_DEFAULT_TOML_FILENAME = os.path.join(_PROJECT_ROOT_DIR, 'settings.toml')
 
 
 GrammarClass = enum.StrEnum('GrammarClass', {name:name.lower() for name in ['REGULAR', 'PATTERN'] + custom_helpers.get_custom_experiment_names()})
@@ -216,10 +218,10 @@ class Settings:
             filename = self.filename
         # FIXME: ugly kludge, but .ini is the "more supported" type anyways
         if not filename:
-            filename = _DEFAULT_INI_FILENAME
+            filename = os.path.join(_PROJECT_ROOT_DIR, _DEFAULT_INI_FILENAME)
         my_version = self.version
         # figure out format from the tail end of the filename
-        if _TOMLLIB_AVAILABLE and 4 < len(filename) and 'toml' == filename[-4:].lower():
+        if _TOMLLIB_AVAILABLE and 'toml' == os.path.splitext(filename)[1].lower():
             self.load_all_from_toml(filename)
         else:
             # default to old format
