@@ -40,6 +40,7 @@ class Settings:
     """User options for controlling the details of the experimental paradigm."""
 
     filename:                   typing.Optional[str] = None
+    autosave:                   bool = False
     username:                   str = 'anonymous'
     grammar_class:              GrammarClass = GrammarClass.REGULAR
     training_strings:           int = 15
@@ -59,7 +60,7 @@ class Settings:
     grammar:                    typing.Optional[str] = None
     halted_experiment:          typing.Optional[ExperimentState] = None
 
-    HOUSEKEEPING_MEMBERS = ['filename', 'grammar', 'halted_experiment']
+    HOUSEKEEPING_MEMBERS = ['filename', 'grammar', 'halted_experiment', 'autosave']
 
     def settings_equal(self, other):
         """Check if all options are equal except irrelevant ones."""
@@ -263,7 +264,7 @@ class Settings:
             self.without_autosave(callback)
         config = configparser.ConfigParser()
         for field in dataclasses.fields(self):
-            if 'filename' == field.name:
+            if 'filename' == field.name or 'autosave' == field.name:
                 continue
             elif 'grammar' == field.name and self.grammar is None:
                 continue
@@ -291,7 +292,7 @@ class Settings:
                 self.filename = filename
             with open(self.filename, 'w', encoding='UTF-8') as configfile:
                 for field in dataclasses.fields(self):
-                    if 'filename' == field.name:
+                    if 'filename' == field.name or 'autosave' == field.name:
                         continue
                     elif 'grammar' == field.name and self.grammar is None:
                         continue
