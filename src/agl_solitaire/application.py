@@ -484,6 +484,11 @@ class Application(Loggable):
                         print('Failed, reason unknown. Sorry. :(')
             print()
             self.duplicate_print('Experiment finished. Thank you for playing!')
+            print()
+            print("\033[31m*** *** *** *** *** *** *** *** *** *** *** ***")
+            print("***   Boldog születésnapot, Szilárd! <3 <3  ***")
+            print("***       Köszi, hogy végignyomtad! ;)      ***")
+            print("*** *** *** *** *** *** *** *** *** *** *** ***\033[0m")
         except KeyboardInterrupt:
             print()
             self.duplicate_print(f"Experiment halted by user. Progress saved to '{stngs.filename}'.")
