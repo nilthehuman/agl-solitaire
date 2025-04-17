@@ -17,7 +17,7 @@ import typing
 
 
 from src.agl_solitaire import custom_helpers
-from src.agl_solitaire.task_state import TaskState
+from src.agl_solitaire.experiment_state import TaskState, ExperimentState
 
 
 _DEFAULT_INI_FILENAME  = 'settings.ini'
@@ -57,10 +57,9 @@ class Settings:
     run_questionnaire:          bool = True
     email_logs:                 bool = True
     grammar:                    typing.Optional[str] = None
-    halted_task:                typing.Optional[TaskState] = None
-    tasks_done:                 int = 0
+    halted_experiment:          typing.Optional[ExperimentState] = None
 
-    HOUSEKEEPING_MEMBERS = ['filename', 'grammar', 'halted_task', 'tasks_done']
+    HOUSEKEEPING_MEMBERS = ['filename', 'grammar', 'halted_experiment']
 
     def settings_equal(self, other):
         """Check if all options are equal except irrelevant ones."""
@@ -183,25 +182,24 @@ class Settings:
                 parsed_value = str(value).lower() in ['true', 'yes', '1']
             if 'string_tokens' == attr_name:
                 parsed_value = ''.join(value).split()
-            # FIXME: is this a dead branch? get rid of duplicate code below
-            if 'halted_task' == attr_name:
-                # deserialize from byte string
-                parsed_value = pickle.loads(eval(value))
-                if not hasattr(parsed_value, 'settings'):
-                    parsed_value.settings = self
             setattr(self, attr_name, parsed_value)
         except TypeError:
             # value is None which you cannot cast to
             assert getattr(self, attr_name) is None
+            if 'grammar' == attr_name:
+                assert type(value) is str
+                setattr(self, attr_name, value)
+                return
             try:
                 # see if this string is really a binary string in disguise
-                value = pickle.loads(eval(value))
-                if not hasattr(value, 'settings'):
-                    value.settings = self
-            except Exception:
+                unpickled_value = pickle.loads(eval(value))
+                setattr(self, attr_name, unpickled_value)
+                if hasattr(unpickled_value, 'settings') and unpickled_value.settings is None:
+                    unpickled_value.set_settings(self)
+            except Exception as e:
                 # nevermind
+                raise e
                 pass
-            setattr(self, attr_name, value)
         except AttributeError:
             pass  # doesn't matter
 
@@ -227,8 +225,6 @@ class Settings:
         for section in config:
             for attr_name in config[section]:
                 self.process_loaded_entry(attr_name, config[section][attr_name])
-        if self.halted_task is not None:
-            self.halted_task.settings = self
         self.autosave = True
 
     if _TOMLLIB_AVAILABLE:
@@ -246,8 +242,6 @@ class Settings:
                         self.process_loaded_entry(subkey, settings_dict[key][subkey])
                 else:
                     self.process_loaded_entry(key, settings_dict[key])
-            if self.halted_task is not None:
-                self.halted_task.settings = self
             self.autosave = True
 
     def save_all(self, filename=None):
@@ -273,15 +267,15 @@ class Settings:
                 continue
             elif 'grammar' == field.name and self.grammar is None:
                 continue
-            elif 'halted_task' == field.name and self.halted_task is None:
+            elif 'halted_experiment' == field.name and self.halted_experiment is None:
                 continue
             # the string_tokens variable is a list of strings internally
             elif 'string_tokens' == field.name:
                 # string_tokens may be a list of strings or a list of individual letters
                 string_value = ' '.join(self.string_tokens)
-            elif 'halted_task' == field.name:
+            elif 'halted_experiment' == field.name:
                 # serialize to byte string
-                string_value = str(pickle.dumps(self.halted_task))
+                string_value = str(pickle.dumps(self.halted_experiment))
             else:
                 string_value = str(getattr(self, field.name))
             # configparser will try to interpolate the string and cry
@@ -301,7 +295,7 @@ class Settings:
                         continue
                     elif 'grammar' == field.name and self.grammar is None:
                         continue
-                    elif 'halted_task' == field.name and self.halted_task is None:
+                    elif 'halted_experiment' == field.name and self.halted_experiment is None:
                         continue
                     value = getattr(self, field.name)
                     if 'grammar_class' == field.name:
@@ -310,9 +304,9 @@ class Settings:
                     elif 'string_tokens' == field.name:
                         # string_tokens may be a list of strings or a list of individual letters
                         value = ' '.join(self.string_tokens)
-                    elif 'halted_task' == field.name:
+                    elif 'halted_experiment' == field.name:
                         # serialize to byte string
-                        value = str(pickle.dumps(self.halted_task))
+                        value = str(pickle.dumps(self.halted_experiment))
                     if type(value) is str:
                         # N.B.: can't use repr(value) because Python and TOML treat single quotes
                         # differently: Python interpolates inside single quotes but TOML does not

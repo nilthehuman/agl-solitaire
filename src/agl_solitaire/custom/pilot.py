@@ -13,7 +13,7 @@ from src.agl_solitaire.experiment import Experiment
 from src.agl_solitaire.grammar import CustomGrammar
 from src.agl_solitaire.settings import SettingsEnabled
 from src.agl_solitaire.task import Task
-from src.agl_solitaire.utils import clear, input, polish_sentences, Loggable
+from src.agl_solitaire.utils import clear, print, input, polish_sentences, Loggable
 
 
 TOKEN_SETS = [
@@ -1311,7 +1311,10 @@ class RecursiveGrammar(CustomGrammar):
 class NaturalnessJudgementTask(Task, Loggable):
     """See how participant rates a few plain English stimuli."""
 
-    def ready(self):
+    def ready_to_produce(self):
+        return True
+
+    def ready_to_run(self):
         return True
 
     def run(self):
@@ -1354,44 +1357,36 @@ class CustomExperiment(Experiment):
     settings_used.string_tokens = False
     settings_used.recursion = False
 
+    my_grammars = [
+        DefiniteArticleAgreementGrammar,
+        AccusativeMarkingAgreementGrammar,
+        VerbalAgreementGrammar,
+        VerbReduplicationGrammar,
+        WackernagelWordOrderGrammar,
+        LeadingCopulaGrammar,
+        PresentParticipleGrammar,
+        EvidentialGrammar,
+        EchoMorphologyGrammar,
+        RhymingGrammar,
+        PalindromeDemonstrativeGrammar,
+        PalindromePastGrammar,
+        RecursiveGrammar
+    ]
+
+    def ready_to_run(self):
+        if len(self.tasks) != len(self.my_grammars) + 1:
+            return False
+        return super().ready_to_run()
+
     def __post_init__(self):
         super().__post_init__()
-        my_grammars = [
-            DefiniteArticleAgreementGrammar,
-            AccusativeMarkingAgreementGrammar,
-            VerbalAgreementGrammar,
-            VerbReduplicationGrammar,
-            WackernagelWordOrderGrammar,
-            LeadingCopulaGrammar,
-            PresentParticipleGrammar,
-            EvidentialGrammar,
-            EchoMorphologyGrammar,
-            RhymingGrammar,
-            PalindromeDemonstrativeGrammar,
-            PalindromePastGrammar,
-            RecursiveGrammar
-        ]
-        # FIXME: apply a hardcoded permutation of tasks for now
-        my_grammars = [
-            AccusativeMarkingAgreementGrammar,
-            PalindromePastGrammar,
-            RecursiveGrammar,
-            WackernagelWordOrderGrammar,
-            VerbReduplicationGrammar,
-            DefiniteArticleAgreementGrammar,
-            PalindromeDemonstrativeGrammar,
-            EvidentialGrammar,
-            PresentParticipleGrammar,
-            RhymingGrammar,
-            VerbalAgreementGrammar,
-            LeadingCopulaGrammar,
-            EchoMorphologyGrammar
-        ]
+        if self.ready_to_run():
+            return
         # remove default Task created by base class
         self.tasks = []
-        for grammar, tokens in zip(my_grammars, random.sample(TOKEN_SETS, k=len(my_grammars))):
+        for grammar, tokens in zip(self.my_grammars, random.sample(TOKEN_SETS, k=len(self.my_grammars))):
             random.shuffle(tokens)
-            custom_task = Task(settings=self.settings, active=True if self.tasks_done == len(self.tasks) else False)
+            custom_task = Task(settings=self.settings)
             try:
                 custom_task.grammar = grammar(tokens)
             except TypeError:
@@ -1399,11 +1394,10 @@ class CustomExperiment(Experiment):
                 custom_task.grammar = grammar(tokens=tokens, rhymes=RHYMES)
             self.tasks.append(custom_task)
         assert all(task.grammar is not None for task in self.tasks)
-        naturalness_task = NaturalnessJudgementTask(settings=(self.settings),
-                                                    active=True if self.tasks_done == 13 else False,
-                                                    anchored_to_end=True)
-        self.tasks.append(naturalness_task)
-        # unanchored_tasks = [t for t in self.tasks if not t.anchored_to_end]
-        # anchored_tasks   = [t for t in self.tasks if t.anchored_to_end]
-        # random.shuffle(unanchored_tasks)
-        # self.tasks = unanchored_tasks + anchored_tasks
+        last_task = NaturalnessJudgementTask(settings=self.settings, anchored_to_end=True)
+        self.tasks.append(last_task)
+        unanchored_tasks = [t for t in self.tasks if not t.anchored_to_end]
+        anchored_tasks   = [t for t in self.tasks if t.anchored_to_end]
+        random.shuffle(unanchored_tasks)
+        self.tasks = unanchored_tasks + anchored_tasks
+        self.tasks[0].active = True

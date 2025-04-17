@@ -11,7 +11,6 @@ from src.agl_solitaire import custom_helpers
 from src.agl_solitaire import experiment
 from src.agl_solitaire import grammar
 from src.agl_solitaire import settings
-from src.agl_solitaire import task_state
 from src.agl_solitaire import version
 from src.agl_solitaire.utils import print, input, clear, get_grammar_from_obfuscated_repr, Loggable
 
@@ -132,8 +131,6 @@ class Application(Loggable):
                 settings_and_gmr = copy.copy(self.settings)
                 settings_and_gmr.autosave = False
                 settings_and_gmr.grammar = gmr.obfuscated_repr()
-                # FIXME: probably save to remove for good, right?
-                # settings_and_gmr.halted_task = task.Task()
                 settings_and_gmr.save_all(filename)
                 return
 
@@ -156,7 +153,7 @@ class Application(Loggable):
         except Exception:
             print('error: loading experiment from file failed')
             return
-        if settings_and_gmr.halted_task is None or not settings_and_gmr.halted_task.test_set:
+        if settings_and_gmr.halted_experiment is None or not settings_and_gmr.halted_experiment.ready_to_produce():
             if settings_and_gmr.grammar is None:
                 print('error: file does not include a grammar or a paused experiment')
                 return
@@ -165,8 +162,7 @@ class Application(Loggable):
             except ValueError:
                 print('error: loading grammar from file failed')
                 return
-            settings_and_gmr.halted_task = task_state.TaskState(settings_and_gmr)
-            settings_and_gmr.tasks_done = 0
+            settings_and_gmr.halted_experiment = experiment.Experiment(settings_and_gmr)
         print(f"Experiment loaded from '{settings_and_gmr.filename}'.")
         if not self.settings.settings_equal(settings_and_gmr):
             print('warning: your current settings differ from those loaded from file:\n')
@@ -177,12 +173,11 @@ class Application(Loggable):
                 choice = input('use the current settings instead? (y/n)> ')
             if choice[0].lower() == 'y':
                 settings_and_gmr.override(self.settings)
-        if all(judgement is None for (_, _, judgement) in settings_and_gmr.halted_task.test_set):
+        if not settings_and_gmr.halted_experiment.started():
             self.duplicate_print('=' * 120, log_only=True)
             self.duplicate_print('You are now starting a previously generated experiment:')
             self.duplicate_print(settings_and_gmr.pretty_short())
-        # FIXME: avoid else branch for now because we don't have the right apparatus for these conditions
-        elif True or any(judgement is None for (_, _, judgement) in settings_and_gmr.halted_task.test_set):
+        elif not settings_and_gmr.halted_experiment.finished():
             self.duplicate_print('You are now resuming a previously paused session.')
         else:
             print('You have loaded a previously completed experiment. Do you want to repeat the same experiment all over again? (y/n)')
@@ -193,11 +188,10 @@ class Application(Loggable):
                 return
             if settings_and_gmr.grammar is None:
                 print('warning: no grammar found in file, the old strings will be used to repeat the experiment')
-                settings_and_gmr.halted_task.test_set = [(string, correct, None) for (string, correct, _) in settings_and_gmr.halted_task.test_set]
+                settings_and_gmr.halted_experiment.reset_answers()
             else:
                 def callback():
-                    settings_and_gmr.halted_task = task_state.TaskState(settings_and_gmr)
-                    settings_and_gmr.tasks_done = 0
+                    settings_and_gmr.halted_experiment = experiment.Experiment(settings_and_gmr)
                 settings_and_gmr.without_autosave(callback)
         self.run_experiment(settings_and_gmr)
 
@@ -379,7 +373,7 @@ class Application(Loggable):
             elif choice in ['0', 'b']:
                 break
             else:
-                print('no such setting')
+                print('error: no such setting')
             if attr_to_change is not None:
                 new_value = input(prompt)
                 try:
@@ -413,8 +407,7 @@ class Application(Loggable):
             if gmr is None:
                 return
             self.settings.grammar = gmr.obfuscated_repr()
-        self.settings.halted_task = None
-        self.settings.tasks_done = 0
+        self.settings.halted_experiment = None
         self.run_experiment()
 
     def run_experiment(self, stngs=None):
@@ -424,12 +417,12 @@ class Application(Loggable):
             if stngs is None:
                 stngs = self.settings
             if not stngs.grammar_class.custom():
-                assert stngs.halted_task is not None or stngs.grammar is not None
+                assert stngs.halted_experiment is not None or stngs.grammar is not None
                 experiment_to_run = experiment.Experiment(stngs)
             else:
                 custom_module = sys.modules[custom_helpers.CUSTOM_MODULE_PREFIX + self.settings.grammar_class.name]
                 experiment_to_run = custom_module.CustomExperiment(stngs)
-            if not experiment_to_run.ready():
+            if not experiment_to_run.ready_to_run():
                 self.duplicate_print('Generating training strings and test strings for the experiment...')
                 ### generate training and test material ###
                 prepare_successful = experiment_to_run.prepare()
@@ -441,7 +434,7 @@ class Application(Loggable):
                     self.duplicate_print('Setup failed. Aborting experiment.')
                     return
                 self.duplicate_print('Done.')
-            assert experiment_to_run.ready()
+            assert experiment_to_run.ready_to_run()
             # FIXME: the latter condition is too broad, you need to use a specific variable here
             if stngs.run_questionnaire and (not experiment_to_run.tasks_done and not experiment_to_run.tasks[0].training_finished):
                 self.duplicate_print('A few questions before we begin. Feel free to answer as briefly or in as much detail as you like.')
