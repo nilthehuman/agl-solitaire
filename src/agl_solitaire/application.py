@@ -20,7 +20,11 @@ class Application(Loggable):
 
     def __init__(self):
         self.settings = settings.Settings()
-        self.settings.load_all()
+        try:
+            self.settings.load_all()
+        except settings.Settings.VersionException as ve:
+            print(ve)
+            print()
         # load custom experiment scripts from the custom/ directory
         self.custom_experiments = custom_helpers.load_custom_experiments()
 
@@ -150,6 +154,8 @@ class Application(Loggable):
         settings_and_gmr = settings.Settings()
         try:
             settings_and_gmr.load_all(filename)
+        except settings.Settings.VersionException as ve:
+            print(ve)
         except Exception:
             print('error: loading experiment from file failed')
             return

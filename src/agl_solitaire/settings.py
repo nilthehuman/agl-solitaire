@@ -17,6 +17,7 @@ import typing
 
 
 from src.agl_solitaire import custom_helpers
+from src.agl_solitaire import version
 from src.agl_solitaire.experiment_state import TaskState, ExperimentState
 
 
@@ -39,7 +40,12 @@ GrammarClass.next = _next_gc
 class Settings:
     """User options for controlling the details of the experimental paradigm."""
 
+    class VersionException(Exception):
+        def __init__(self):
+            super().__init__("warning: settings file is from an older version of the application, this does not bode well for loading previous experiments")
+
     filename:                   typing.Optional[str] = None
+    version:                    str = version.get_version()
     autosave:                   bool = False
     username:                   str = 'anonymous'
     grammar_class:              GrammarClass = GrammarClass.REGULAR
@@ -211,12 +217,38 @@ class Settings:
         # FIXME: ugly kludge, but .ini is the "more supported" type anyways
         if not filename:
             filename = _DEFAULT_INI_FILENAME
+        my_version = self.version
         # figure out format from the tail end of the filename
         if _TOMLLIB_AVAILABLE and 4 < len(filename) and 'toml' == filename[-4:].lower():
             self.load_all_from_toml(filename)
         else:
             # default to old format
             self.load_all_from_ini(filename)
+        # check version number
+        if my_version and self.version:
+            def parse_version(version_string):
+                if not version_string:
+                    raise ValueError
+                version_major = ''
+                while '.' != (c := version_string[0]):
+                    version_major += c
+                    version_string = version_string[1:]
+                version_major = int(version_major)
+                version_string = version_string[1:]
+                version_minor = ''
+                while '.' != (c := version_string[0]):
+                    version_minor += c
+                    version_string = version_string[1:]
+                version_minor = int(version_minor)
+                return (version_major, version_minor)
+            try:
+                my_version = parse_version(my_version)
+                file_version = parse_version(self.version)
+                if my_version[0] > file_version[0] or my_version[1] > file_version[1]:
+                    raise Settings.VersionException
+            except ValueError:
+                # looks like one of the version strings is formatted wrong
+                pass
 
     def load_all_from_ini(self, filename=_DEFAULT_INI_FILENAME):
         """Read and set our settings values from an INI settings file if it exists."""
