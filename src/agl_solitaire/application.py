@@ -455,11 +455,13 @@ class Application(Loggable):
             ### now perform the main part of the experiment ###
             experiment_to_run.run()
             ### ### ### ### ### ### ### ### ### ### ### ### ###
+            print()
+            self.duplicate_print('Experiment finished. Thank you for playing!')
             if stngs.email_logs:
                 go_ahead = True
                 while go_ahead:
                     go_ahead = False
-                    print('Sending experiment logs to the author of the application...')
+                    print('Sending experiment logs to the author of the application. Please stand by...')
                     with open(stngs.logfile_filename, 'r') as fh:
                         log_lines = fh.read().split('\n')
                     try:
@@ -482,8 +484,6 @@ class Application(Loggable):
                             go_ahead = True
                     except Exception:
                         print('Failed, reason unknown. Sorry. :(')
-            print()
-            self.duplicate_print('Experiment finished. Thank you for playing!')
         except KeyboardInterrupt:
             print()
             self.duplicate_print(f"Experiment halted by user. Progress saved to '{stngs.filename}'.")
