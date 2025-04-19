@@ -47,6 +47,13 @@ RHYMES = [
 ]
 
 
+class CustomTask(Task):
+    """Our type of task, which has no need for a Grammar."""
+
+    def ready_to_produce(self):
+        return True
+
+
 class DefiniteArticleAgreementGrammar(CustomGrammar):
     """A grammar fragment where nouns and their adjectives agree in definiteness marking."""
 
@@ -1386,7 +1393,7 @@ class CustomExperiment(Experiment):
         self.tasks = []
         for grammar, tokens in zip(self.my_grammars, random.sample(TOKEN_SETS, k=len(self.my_grammars))):
             random.shuffle(tokens)
-            custom_task = Task(settings=self.settings)
+            custom_task = CustomTask(settings=self.settings)
             try:
                 custom_task.grammar = grammar(tokens)
             except TypeError:

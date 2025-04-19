@@ -60,7 +60,8 @@ class Task(Loggable, TaskState):
         assert 0 < self.settings.training_strings
         assert 0 < self.settings.test_strings_grammatical
         assert 0 < self.settings.test_strings_ungrammatical
-        if not self.grammar:
+        if not self.ready_to_produce():
+            assert self.settings.grammar_class.custom()
             self.grammar = get_grammar_from_obfuscated_repr(self.settings)
         num_required_grammatical = self.settings.training_strings + self.settings.test_strings_grammatical
         if not self.settings.grammar_class.custom():

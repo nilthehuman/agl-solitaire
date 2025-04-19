@@ -23,13 +23,14 @@ class Experiment(Loggable, experiment_state.ExperimentState):
 
     def __post_init__(self):
         """Set up one basic task or check for previously halted Experiment."""
-        if self.settings.halted_experiment is not None:
-            self.resume(self.settings.halted_experiment)
-        else:
-            # by default, create one vanilla default task, unless there's a paused task from before
-            self.tasks.append(task.Task(settings=self.settings, active=True))
-            # register this Experiment in the Settings it belongs to
-            self.settings.halted_experiment = self
+        # this is a brand new Experiment, we don't know if we are supposed to resume() or not
+        assert self.settings is not None
+        assert not self.tasks
+        # by default, create one vanilla default task
+        self.tasks.append(task.Task(settings=self.settings, active=True))
+        if self.settings is not None:
+            for t in self.tasks:
+                t.settings = self.settings
 
     def __setstate__(self, state):
         """This gets called when an Experiment is restored from file."""
@@ -41,18 +42,23 @@ class Experiment(Loggable, experiment_state.ExperimentState):
         self.settings = settings
         for task in self.tasks:
             task.settings = self.settings
-        self.__post_init__()
+        if self.settings.halted_experiment:
+            self.resume(self.settings.halted_experiment)
+
+    def track_state(self):
+        """Tell Settings to save all progress happening in this Experiment."""
+        self.settings.halted_experiment = self
 
     def resume(self, other):
         """Take up a previously halted Experiment to proceed with it."""
-        if self is other:
+        if other is None or self is other:
             return
         if isinstance(other, experiment_state.ExperimentState):
             for field in dataclasses.fields(experiment_state.ExperimentState):
                 value = getattr(other, field.name)
                 setattr(self, field.name, value)
             assert self.settings is not None
-            self.settings.halted_experiment = self
+            self.track_state()
         else:
             assert type(other) is dict
             for key, value in other.items():
@@ -70,6 +76,9 @@ class Experiment(Loggable, experiment_state.ExperimentState):
 
     def run(self):
         """Let the user perform all tasks of the experiment in order."""
+        assert self.ready_to_run()
+        # make sure our progress is being tracked
+        self.track_state()
         remaining_tasks = self.tasks[self.tasks_done:]
         for i, task in [(n + self.tasks_done, t) for n, t in enumerate(remaining_tasks)]:
             clear()

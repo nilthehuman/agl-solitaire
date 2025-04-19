@@ -197,7 +197,7 @@ class Application(Loggable):
                 settings_and_gmr.halted_experiment.reset_answers()
             else:
                 def callback():
-                    settings_and_gmr.halted_experiment = experiment.Experiment(settings_and_gmr)
+                    settings_and_gmr.halted_experiment = None
                 settings_and_gmr.without_autosave(callback)
         self.run_experiment(settings_and_gmr)
 
@@ -428,6 +428,8 @@ class Application(Loggable):
             else:
                 custom_module = sys.modules[custom_helpers.CUSTOM_MODULE_PREFIX + self.settings.grammar_class.name]
                 experiment_to_run = custom_module.CustomExperiment(stngs)
+            if self.settings.halted_experiment is not None:
+                experiment_to_run.resume(self.settings.halted_experiment)
             if not experiment_to_run.ready_to_run():
                 self.duplicate_print('Generating training strings and test strings for the experiment...')
                 ### generate training and test material ###

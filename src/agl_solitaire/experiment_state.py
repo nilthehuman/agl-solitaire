@@ -107,3 +107,8 @@ class ExperimentState:
     def finished(self):
         """Has the experiment been started?"""
         return self.tasks_done == len(self.tasks)
+
+    def reset_answers(self):
+        """Remove participant's previous answers to any test stimuli."""
+        for task in self.tasks:
+            task.test_set = [(string, correct, None) for string, correct, _ in task.test_set]
