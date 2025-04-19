@@ -205,9 +205,8 @@ class Settings:
                 setattr(self, attr_name, unpickled_value)
                 if hasattr(unpickled_value, 'settings') and unpickled_value.settings is None:
                     unpickled_value.set_settings(self)
-            except Exception as e:
+            except Exception:
                 # nevermind
-                raise e
                 pass
         except AttributeError:
             pass  # doesn't matter
