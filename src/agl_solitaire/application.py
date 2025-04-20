@@ -457,7 +457,7 @@ class Application(Loggable):
                 self.duplicate_print('What is your profession if you care to share?')
                 answer = input()
                 self.duplicate_print(answer, log_only=True)
-            self.duplicate_print(f"You may add any {'further ' if stngs.run_questionnaire else ''}notes or comments for the record before the training phase begins (optional). Please enter an empty line when you're done:")
+            self.duplicate_print(f"You may add any {'further ' if stngs.run_questionnaire else ''}notes or comments for the record before the experiment begins (optional). Please enter an empty line when you're done:")
             comments = '\n'.join(iter(input, ''))
             self.duplicate_print(comments, log_only=True)
             clear()
