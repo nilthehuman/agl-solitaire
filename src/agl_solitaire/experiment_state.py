@@ -110,5 +110,6 @@ class ExperimentState:
 
     def reset_answers(self):
         """Remove participant's previous answers to any test stimuli."""
+        self.tasks_done = 0
         for task in self.tasks:
             task.test_set = [(string, correct, None) for string, correct, _ in task.test_set]

@@ -426,10 +426,10 @@ class Application(Loggable):
                 assert stngs.halted_experiment is not None or stngs.grammar is not None
                 experiment_to_run = experiment.Experiment(stngs)
             else:
-                custom_module = sys.modules[custom_helpers.CUSTOM_MODULE_PREFIX + self.settings.grammar_class.name]
+                custom_module = sys.modules[custom_helpers.CUSTOM_MODULE_PREFIX + stngs.grammar_class.name]
                 experiment_to_run = custom_module.CustomExperiment(stngs)
-            if self.settings.halted_experiment is not None:
-                experiment_to_run.resume(self.settings.halted_experiment)
+            if stngs.halted_experiment is not None:
+                experiment_to_run.resume(stngs.halted_experiment)
             if not experiment_to_run.ready_to_run():
                 self.duplicate_print('Generating training strings and test strings for the experiment...')
                 ### generate training and test material ###
