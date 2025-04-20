@@ -1332,6 +1332,7 @@ class NaturalnessJudgementTask(Task, Loggable):
             'Tough though the subject matter is, it is universally relevant.',
             'Our flowers bloom outside the room.',
             'Madam in Eden, I\'m Adam.',
+            'The gardener\'s friend\'s wife\'s parish priest\'s brother\'s dog got the bones from his meal.',
             'Silent stood the ancient trees.'
         ]
         self.duplicate_print(
