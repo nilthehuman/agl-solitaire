@@ -139,6 +139,135 @@ class DefiniteArticleAgreementGrammar(CustomGrammar):
         return ungrammatical_sentences
 
 
+class AsymmetricArticlesGrammar(CustomGrammar):
+    """A grammar fragment where the definite article cliticizes to the end of the noun head
+    but the indefinite article does not."""
+
+    def __init__(self, tokens):
+        super().__init__(tokens)
+        def monosyll(string):
+            return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
+        assert any(monosyll(s) for s in self.tokens)
+        while not monosyll(self.tokens[0]):
+            random.shuffle(self.tokens)
+        self.lexicon = {
+            'a'             : self.tokens[0],
+            'the'           : self.tokens[1],
+            'some'          : self.tokens[2],
+            'doctor'        : self.tokens[3],
+            'knight'        : self.tokens[4],
+            'troll'         : self.tokens[5],
+            'drank'         : self.tokens[6],
+            'stole'         : self.tokens[7],
+            'beer'          : self.tokens[8],
+            'glass of milk' : self.tokens[9],
+            'magic potion'  : self.tokens[10] + self.tokens[11]
+        }
+
+    def produce_grammatical(self, num_strings=1, polish=True):
+        sentence_pattern_indef_indef = [
+            [ 'a ', 'some ' ],
+            [ 'doctor', 'knight', 'troll' ],
+            [ ' drank ', ' stole ' ],
+            [ 'a ', 'some ' ],
+            [ 'beer', 'glass of milk', 'magic potion' ]
+        ]
+        sentence_pattern_indef_def = [
+            [ 'a ', 'some ' ],
+            [ 'doctor', 'knight', 'troll' ],
+            [ ' drank ', ' stole ' ],
+            [ 'beer', 'glass of milk', 'magic potion' ],
+            [ 'the ' ]
+        ]
+        sentence_pattern_def_indef = [
+            [ 'doctor', 'knight', 'troll' ],
+            [ 'the ' ],
+            [ ' drank ', ' stole ' ],
+            [ 'a ', 'some ' ],
+            [ 'beer', 'glass of milk', 'magic potion' ]
+        ]
+        sentence_pattern_def_def = [
+            [ 'doctor', 'knight', 'troll' ],
+            [ 'the ' ],
+            [ ' drank ', ' stole ' ],
+            [ 'beer', 'glass of milk', 'magic potion' ],
+            [ 'the ' ]
+        ]
+        try:
+            sentences_indef_indef = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_indef_indef)]
+            sentences_indef_indef = random.sample(sentences_indef_indef, int(num_strings / 4 + 0.25))
+            sentences_indef_def = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_indef_def)]
+            sentences_indef_def = random.sample(sentences_indef_def, int(num_strings / 4 + 0.25))
+            sentences_def_indef = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_def_indef)]
+            sentences_def_indef = random.sample(sentences_def_indef, int(num_strings / 4 + 0.25))
+            sentences_def_def = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_def_def)]
+            sentences_def_def = random.sample(sentences_def_def, int(num_strings / 4 + 0.25))
+        except ValueError:
+            return None
+        # restore English word order
+        sentences_indef_def = [(mar, eng[0:3] + (eng[4],) + (eng[3],)) for mar, eng in sentences_indef_def]
+        sentences_def_indef = [(mar, (eng[1],) + (eng[0],) + eng[2:]) for mar, eng in sentences_def_indef]
+        sentences_def_def = [(mar, (eng[1], eng[0], eng[2], eng[4], eng[3])) for mar, eng in sentences_def_def]
+        sentences = sentences_indef_indef + sentences_indef_def + sentences_def_indef + sentences_def_def
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            sentences = polish_sentences(sentences)
+        random.shuffle(sentences)
+        return sentences
+
+    def produce_ungrammatical(self, num_strings=1, polish=True):
+        bad_pattern_indef_indef = [
+            [ 'doctor', 'knight', 'troll' ],
+            [ 'a ', 'some ' ],
+            [ ' drank ', ' stole ' ],
+            [ 'beer', 'glass of milk', 'magic potion' ],
+            [ 'a ', 'some ' ]
+        ]
+        bad_pattern_indef_def = [
+            [ 'doctor', 'knight', 'troll' ],
+            [ 'a ', 'some ' ],
+            [ ' drank ', ' stole ' ],
+            [ 'the ' ],
+            [ 'beer', 'glass of milk', 'magic potion' ]
+        ]
+        bad_pattern_def_indef = [
+            [ 'the ' ],
+            [ 'doctor', 'knight', 'troll' ],
+            [ ' drank ', ' stole ' ],
+            [ 'beer', 'glass of milk', 'magic potion' ],
+            [ 'a ', 'some ' ]
+        ]
+        bad_pattern_def_def = [
+            [ 'the ' ],
+            [ 'doctor', 'knight', 'troll' ],
+            [ ' drank ', ' stole ' ],
+            [ 'the ' ],
+            [ 'beer', 'glass of milk', 'magic potion' ]
+        ]
+        try:
+            bad_indef_indef = [(self.translate(s), s) for s in itertools.product(*bad_pattern_indef_indef)]
+            bad_indef_indef = random.sample(bad_indef_indef, int(num_strings / 4 + 1))
+            bad_indef_def = [(self.translate(s), s) for s in itertools.product(*bad_pattern_indef_def)]
+            bad_indef_def = random.sample(bad_indef_def, int(num_strings / 4 + 1))
+            bad_def_indef = [(self.translate(s), s) for s in itertools.product(*bad_pattern_def_indef)]
+            bad_def_indef = random.sample(bad_def_indef, int(num_strings / 4 + 1))
+            bad_def_def = [(self.translate(s), s) for s in itertools.product(*bad_pattern_def_def)]
+            bad_def_def = random.sample(bad_def_def, int(num_strings / 4 + 1))
+        except ValueError:
+            return None
+        # restore English word order
+        bad_indef_indef = [(mar, (eng[1], eng[0], eng[2], eng[4], eng[3])) for mar, eng in bad_indef_indef]
+        bad_indef_def = [(mar, (eng[1],) + (eng[0],) + eng[2:]) for mar, eng in bad_indef_def]
+        bad_def_indef = [(mar, eng[0:3] + (eng[4],) + (eng[3],)) for mar, eng in bad_def_indef]
+        ungrammatical_sentences = bad_indef_indef + bad_indef_def + bad_def_indef + bad_def_def
+        ungrammatical_sentences = random.sample(ungrammatical_sentences, num_strings)
+        random.shuffle(ungrammatical_sentences)
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+        return ungrammatical_sentences
+
+
 class AccusativeMarkingAgreementGrammar(CustomGrammar):
     """A grammar fragment where nouns and their adjuncts agree in object marking."""
 
@@ -1367,6 +1496,7 @@ class CustomExperiment(Experiment):
 
     my_grammars = [
         DefiniteArticleAgreementGrammar,
+        #AsymmetricArticlesGrammar,
         AccusativeMarkingAgreementGrammar,
         VerbalAgreementGrammar,
         VerbReduplicationGrammar,
