@@ -442,6 +442,7 @@ class Application(Loggable):
                     self.duplicate_print('Setup failed. Aborting experiment.')
                     return
                 self.duplicate_print('Done.')
+            # FIXME: this assert can fail if you change the code of a CustomExperiment after saving it to file
             assert experiment_to_run.ready_to_run()
             # FIXME: the latter condition is too broad, you need to use a specific variable here
             if stngs.run_questionnaire and (not experiment_to_run.tasks_done and not experiment_to_run.tasks[0].training_finished):
