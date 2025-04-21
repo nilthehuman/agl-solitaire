@@ -6,7 +6,7 @@ import random
 from src.agl_solitaire import experiment_state
 from src.agl_solitaire import settings
 from src.agl_solitaire import task
-from src.agl_solitaire.utils import print, input, clear, get_grammar_from_obfuscated_repr, Loggable
+from src.agl_solitaire.utils import print, input, clear, colorize, get_grammar_from_obfuscated_repr, Loggable
 
 
 @dataclasses.dataclass
@@ -113,7 +113,9 @@ class Experiment(Loggable, experiment_state.ExperimentState):
                 width = max(16, 2 + max(len(item[0]) for item in task.test_set))
                 self.duplicate_print(f"{'Test string':<{width}}{'Correct answer':<16}{'Your answer':<16}")
                 for item in task.test_set:
-                    self.duplicate_print(f"{item[0]:<{width}}{'yes' if 'y' == item[1] else 'no':<16}{'yes' if 'y' == item[2] else 'no':<16}")
+                    color_string = colorize(item[0], self.settings)
+                    real_width = width + len(color_string) - len(item[0])
+                    self.duplicate_print(f"{color_string:<{real_width}}{'yes' if 'y' == item[1] else 'no':<16}{'yes' if 'y' == item[2] else 'no':<16}")
             self.duplicate_print('You now have a chance to add any other post hoc notes or comments for the record if you wish. Please enter an empty line when you\'re done:')
             comments = '\n'.join(iter(input, ''))
             self.duplicate_print(comments, log_only=True)

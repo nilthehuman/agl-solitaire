@@ -65,6 +65,7 @@ class Settings:
     training_one_at_a_time:     bool = False
     run_questionnaire:          bool = True
     email_logs:                 bool = True
+    highlight_color:            str = 'default'
     grammar:                    typing.Optional[str] = None
     halted_experiment:          typing.Optional[ExperimentState] = None
 

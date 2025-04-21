@@ -12,7 +12,14 @@ from src.agl_solitaire import experiment
 from src.agl_solitaire import grammar
 from src.agl_solitaire import settings
 from src.agl_solitaire import version
-from src.agl_solitaire.utils import print, input, clear, get_grammar_from_obfuscated_repr, Loggable
+from src.agl_solitaire.utils import (print,
+                                     input,
+                                     clear,
+                                     ansi_term_color_codes,
+                                     pretty_print_color_codes,
+                                     colorize,
+                                     get_grammar_from_obfuscated_repr,
+                                     Loggable)
 
 
 class Application(Loggable):
@@ -240,6 +247,7 @@ class Application(Loggable):
                 f"13: number of training [r]epetitions:\t\t{settings_display.training_reps}{' round(s)' if settings_enabled.training_reps else ''}",
                 f"14: run pre and post session [q]uestionnaire:\t{settings_display.run_questionnaire}",
                 f"15: automatically [e]mail logs to author:\t{settings_display.email_logs}",
+                f"16: string [h]ighlight color:\t\t\t{settings_display.highlight_color}",
                 ' 0: [b]ack to main menu'
             ]
             for i, option in enumerate(options):
@@ -255,6 +263,7 @@ class Application(Loggable):
                 except UnboundLocalError:
                     # choice variable has not been assigned
                     pass
+            options[15] = colorize(options[15], self.settings)
             print("\n".join(options))
             choice = ''
             while not choice:
@@ -290,7 +299,9 @@ class Application(Loggable):
                 '14' : 'run_questionnaire',
                 'q'  : 'run_questionnaire',
                 '15' : 'email_logs',
-                'e'  : 'email_logs'
+                'e'  : 'email_logs',
+                '16' : 'highlight_color',
+                'h'  : 'highlight_color'
             }
             try:
                 if not getattr(settings_enabled, choice_to_attr_name[choice]):
@@ -376,6 +387,16 @@ class Application(Loggable):
                 self.settings.run_questionnaire = not self.settings.run_questionnaire
             elif choice in ['15', 'e']:
                 self.settings.email_logs = not self.settings.email_logs
+            elif choice in ['16', 'h']:
+                print('available colors:')
+                pretty_print_color_codes(self.settings)
+                new_color = input('new highlight color (leave blank to go back): ')
+                if not new_color:
+                    continue
+                if new_color not in ansi_term_color_codes.keys():
+                    print('error: no such color name in the list above')
+                    continue
+                self.settings.highlight_color = new_color
             elif choice in ['0', 'b']:
                 break
             else:

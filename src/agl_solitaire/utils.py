@@ -84,6 +84,44 @@ def clear():
         os.system(which_clear)
 
 
+ansi_term_color_codes = {
+    'default'        : 39,
+    'red'            : 31,
+    'green'          : 32,
+    'yellow'         : 33,
+    'blue'           : 34,
+    'magenta'        : 35,
+    'cyan'           : 36,
+    'white'          : 37,
+    'bright red'     : 91,
+    'bright green'   : 92,
+    'bright yellow'  : 93,
+    'bright blue'    : 94,
+    'bright magenta' : 95,
+    'bright cyan'    : 96,
+    'bright white'   : 97
+}
+
+def pretty_print_color_codes(settings):
+    for name, code in ansi_term_color_codes.items():
+        blimp = '*' if name == settings.highlight_color else ' '
+        print(f"[{blimp}] \033[{code}m{name}\033[0m")
+
+def colorize(string, settings):
+    try:
+        code = ansi_term_color_codes[settings.highlight_color]
+    except KeyError:
+        return string
+    if re.search(r" '", string):
+        return re.sub(r"(.*) '", r"\033[" + str(code) + r"m\1\033[0m '", string)
+    if re.match(r"[^:]*:[^:]*:[^:*]", string):
+        # cancel 'last selected option' coloring
+        string = re.sub(r"\033\[\d+m", '', string)
+        # apply highlight color
+        return re.sub(r"(.*:.*):(.*)", r"\1:\033[" + str(code) + r"m\2\033[0m", string)
+    return f"\033[{code}m" + string + "\033[0m"
+
+
 class Loggable:
     """For classes that want to write most of their output both to screen and to a file."""
 
@@ -91,9 +129,10 @@ class Loggable:
         """Output the string on the screen and log it in a text file at the same time."""
         if not log_only:
             print(string)
+        string_to_log = re.sub(r"\033\[\d+m", '', string)
         with open(self.settings.logfile_filename, 'a', encoding='UTF-8') as logfile:
             # prepend timestamp
-            stamped_list = ['[' + str(datetime.datetime.now().replace(microsecond=0)) + '] ' + line.strip() for line in string.split('\n')]
+            stamped_list = ['[' + str(datetime.datetime.now().replace(microsecond=0)) + '] ' + line.strip() for line in string_to_log.split('\n')]
             stamped_string = '\n'.join(stamped_list)
             logfile.write(stamped_string + '\n')
 

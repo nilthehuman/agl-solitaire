@@ -20,6 +20,7 @@ from src.agl_solitaire.utils import (print,
                                      input,
                                      _builtin_input,
                                      clear,
+                                     colorize,
                                      Loggable,
                                      pad_sentences,
                                      get_grammar_from_obfuscated_repr)
@@ -132,7 +133,7 @@ class Task(Loggable, TaskState):
                     for string in self.training_set:
                         clear()
                         print()
-                        self.duplicate_print(string)
+                        self.duplicate_print(colorize(string, self.settings))
                         time.sleep(float(self.settings.training_time) / self.settings.training_strings)
                     if training_rep < self.settings.training_reps:
                         clear()
@@ -141,7 +142,7 @@ class Task(Loggable, TaskState):
             else:
                 self.duplicate_print('Training phase started. Please study the following list of strings:')
                 print()
-                self.duplicate_print('\n'.join(self.training_set))
+                self.duplicate_print('\n'.join([colorize(s, self.settings) for s in self.training_set]))
                 print()
                 input_thread = threading.Thread(target=_builtin_input, daemon=True)
                 input_thread.start()
@@ -171,7 +172,7 @@ class Task(Loggable, TaskState):
             clear()
             self.duplicate_print(f"Test item #{i+1} out of {len(self.test_set)}. Is the following string grammatical? (y/n)")
             print()
-            self.duplicate_print(self.test_set[i][0])
+            self.duplicate_print(colorize(self.test_set[i][0], self.settings))
             answer = '_'
             while answer[0] not in ['y', 'n']:
                 answer = None
