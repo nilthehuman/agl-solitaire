@@ -664,7 +664,7 @@ class PatternGrammar(FormalGrammar):
         attempts = 0
         while len(grammatical_strings) < num_strings and attempts < max_attempts:
             pattern = random.choice(suitable_patterns)
-            string = ''.join(map(lambda c: random.choice(list(c)), pattern))
+            string = self.joiner().join(map(lambda c: random.choice(list(c)), pattern))
             grammatical_strings.add(string)
             attempts += 1
         if len(grammatical_strings) < num_strings:
