@@ -1172,7 +1172,13 @@ class PalindromeDemonstrativeGrammar(CustomGrammar):
         sentences_colors = [(mar, eng[0:2] + ('has ',) + eng[3:4] + eng[2:3]) for mar, eng in sentences_colors]
         sentences = sentences_colors + sentences_symbol
         # render Martian demonstrative
-        sentences = [((mar[1][::-1]+' ' if 'THAT' in mar[0] else mar[0],) + mar[1:], eng) for mar, eng in sentences]
+        def rev(string):
+            rev_string = string[::-1]
+            rev_string = re.sub('hc', 'ch', rev_string)
+            rev_string = re.sub('hs', 'sh', rev_string)
+            rev_string = re.sub('hk', 'kh', rev_string)
+            return rev_string
+        sentences = [((rev(mar[1])+' ' if 'THAT' in mar[0] else mar[0],) + mar[1:], eng) for mar, eng in sentences]
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
             sentences = polish_sentences(sentences)
