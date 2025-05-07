@@ -12,7 +12,10 @@ CUSTOM_MODULE_PREFIX = 'src.agl_solitaire.custom.'
 def get_custom_experiment_filenames():
     def pick(filename):
         return pathlib.Path(filename).suffix == '.py' and '__' not in filename
-    return [filename for filename in os.listdir(CUSTOM_DIR) if pick(filename)]
+    try:
+        return [filename for filename in os.listdir(CUSTOM_DIR) if pick(filename)]
+    except FileNotFoundError:
+        return []
 
 def get_custom_experiment_names():
     custom_filenames = get_custom_experiment_filenames()
