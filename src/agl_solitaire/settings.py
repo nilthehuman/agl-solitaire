@@ -187,7 +187,12 @@ class Settings:
         loaded from file."""
         try:
             # parse attribute from string
-            parsed_value = type(getattr(self, attr_name))(value)
+            try:
+                parsed_value = type(getattr(self, attr_name))(value)
+            except ValueError:
+                # invalid value provided in settings file
+                # TODO: warn user about this unfortunate predicament
+                return
             if attr_name in ['recursion', 'training_one_at_a_time', 'run_questionnaire', 'email_logs']:
                 parsed_value = str(value).lower() in ['true', 'yes', '1']
             if 'string_tokens' == attr_name:
