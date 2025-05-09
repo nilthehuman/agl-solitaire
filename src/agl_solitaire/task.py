@@ -1,6 +1,7 @@
 """Class responsible for driving most of the actual experimental procedure."""
 
 import dataclasses
+import platform
 import random
 import threading
 import time
@@ -125,7 +126,10 @@ class Task(Loggable, TaskState):
                 self.duplicate_print(f"The training phase will now begin. You will be presented with {the_same}{self.settings.training_strings} exemplars of the hidden grammar {in_rounds}for {time_per_item} seconds each.")
             else:
                 self.duplicate_print(f"The training phase will now begin. You will have {self.settings.training_time} seconds to study a list of {self.settings.training_strings} exemplars of the hidden grammar.")
-            self.duplicate_print('You can use Ctrl-Break on Windows or Ctrl-C on macOS/Unix to halt the experiment at any time.')
+            if 'Windows' == platform.system():
+                self.duplicate_print('You can use Ctrl-Break to halt the experiment at any time.')
+            else:
+                self.duplicate_print('You can use Ctrl-C to halt the experiment at any time.')
             self.duplicate_print('Please make sure your screen and terminal font are comfortable to read. Press return when you are ready.')
             input()
             if self.settings.training_one_at_a_time:
