@@ -1515,7 +1515,7 @@ class CustomExperiment(Experiment):
 
     my_grammars = [
         DefiniteArticleAgreementGrammar,
-        #AsymmetricArticlesGrammar,
+        AsymmetricArticlesGrammar,
         AccusativeMarkingAgreementGrammar,
         VerbalAgreementGrammar,
         VerbReduplicationGrammar,
