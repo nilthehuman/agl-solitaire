@@ -912,7 +912,7 @@ class EchoMorphologyGrammar(CustomGrammar):
         consonant = random.choice(['g', 'm', 't'])
         def redouble_first(string):
             # reduplicate first syllable, kinda
-            return re.sub(r"\b([^aeiouy]*)([aeiouy]+)", r"\1\2" + consonant + r"\2", string)
+            return re.sub(r"\b([^aeiouy]*)([aeiou]+|y+)", r"\1\2" + consonant + r"\2", string)
         self.unechoed_lexicon = {
             'all'         : self.tokens[0],
             'dogs'        : self.tokens[1],
