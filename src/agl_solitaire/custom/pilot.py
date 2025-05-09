@@ -1464,6 +1464,104 @@ class RecursiveGrammar(CustomGrammar):
         return ungrammatical_sentences
 
 
+class PredicativeEndingGrammar(CustomGrammar):
+    """A grammar fragment where adjectives used as predicates are overtly marked, taking the same ending
+    as the subject, but adjectives used as an adjunct with a noun are unmarked."""
+
+    def __init__(self, tokens):
+        super().__init__(tokens)
+        def monosyll(string):
+            return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
+        assert any(monosyll(s) for s in self.tokens)
+        while not monosyll(self.tokens[0]):
+            random.shuffle(self.tokens)
+        self.lexicon = {
+            'the'   : self.tokens[0],
+            'dress' : self.tokens[1],
+            'skirt' : self.tokens[2],
+            'bike'  : self.tokens[3],
+            'car'   : self.tokens[4],
+            'green' : self.tokens[5],
+            'red'   : self.tokens[6],
+            'nice'  : self.tokens[7],
+            'long'  : self.tokens[8],
+            'short' : self.tokens[9],
+            'fast'  : self.tokens[10],
+            'slow'  : self.tokens[11],
+            'is'    : '',
+            'PRED'  : ''
+        }
+
+    def produce_grammatical(self, num_strings=1, polish=True):
+        sentence_pattern_clothes = [
+            [ 'the' ],
+            [ '', '', ' nice', ' long' ],
+            [ '', '', ' green', ' red' ],
+            [ ' dress ', ' skirt ' ],
+            [ 'is ' ],
+            [ 'green', 'red', 'nice', 'long' ],
+            [ 'PRED' ]
+        ]
+        sentence_pattern_vehicles = [
+            [ 'the ' ],
+            [ '', '', ' fast', ' slow', ' green', ' red' ],
+            [ ' bike ', ' car ' ],
+            [ 'is ' ],
+            [ 'nice', 'long', 'fast', 'slow' ],
+            [ 'PRED' ]
+        ]
+        try:
+            sentences_clothes = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_clothes)]
+            sentences_clothes = list(set(sentences_clothes))
+            sentences_clothes = random.sample(sentences_clothes, int(num_strings / 2 + 0.5))
+            sentences_vehicles = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_vehicles)]
+            sentences_vehicles = list(set(sentences_vehicles))
+            sentences_vehicles = random.sample(sentences_vehicles, int(num_strings / 2 + 0.5))
+        except ValueError:
+            return None
+        sentences = sentences_clothes + sentences_vehicles
+        # render Martian predicative suffix
+        def ending(noun):
+            return re.search(r"[aeiouy]+?[^aeiouy]*$", noun).group(0)
+        sentences = [(mar[:-1] + (ending(mar[-4]),), eng) for mar, eng in sentences]
+        # get rid of PRED in English
+        sentences = [(mar, eng[:-1]) for mar, eng in sentences]
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            sentences = polish_sentences(sentences)
+        random.shuffle(sentences)
+        return sentences
+
+    def produce_ungrammatical(self, num_strings=1, polish=True):
+        ungrammatical_sentences = set()
+        while len(ungrammatical_sentences) < num_strings:
+            sentence = self.produce_grammatical(1, polish=False)[0]
+            form, meaning = sentence
+            done = False
+            ending = re.search(r"[aeiouy]+?[^aeiouy]*$", form[-4]).group(0)
+            while not done:
+                if random.choice([True, False]):
+                    # drop PRED from predicative adjective
+                    form = form[:-1]
+                    done = True
+                if random.choice([True, False]):
+                    # tack PRED onto non-predicative adjective
+                    if form[1].strip() in [self.translate(w) for w in ['green', 'red', 'nice', 'long', 'fast', 'slow']]:
+                        form = form[0:2] + (ending,) + form[2:]
+                        done = True
+                if random.choice([True, False]):
+                    # tack PRED onto non-predicative adjective
+                    if form[2].strip() in [self.translate(w) for w in ['green', 'red', 'nice', 'long', 'fast', 'slow']]:
+                        form = form[0:3] + (ending,) + form[3:]
+                        done = True
+            sentence = (tuple(form), meaning)
+            ungrammatical_sentences.add(sentence)
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+        return ungrammatical_sentences
+
+
 class NaturalnessJudgementTask(Task, Loggable):
     """See how participant rates a few plain English stimuli."""
 
@@ -1528,7 +1626,8 @@ class CustomExperiment(Experiment):
         RhymingGrammar,
         PalindromeDemonstrativeGrammar,
         PalindromePastGrammar,
-        RecursiveGrammar
+        RecursiveGrammar,
+        PredicativeEndingGrammar
     ]
 
     def ready_to_run(self):
