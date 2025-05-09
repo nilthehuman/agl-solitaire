@@ -116,21 +116,20 @@ class DefiniteArticleAgreementGrammar(CustomGrammar):
         ungrammatical_sentences = set()
         while len(ungrammatical_sentences) < num_strings:
             sentence = self.produce_grammatical(1, polish=False)[0]
-            done = False
             form, meaning = sentence
-            while not done:
+            while True:
                 if random.choice([True, False]):
                     if meaning[0] == 'the ':
                         form = form[0:2] + form[3:]
                     else:
                         form = form[0:1] + (self.translate('the'),) + form[1:]
-                    done = True
-                if random.choice([True, False]):
+                    break
+                elif random.choice([True, False]):
                     if meaning[0] == 'the ':
                         form = form[1:]
                     else:
                         form = (self.translate('the'),) + form
-                    done = True
+                    break
             sentence = (tuple(form), meaning)
             ungrammatical_sentences.add(sentence)
         if polish:
@@ -1130,9 +1129,11 @@ class PalindromeDemonstrativeGrammar(CustomGrammar):
         super().__init__(tokens, rhymes)
         def monosyll(string):
             return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
-        while monosyll(self.tokens[2]) or monosyll(self.tokens[3]) or monosyll(self.tokens[4]):
+        def palindrome(string):
+            naked_string = string.strip()
+            return naked_string == naked_string[::-1]
+        while any(map(monosyll, (self.tokens[2], self.tokens[3], self.tokens[4]))) or all(map(palindrome, (self.tokens[2], self.tokens[3], self.tokens[4]))):
             random.shuffle(self.tokens)
-        assert(not all(t == t[::-1] for t in [self.tokens[2], self.tokens[3], self.tokens[4]]))
         self.lexicon = {
             'that'      : 'THAT',
             'the left'  : self.tokens[0],
@@ -1186,20 +1187,26 @@ class PalindromeDemonstrativeGrammar(CustomGrammar):
         return sentences
 
     def produce_ungrammatical(self, num_strings=1, polish=True):
+        def palindrome(string):
+            naked_string = string.strip()
+            return naked_string == naked_string[::-1]
         ungrammatical_sentences = set()
         while len(ungrammatical_sentences) < num_strings:
             sentence = self.produce_grammatical(1, polish=False)[0]
             form, meaning = sentence
             if meaning[0] == ' that ':
-                if random.choice([True, False]):
+                # make sure the noun head isn't the reverse of itself
+                if not palindrome(form[1]) and random.choice([True, False]):
                     # use noun phrase head without reversing it
                     form = (form[1]+' ',) + form[1:]
                 else:
                     # use last remaining token, not seen in training data
                     form = (self.tokens[11]+' ',) + form[1:]
-            else:
+            elif not palindrome(form[1]):
                 # reduplicate noun phrase head without reversing it
                 form = (form[1]+' ',) + form[1:]
+            else:
+                continue
             sentence = (tuple(form), meaning)
             ungrammatical_sentences.add(sentence)
         if polish:
