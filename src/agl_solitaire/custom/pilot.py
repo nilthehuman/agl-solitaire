@@ -147,20 +147,20 @@ class AsymmetricArticlesGrammar(CustomGrammar):
         def monosyll(string):
             return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
         assert any(monosyll(s) for s in self.tokens)
-        while not monosyll(self.tokens[0]):
+        while not monosyll(self.tokens[0]) or not monosyll(self.tokens[1]):
             random.shuffle(self.tokens)
         self.lexicon = {
             'a'             : self.tokens[0],
             'the'           : self.tokens[1],
-            'some'          : self.tokens[2],
-            'doctor'        : self.tokens[3],
-            'knight'        : self.tokens[4],
-            'troll'         : self.tokens[5],
-            'drank'         : self.tokens[6],
-            'stole'         : self.tokens[7],
-            'beer'          : self.tokens[8],
-            'glass of milk' : self.tokens[9],
-            'magic potion'  : self.tokens[10] + self.tokens[11]
+            'some'          : '',
+            'doctor'        : self.tokens[2],
+            'knight'        : self.tokens[3],
+            'troll'         : self.tokens[4],
+            'drank'         : self.tokens[5],
+            'stole'         : self.tokens[6],
+            'beer'          : self.tokens[7],
+            'coffee'        : self.tokens[8],
+            'magic potion'  : self.tokens[9] + self.tokens[10]
         }
 
     def produce_grammatical(self, num_strings=1, polish=True):
@@ -169,13 +169,13 @@ class AsymmetricArticlesGrammar(CustomGrammar):
             [ 'doctor', 'knight', 'troll' ],
             [ ' drank ', ' stole ' ],
             [ 'a ', 'some ' ],
-            [ 'beer', 'glass of milk', 'magic potion' ]
+            [ 'beer', 'coffee', 'magic potion' ]
         ]
         sentence_pattern_indef_def = [
             [ 'a ', 'some ' ],
             [ 'doctor', 'knight', 'troll' ],
             [ ' drank ', ' stole ' ],
-            [ 'beer', 'glass of milk', 'magic potion' ],
+            [ 'beer', 'coffee', 'magic potion' ],
             [ 'the ' ]
         ]
         sentence_pattern_def_indef = [
@@ -183,23 +183,27 @@ class AsymmetricArticlesGrammar(CustomGrammar):
             [ 'the ' ],
             [ ' drank ', ' stole ' ],
             [ 'a ', 'some ' ],
-            [ 'beer', 'glass of milk', 'magic potion' ]
+            [ 'beer', 'coffee', 'magic potion' ]
         ]
         sentence_pattern_def_def = [
             [ 'doctor', 'knight', 'troll' ],
             [ 'the ' ],
             [ ' drank ', ' stole ' ],
-            [ 'beer', 'glass of milk', 'magic potion' ],
+            [ 'beer', 'coffee', 'magic potion' ],
             [ 'the ' ]
         ]
+        def finalize_english(string):
+            if string[-2:] == ('some ', 'magic potion'):
+                return string[:-1] + ('magic potions',)
+            return string
         try:
-            sentences_indef_indef = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_indef_indef)]
+            sentences_indef_indef = [(self.translate(s), finalize_english(s)) for s in itertools.product(*sentence_pattern_indef_indef)]
             sentences_indef_indef = random.sample(sentences_indef_indef, int(num_strings / 4 + 0.25))
-            sentences_indef_def = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_indef_def)]
+            sentences_indef_def = [(self.translate(s), finalize_english(s)) for s in itertools.product(*sentence_pattern_indef_def)]
             sentences_indef_def = random.sample(sentences_indef_def, int(num_strings / 4 + 0.25))
-            sentences_def_indef = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_def_indef)]
+            sentences_def_indef = [(self.translate(s), finalize_english(s)) for s in itertools.product(*sentence_pattern_def_indef)]
             sentences_def_indef = random.sample(sentences_def_indef, int(num_strings / 4 + 0.25))
-            sentences_def_def = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_def_def)]
+            sentences_def_def = [(self.translate(s), finalize_english(s)) for s in itertools.product(*sentence_pattern_def_def)]
             sentences_def_def = random.sample(sentences_def_def, int(num_strings / 4 + 0.25))
         except ValueError:
             return None
@@ -219,7 +223,7 @@ class AsymmetricArticlesGrammar(CustomGrammar):
             [ 'doctor', 'knight', 'troll' ],
             [ 'a ', 'some ' ],
             [ ' drank ', ' stole ' ],
-            [ 'beer', 'glass of milk', 'magic potion' ],
+            [ 'beer', 'coffee', 'magic potion' ],
             [ 'a ', 'some ' ]
         ]
         bad_pattern_indef_def = [
@@ -227,13 +231,13 @@ class AsymmetricArticlesGrammar(CustomGrammar):
             [ 'a ', 'some ' ],
             [ ' drank ', ' stole ' ],
             [ 'the ' ],
-            [ 'beer', 'glass of milk', 'magic potion' ]
+            [ 'beer', 'coffee', 'magic potion' ]
         ]
         bad_pattern_def_indef = [
             [ 'the ' ],
             [ 'doctor', 'knight', 'troll' ],
             [ ' drank ', ' stole ' ],
-            [ 'beer', 'glass of milk', 'magic potion' ],
+            [ 'beer', 'coffee', 'magic potion' ],
             [ 'a ', 'some ' ]
         ]
         bad_pattern_def_def = [
@@ -241,10 +245,12 @@ class AsymmetricArticlesGrammar(CustomGrammar):
             [ 'doctor', 'knight', 'troll' ],
             [ ' drank ', ' stole ' ],
             [ 'the ' ],
-            [ 'beer', 'glass of milk', 'magic potion' ]
+            [ 'beer', 'coffee', 'magic potion' ]
         ]
         try:
             bad_indef_indef = [(self.translate(s), s) for s in itertools.product(*bad_pattern_indef_indef)]
+            # filter out 'Some troll drank some beer' and similar
+            bad_indef_indef = [(mar, eng) for mar, eng in bad_indef_indef if 'a ' in eng]
             bad_indef_indef = random.sample(bad_indef_indef, int(num_strings / 4 + 1))
             bad_indef_def = [(self.translate(s), s) for s in itertools.product(*bad_pattern_indef_def)]
             bad_indef_def = random.sample(bad_indef_def, int(num_strings / 4 + 1))
