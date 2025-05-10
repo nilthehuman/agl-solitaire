@@ -148,7 +148,7 @@ class AsymmetricArticlesGrammar(CustomGrammar):
         def monosyll(string):
             return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
         assert any(monosyll(s) for s in self.tokens)
-        while not monosyll(self.tokens[0]) or not monosyll(self.tokens[1]):
+        while not monosyll(self.tokens[0]) or not monosyll(self.tokens[1]) or monosyll(self.tokens[5]) or monosyll(self.tokens[6]):
             random.shuffle(self.tokens)
         self.lexicon = {
             'a'             : self.tokens[0],
