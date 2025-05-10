@@ -959,7 +959,7 @@ class EchoMorphologyGrammar(CustomGrammar):
             while not done:
                 # revert a few words to their "unechoed" forms
                 for i in range(len(form)):
-                    if random.choice([True, False, False]):
+                    if form[i] and random.choice([True, False, False]):
                         try:
                             form = form[0:i] + self.translate([meaning[i]], lexicon=self.unechoed_lexicon) + form[i+1:]
                             done = True
