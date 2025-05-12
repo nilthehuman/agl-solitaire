@@ -1562,6 +1562,141 @@ class PredicativeEndingGrammar(CustomGrammar):
         return ungrammatical_sentences
 
 
+class ErgativeAbsolutiveGrammar(CustomGrammar):
+    """A grammar fragment where the subjects of intransitive verbs and the objects
+    of transitive verbs are marked the same way (ergativity)."""
+
+    def __init__(self, tokens):
+        super().__init__(tokens)
+        def monosyll(string):
+            return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
+        assert any(monosyll(s) for s in self.tokens)
+        while not monosyll(self.tokens[10]) or not monosyll(self.tokens[11]):
+            random.shuffle(self.tokens)
+        self.lexicon = {
+            'Mara'  : 'Mara',
+            'Pavel' : 'Pavel',
+            'was sleeping'   : self.tokens[0],
+            'were sleeping'   : self.tokens[0],
+            'was walking' : self.tokens[1],
+            'were walking' : self.tokens[1],
+            'knew' : self.tokens[2],
+            'introduced' : self.tokens[3],
+            'had introduced' : self.tokens[3],
+            'was introduced' : self.tokens[3],
+            'were introduced' : self.tokens[3],
+            'was introduced by' : self.tokens[3],
+            'were introduced by' : self.tokens[3],
+            'asked'  : self.tokens[4],
+            'had asked'  : self.tokens[4],
+            'was asked'  : self.tokens[4],
+            'were asked'  : self.tokens[4],
+            'was asked by'  : self.tokens[4],
+            'were asked by'  : self.tokens[4],
+            'the chieftain'   : self.tokens[6],
+            'the chieftain of the tribe'   : self.tokens[5] + ' ' + self.tokens[6],
+            'the man'  : self.tokens[7],
+            'the man of the tribe'  : self.tokens[5] + ' ' + self.tokens[7],
+            'and'   : self.tokens[8],
+            'already'  : self.tokens[9],
+            'ABS'  : self.tokens[10],
+            'ERG'  : self.tokens[11]
+        }
+
+    def produce_grammatical(self, num_strings=1, polish=True):
+        sentence_pattern_intransitive_1 = [
+            [ 'Mara', 'Pavel', 'the chieftain', 'the chieftain of the tribe', 'the man', 'the man of the tribe' ],
+            [ 'ABS' ],
+            [ '', '', ' already' ],
+            [ ' was sleeping', ' was walking', ' was introduced' ]
+        ]
+        sentence_pattern_intransitive_2 = [
+            [ 'Mara', 'Pavel', 'the chieftain', 'the chieftain of the tribe', 'the man', 'the man of the tribe' ],
+            [ 'ABS' ],
+            [ ' and ' ],
+            [ 'Mara', 'Pavel', 'the chieftain', 'the chieftain of the tribe', 'the man', 'the man of the tribe' ],
+            [ 'ABS' ],
+            [ '', '', ' already' ],
+            [ ' were sleeping', ' were walking ', ' were introduced' ],
+        ]
+        sentence_pattern_transitive = [
+            [ 'Mara', 'Pavel', 'the chieftain', 'the chieftain of the tribe', 'the man', 'the man of the tribe' ],
+            [ 'ERG' ],
+            [ '', '', ' already' ],
+            [ ' knew ', ' introduced ', ' had introduced ', ' asked ', ' had asked ' ],
+            [ 'Mara', 'Pavel', 'the chieftain', 'the chieftain of the tribe', 'the man', 'the man of the tribe' ],
+            [ 'ABS' ]
+        ]
+        sentence_pattern_passive = [
+            [ 'Mara', 'Pavel', 'the chieftain', 'the chieftain of the tribe', 'the man', 'the man of the tribe' ],
+            [ 'ABS' ],
+            [ '', '', ' already' ],
+            [ ' was introduced by ', ' was asked by ' ],
+            [ 'Mara', 'Pavel', 'the chieftain', 'the chieftain of the tribe', 'the man', 'the man of the tribe' ],
+            [ 'ERG' ]
+        ]
+        try:
+            sentences_intransitive_1 = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_intransitive_1)]
+            sentences_intransitive_1 = list(set(sentences_intransitive_1))
+            sentences_intransitive_1 = random.sample(sentences_intransitive_1, int(num_strings / 4 + 0.25))
+            sentences_intransitive_2 = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_intransitive_2) if s[0] != s[3]]
+            sentences_intransitive_2 = list(set(sentences_intransitive_2))
+            sentences_intransitive_2 = random.sample(sentences_intransitive_2, int(num_strings / 4 + 0.25))
+            sentences_transitive = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_transitive) if s[0] != s[4]]
+            sentences_transitive = list(set(sentences_transitive))
+            sentences_transitive = random.sample(sentences_transitive, int(num_strings / 4 + 0.25))
+            sentences_passive = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_passive) if s[0] != s[4]]
+            sentences_passive = list(set(sentences_passive))
+            sentences_passive = random.sample(sentences_passive, int(num_strings / 4 + 0.25))
+        except ValueError:
+            return None
+        sentences = sentences_intransitive_1 + sentences_intransitive_2 + sentences_transitive + sentences_passive
+        # fix placement of 'already' in English
+        def move_already(eng):
+            try:
+                i = eng.index(' already')
+                return eng[0:i] + eng[i+1:] + (' already',)
+            except ValueError:
+                return eng
+        sentences = [(mar, move_already(eng)) for mar, eng in sentences]
+        # remove ERG and ABS morphemes from English
+        def remove_markers(eng):
+            return tuple(['' if w in ['ABS', 'ERG'] else w for w in eng])
+        sentences = [(mar, remove_markers(eng)) for mar, eng in sentences]
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            sentences = polish_sentences(sentences)
+        random.shuffle(sentences)
+        return sentences
+
+    def produce_ungrammatical(self, num_strings=1, polish=True):
+        ungrammatical_sentences = set()
+        sentences = self.produce_grammatical(4, polish=False)
+        while len(ungrammatical_sentences) < num_strings:
+            form, meaning = sentences[0]
+            sentences = sentences[1:]
+            if not sentences:
+                sentences = self.produce_grammatical(4, polish=False)
+            done = False
+            new_form = form
+            while not done:
+                for i, word in enumerate(form):
+                    if word == self.translate('ABS') and random.choice([True, False, False]):
+                        # swap ABS for ERG
+                        new_form = form[:i] + (self.translate('ERG'),) + form[i+1:]
+                        done = True
+                    if word == self.translate('ERG') and random.choice([True, False, False]):
+                        # swap ERG for ABS
+                        new_form = form[:i] + (self.translate('ABS'),) + form[i+1:]
+                        done = True
+            sentence = (tuple(new_form), meaning)
+            ungrammatical_sentences.add(sentence)
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+        return ungrammatical_sentences
+
+
 class NaturalnessJudgementTask(Task, Loggable):
     """See how participant rates a few plain English stimuli."""
 
@@ -1627,7 +1762,8 @@ class CustomExperiment(Experiment):
         PalindromeDemonstrativeGrammar,
         PalindromePastGrammar,
         RecursiveGrammar,
-        PredicativeEndingGrammar
+        PredicativeEndingGrammar,
+        ErgativeAbsolutiveGrammar
     ]
 
     def ready_to_run(self):
