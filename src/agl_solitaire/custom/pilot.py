@@ -1473,7 +1473,7 @@ class PredicativeEndingGrammar(CustomGrammar):
         def monosyll(string):
             return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
         assert any(monosyll(s) for s in self.tokens)
-        while not monosyll(self.tokens[0]):
+        while not monosyll(self.tokens[0]) or all(monosyll(t) for t in self.tokens[2:6]):
             random.shuffle(self.tokens)
         self.lexicon = {
             'the'   : self.tokens[0],
