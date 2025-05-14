@@ -188,12 +188,12 @@ class Task(Loggable, TaskState):
                 answer = None
                 while not answer:
                     answer = input()
+                    self.duplicate_print(answer, log_only=True)
                 answer = answer[0].lower()
                 if answer == 'g':
                     answer = 'y'
                 elif answer == 'u':
                     answer = 'n'
-            self.duplicate_print(answer, log_only=True)
             self.test_set[i] = (self.test_set[i][0], self.test_set[i][1], answer)
             # FIXME: need to call this manually because __setattr__ doesn't get called if you update a member variable in-place :(
             self.settings.save_all()
