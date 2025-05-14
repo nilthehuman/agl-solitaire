@@ -492,7 +492,7 @@ class Application(Loggable):
                 while go_ahead:
                     go_ahead = False
                     print('Sending experiment logs to the author of the application. Please stand by...')
-                    with open(stngs.logfile_filename, 'r') as fh:
+                    with open(stngs.logfile_filename, 'r', encoding='UTF-8') as fh:
                         log_lines = fh.read().split('\n')
                     try:
                         from_line = len(log_lines) - 1 - next(i for i, line in enumerate(log_lines[::-1]) if '====' in line)
@@ -504,7 +504,7 @@ class Application(Loggable):
                         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
                             # all in plaintext, probably not a good idea :(
                             server.login('aglsolitaire@gmail.com', 'llot gfpy csfw wuyt')
-                            server.sendmail('aglsolitaire@gmail.com', 'aglsolitaire@gmail.com', message_body)
+                            server.sendmail('aglsolitaire@gmail.com', 'aglsolitaire@gmail.com', message_body.encode('utf-8'))
                         print('Success. Thank you for your contribution!')
                     except OSError:
                         print('Failed. Perhaps your internet connection is not working.')
