@@ -17,29 +17,30 @@ from src.agl_solitaire.utils import clear, print, input, polish_sentences, Logga
 
 
 TOKEN_SETS = [
-    [ 'an', 'ar', 'bobo', 'dal', 'eli', 'kuu', 'ma', 'mele', 'nu', 'pul', 'teng', 'ze' ],
+    [ 'an', 'ar', 'bobo', 'dal', 'eli', 'kuu', 'ma', 'mele', 'nuppi', 'pul', 'teng', 'ze' ],
     [ 'a', 'ele', 'il', 'kon', 'moda', 'me', 'nigi', 'punnu', 'shii', 'tam', 'va', 'zen' ],
     [ 'amura', 'es', 'ilani', 'gova', 'khen', 'li', 'ni', 'oba', 'pol', 'so', 'to', 'xe' ],
     [ 'ado', 'hovo', 'kere', 'loa', 'mod', 'muma', 'nog', 'pavo', 'saso', 'sil', 'tir', 'wa' ],
-    [ 'bo', 'bunna', 'ebbe', 'enta', 'haaru', 'kaal', 'ki', 'ma', 'sawa', 'sor', 'tama', 'zaal' ],
-    [ 'amo', 'avadi', 'bint', 'esse', 'gorra', 'ikka', 'min', 'mula', 'ol', 'teti', 've', 'voro' ],
+    [ 'bo', 'bunna', 'ebbe', 'enta', 'haaru', 'kaal', 'ki', 'maja', 'sawa', 'sor', 'tama', 'zaal' ],
+    [ 'amo', 'avadi', 'bint', 'esse', 'gorra', 'ikka', 'mir', 'mula', 'ol', 'teti', 've', 'voro' ],
     [ 'ateme', 'en', 'felle', 'gora', 'khiad', 'myna', 'mu', 'o', 'soro', 'xind', 'yko', 'ylmo' ],
     [ 'del', 'fy', 'fyyri', 'hel', 'ivi', 'kaha', 'ky', 'mamo', 'min', 'porda', 'te', 'wek' ],
     [ 'atta', 'eve', 'henne', 'i', 'manba', 'men', 'pon', 'raago', 'tor', 'tuu', 'uva', 'zoto' ],
     [ 'daa', 'dyn', 'e', 'iti', 'mene', 'nu', 'ogho', 'shen', 'taal', 'urro', 'uzto', 'zo' ],
-    [ 'ata', 'cir', 'farra', 'ke', 'meze', 'mor', 'nibi', 'ob', 'ono', 'pur', 'tala', 'toyo' ],
-    [ 'aene', 'de', 'er', 'hin', 'lu', 'maata', 'melde', 'ni', 'olta', 'osso', 'pi', 'vent' ],
-    [ 'ar', 'bo', 'da', 'echa', 'me', 'opo', 'oto', 'pau', 'sako', 'tau', 'ti', 'ud' ],
-    [ 'ben', 'e', 'firno', 'hen', 'huu', 'mi', 'ne', 'opi', 'pa', 'ro', 'tel', 'tum' ],
-    [ 'ava', 'eti', 'gar', 'im', 'ka', 'miko', 'na', 'og', 'onno', 'pana', 'quon', 'va' ],
-    [ 'baa', 'ber', 'dem', 'koko', 'mem', 'nuo', 'pin', 'sa', 'sil', 'tan', 'usu', 'yppo' ],
-    [ 'atta', 'bara', 'de', 'hi', 'lo', 'mbe', 'ope', 'pek', 'tunde', 'u', 'vym', 'wal' ],
-    [ 'an', 'fer', 'ho', 'je', 'mata', 'nin', 'ob', 'pirra', 'samu', 'ten', 'toma', 'wu' ],
-    [ 'bevish', 'el', 'go', 'kabu', 'mata', 'milen', 'nau', 'nish', 'ruu', 'ter', 'tin', 'vi' ],
-    [ 'anga', 'bara', 'em', 'gii', 'hol', 'lato', 'momma', 'pede', 'polo', 'se', 'tai', 'to' ],
-    [ 'bi', 'chari', 'kon', 'koro', 'ma', 'mbene', 'nga', 'por', 'ru', 'tolo', 'vende', 'ye' ],
-    [ 'amma', 'bin', 'choa', 'eze', 'ito', 'keme', 'mi', 'mou', 'po', 'su', 'uk', 'uru' ],
-    [ 'arwa', 'den', 'eis', 'gor', 'hei', 'loma', 'megi', 'nam', 're', 'sim', 'tin', 'vagu' ]
+    [ 'ata', 'cir', 'farra', 'ke', 'meze', 'mor', 'nibi', 'op', 'ono', 'pur', 'tala', 'toyo' ],
+    [ 'aene', 'de', 'er', 'hin', 'lu', 'maata', 'melde', 'no', 'olta', 'osso', 'pi', 'vent' ],
+    [ 'araz', 'bom', 'da', 'echa', 'mel', 'opo', 'oto', 'pau', 'sako', 'tau', 'ti', 'ud' ],
+    [ 'ben', 'ega', 'firno', 'hen', 'huu', 'mi', 'ne', 'opi', 'pa', 'ro', 'tel', 'tum' ],
+    [ 'ava', 'eti', 'gar', 'im', 'ka', 'miko', 'na', 'og', 'onno', 'pana', 'quon', 'vu' ],
+    [ 'baa', 'ber', 'dem', 'koko', 'mem', 'nuo', 'pin', 'sa', 'sik', 'tan', 'usu', 'yppo' ],
+    [ 'baro', 'do', 'hi', 'lo', 'mbe', 'mina', 'ope', 'pek', 'tunde', 'u', 'vym', 'wal' ],
+    [ 'am', 'fer', 'ho', 'je', 'mata', 'nin', 'ob', 'pirra', 'samu', 'ten', 'toma', 'wu' ],
+    [ 'bevish', 'el', 'go', 'kabu', 'munga', 'milen', 'nau', 'nish', 'ruu', 'ter', 'tin', 'vi' ],
+    [ 'anga', 'bara', 'em', 'gii', 'hol', 'lato', 'momma', 'pede', 'polo', 'se', 'tai', 'tu' ],
+    [ 'bi', 'chari', 'kol', 'koro', 'maa', 'mbene', 'nga', 'por', 'ru', 'tolo', 'vende', 'ye' ],
+    [ 'amma', 'bin', 'choa', 'eze', 'ito', 'keme', 'miz', 'mou', 'po', 'su', 'uk', 'uru' ],
+    [ 'arwa', 'den', 'eis', 'gor', 'hei', 'loma', 'megi', 'nam', 're', 'sim', 'tun', 'vagu' ],
+    [ 'as', 'be', 'boi', 'dakh', 'hem', 'kel', 'shoka', 'jiba', 'lulu', 'tol', 'vongo', 'ulme' ]
 ]
 for tokens in TOKEN_SETS:
     assert len(tokens) == 12
