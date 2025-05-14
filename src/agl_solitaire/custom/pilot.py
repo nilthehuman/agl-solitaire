@@ -21,7 +21,7 @@ TOKEN_SETS = [
     [ 'a', 'ele', 'il', 'kon', 'moda', 'me', 'nigi', 'punnu', 'shii', 'tam', 'va', 'zen' ],
     [ 'amura', 'es', 'ilani', 'gova', 'khen', 'li', 'ni', 'oba', 'pol', 'so', 'to', 'xe' ],
     [ 'ado', 'hovo', 'kere', 'loa', 'mod', 'muma', 'nog', 'pavo', 'saso', 'sil', 'tir', 'wa' ],
-    [ 'bo', 'bunna', 'ebbe', 'enta', 'haaru', 'kaal', 'ki', 'maja', 'sawa', 'sor', 'tama', 'zaal' ],
+    [ 'bo', 'bunna', 'ebbe', 'enta', 'haaru', 'ki', 'maja', 'om', 'sawa', 'sor', 'tama', 'zaal' ],
     [ 'amo', 'avadi', 'bint', 'esse', 'gorra', 'ikka', 'mir', 'mula', 'ol', 'teti', 've', 'voro' ],
     [ 'ateme', 'en', 'felle', 'gora', 'khiad', 'myna', 'mu', 'o', 'soro', 'xind', 'yko', 'ylmo' ],
     [ 'del', 'fy', 'fyyri', 'hel', 'ivi', 'kaha', 'ky', 'mamo', 'min', 'porda', 'te', 'wek' ],
