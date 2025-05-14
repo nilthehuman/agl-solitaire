@@ -104,11 +104,11 @@ class Application(Loggable):
             oversize += 1
             if (grammatical_strings is None or ungrammatical_strings is None) and oversize <= max_oversize_attempts:
                 if self.settings.grammar_class == settings.GrammarClass.REGULAR:
-                    self.duplicate_print(f"None found, expanding search to {gmr.MIN_STATES+oversize} to {gmr.MAX_STATES+oversize} states...")
+                    self.duplicate_print(f"None found, extending search to {gmr.MIN_STATES+oversize} to {gmr.MAX_STATES+oversize} states...")
                 elif self.settings.grammar_class == settings.GrammarClass.PATTERN:
                     class_oversize = int(oversize/2 + 0.5)
                     pattern_oversize = int(oversize/2)
-                    self.duplicate_print(f"None found, expanding search to {gmr.MIN_CLASSES+class_oversize} to {gmr.MAX_CLASSES+class_oversize} word classes and {gmr.MIN_PATTERNS+pattern_oversize} to {gmr.MAX_PATTERNS+pattern_oversize} patterns...")
+                    self.duplicate_print(f"None found, extending search to {gmr.MIN_CLASSES+class_oversize} to {gmr.MAX_CLASSES+class_oversize} word classes and {gmr.MIN_PATTERNS+pattern_oversize} to {gmr.MAX_PATTERNS+pattern_oversize} patterns...")
                 else:
                     assert False
         if (grammatical_strings is None or ungrammatical_strings is None):
