@@ -45,8 +45,9 @@ class Grammar(abc.ABC):
 class CustomGrammar(Grammar):
     """Base class for non-trivial grammars (as opposed to simple formal grammars)."""
 
-    def __init__(self, tokens=None, rhymes=None):
+    def __init__(self, tokens=None, proper_names=None, rhymes=None):
         self.tokens = tokens
+        self.proper_names = proper_names
         self.rhymes = rhymes
 
     def translate(self, string, lexicon=None):
@@ -54,12 +55,25 @@ class CustomGrammar(Grammar):
         if lexicon is None:
             assert self.lexicon
             lexicon = self.lexicon
+        def lookup(string):
+            try:
+                return lexicon[string]
+            except KeyError:
+                if string.endswith("'s"):
+                    assert string[:-2] in self.proper_names
+                elif string.endswith("'"):
+                    assert string[:-1] in self.proper_names
+                else:
+                    assert string in self.proper_names
+                return string
         if type(string) is str:
-            return lexicon[string]
-        def tr(word):
-                # disregard whitespace on either side
-            return re.sub(r"([\w'-]+(\s*?[\w'-]+?)*)", lambda m: lexicon[m.group(1)], word)
-        return tuple(tr(x) for x in string)
+            return lookup(string)
+        def translate_word(word):
+            if word.endswith("'s"):
+                return re.sub(r"([\w'-]+(\s*?[\w'-]+?)*)", lambda m: lookup(m.group(1)), word[:-2])
+            # disregard whitespace on either side
+            return re.sub(r"([\w'-]+(\s*?[\w'-]+?)*)", lambda m: lookup(m.group(1)), word)
+        return tuple(translate_word(x) for x in string)
 
 
 class FormalGrammar(Grammar):

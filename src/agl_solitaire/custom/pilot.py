@@ -44,6 +44,36 @@ TOKEN_SETS = [
 ]
 for tokens in TOKEN_SETS:
     assert len(tokens) == 12
+
+PROPER_NAME_SETS = [
+    [ 'Ammu',    'Baxer' ],
+    [ 'Bilka',   'Arno' ],
+    [ 'Cenga',   'Dilve' ],
+    [ 'Domota',  'Chiras' ],
+    [ 'Egevina', 'Fei Li' ],
+    [ 'Fendi',   'Enbos' ],
+    [ 'Gresta',  'Hiki' ],
+    [ 'Hulma',   'Goso' ],
+    [ 'Imman',   'Jamu' ],
+    [ 'Juchu',   'Ikil' ],
+    [ 'Kagora',  'Lem' ],
+    [ 'Lasha',   'Kuor' ],
+    [ 'Mara',    'Neri' ],
+    [ 'Nekki',   'Munlo' ],
+    [ 'Onte',    'Pavel' ],
+    [ 'Pembosh', 'Ortin' ],
+    [ 'Quesse',  'Ruos' ],
+    [ 'Rinka',   'Qaal' ],
+    [ 'Shen',    'Trevion' ],
+    [ 'Tibu',    'Silaq' ],
+    [ 'Umida',   'Vinne' ],
+    [ 'Venke',   'Umpa' ],
+    [ 'Wolnea',  'Xalo' ],
+    [ 'Xinebu',  'Wotur' ],
+    [ 'Yrris',   'Zog' ],
+    [ 'Zigel',   'Yshtu' ]
+]
+
 RHYMES = [
     ('borna', 'lorna'), ('fairu', 'tairu'), ('gullam', 'mullam'), ('helto', 'nelto'), ('ippo', 'pippo'),
     ('kolo', 'tolo'), ('mahi', 'vahi'), ('ledek', 'nedek'), ('sendu', 'vendu'), ('tuko', 'zuko')
@@ -60,8 +90,8 @@ class CustomTask(Task):
 class DefiniteArticleAgreementGrammar(CustomGrammar):
     """A grammar fragment where nouns and their adjectives agree in definiteness marking."""
 
-    def __init__(self, tokens):
-        super().__init__(tokens)
+    def __init__(self, tokens, proper_names):
+        super().__init__(tokens, proper_names)
         def monosyll(string):
             return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
         assert any(monosyll(s) for s in self.tokens)
@@ -97,18 +127,25 @@ class DefiniteArticleAgreementGrammar(CustomGrammar):
             [ 'is running', 'is reading' ],
             [ '', ' a lot', ' tonight' ]
         ]
+        sentence_pattern_name = [
+            self.proper_names,
+            [ ' is running', ' is reading' ],
+            [ '', ' a lot', ' tonight' ]
+        ]
         try:
             sentences_def = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_def)]
-            sentences_def = random.sample(sentences_def, int(num_strings / 2 + 0.5))
+            sentences_def = random.sample(sentences_def, int(num_strings / 3 + 0.67))
             # Martian is fine, but space needed after English 'the'
             sentences_def = [(mar, (eng[0]+' ', eng[1],) + eng[3:]) for mar, eng in sentences_def]
             sentences_indef = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_indef)]
-            sentences_indef = random.sample(sentences_indef, int(num_strings / 2 + 0.5))
+            sentences_indef = random.sample(sentences_indef, int(num_strings / 3 + 0.67))
             # Martian is fine, English needs an indefinite article
             sentences_indef = [(mar, ('a' + ('n' if eng[0].startswith('o') else '') + ' ',) + eng) for mar, eng in sentences_indef]
+            sentences_name = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_name)]
+            sentences_name = random.sample(sentences_name, int(num_strings / 3 + 0.67))
         except ValueError:
             return None
-        sentences = sentences_def + sentences_indef
+        sentences = sentences_def + sentences_indef + sentences_name
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
             sentences = polish_sentences(sentences)
@@ -145,8 +182,8 @@ class AsymmetricArticlesGrammar(CustomGrammar):
     """A grammar fragment where the definite article cliticizes to the end of the noun head
     but the indefinite article does not."""
 
-    def __init__(self, tokens):
-        super().__init__(tokens)
+    def __init__(self, tokens, proper_names):
+        super().__init__(tokens, proper_names)
         def monosyll(string):
             return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
         assert any(monosyll(s) for s in self.tokens)
@@ -195,6 +232,18 @@ class AsymmetricArticlesGrammar(CustomGrammar):
             [ 'beer', 'coffee', 'magic potion' ],
             [ 'the ' ]
         ]
+        sentence_pattern_name_indef = [
+            self.proper_names,
+            [ ' drank ', ' stole ' ],
+            [ 'a ', 'some ' ],
+            [ 'beer', 'coffee', 'magic potion' ]
+        ]
+        sentence_pattern_name_def = [
+            self.proper_names,
+            [ ' drank ', ' stole ' ],
+            [ 'beer', 'coffee', 'magic potion' ],
+            [ 'the ' ]
+        ]
         def finalize_english(string):
             if string[-2:] == ('some ', 'magic potion'):
                 return string[:-1] + ('magic potions',)
@@ -208,13 +257,18 @@ class AsymmetricArticlesGrammar(CustomGrammar):
             sentences_def_indef = random.sample(sentences_def_indef, int(num_strings / 4 + 0.25))
             sentences_def_def = [(self.translate(s), finalize_english(s)) for s in itertools.product(*sentence_pattern_def_def)]
             sentences_def_def = random.sample(sentences_def_def, int(num_strings / 4 + 0.25))
+            sentences_name_indef = [(self.translate(s), finalize_english(s)) for s in itertools.product(*sentence_pattern_name_indef)]
+            sentences_name_indef = random.sample(sentences_name_indef, int(num_strings / 4 + 0.25))
+            sentences_name_def = [(self.translate(s), finalize_english(s)) for s in itertools.product(*sentence_pattern_name_def)]
+            sentences_name_def = random.sample(sentences_name_def, int(num_strings / 4 + 0.25))
         except ValueError:
             return None
         # restore English word order
         sentences_indef_def = [(mar, eng[0:3] + (eng[4],) + (eng[3],)) for mar, eng in sentences_indef_def]
         sentences_def_indef = [(mar, (eng[1],) + (eng[0],) + eng[2:]) for mar, eng in sentences_def_indef]
         sentences_def_def = [(mar, (eng[1], eng[0], eng[2], eng[4], eng[3])) for mar, eng in sentences_def_def]
-        sentences = sentences_indef_indef + sentences_indef_def + sentences_def_indef + sentences_def_def
+        sentences_name_def = [(mar, (eng[0], eng[1], eng[3], eng[2])) for mar, eng in sentences_name_def]
+        sentences = sentences_indef_indef + sentences_indef_def + sentences_def_indef + sentences_def_def + sentences_name_def
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
             sentences = polish_sentences(sentences)
@@ -250,24 +304,41 @@ class AsymmetricArticlesGrammar(CustomGrammar):
             [ 'the ' ],
             [ 'beer', 'coffee', 'magic potion' ]
         ]
+        bad_pattern_name_indef = [
+            self.proper_names,
+            [ ' drank ', ' stole ' ],
+            [ 'beer', 'coffee', 'magic potion' ],
+            [ 'a ' ]
+        ]
+        bad_pattern_name_def = [
+            self.proper_names,
+            [ ' drank ', ' stole ' ],
+            [ 'the ' ],
+            [ 'beer', 'coffee', 'magic potion' ]
+        ]
         try:
             bad_indef_indef = [(self.translate(s), s) for s in itertools.product(*bad_pattern_indef_indef)]
             # filter out 'Some troll drank some beer' and similar
             bad_indef_indef = [(mar, eng) for mar, eng in bad_indef_indef if 'a ' in eng]
-            bad_indef_indef = random.sample(bad_indef_indef, int(num_strings / 4 + 1))
+            bad_indef_indef = random.sample(bad_indef_indef, int(num_strings / 6 + 1))
             bad_indef_def = [(self.translate(s), s) for s in itertools.product(*bad_pattern_indef_def)]
-            bad_indef_def = random.sample(bad_indef_def, int(num_strings / 4 + 1))
+            bad_indef_def = random.sample(bad_indef_def, int(num_strings / 6 + 1))
             bad_def_indef = [(self.translate(s), s) for s in itertools.product(*bad_pattern_def_indef)]
-            bad_def_indef = random.sample(bad_def_indef, int(num_strings / 4 + 1))
+            bad_def_indef = random.sample(bad_def_indef, int(num_strings / 6 + 1))
             bad_def_def = [(self.translate(s), s) for s in itertools.product(*bad_pattern_def_def)]
-            bad_def_def = random.sample(bad_def_def, int(num_strings / 4 + 1))
+            bad_def_def = random.sample(bad_def_def, int(num_strings / 6 + 1))
+            bad_name_indef = [(self.translate(s), s) for s in itertools.product(*bad_pattern_name_indef)]
+            bad_name_indef = random.sample(bad_name_indef, int(num_strings / 6 + 1))
+            bad_name_def = [(self.translate(s), s) for s in itertools.product(*bad_pattern_name_def)]
+            bad_name_def = random.sample(bad_name_def, int(num_strings / 6 + 1))
         except ValueError:
             return None
         # restore English word order
         bad_indef_indef = [(mar, (eng[1], eng[0], eng[2], eng[4], eng[3])) for mar, eng in bad_indef_indef]
         bad_indef_def = [(mar, (eng[1],) + (eng[0],) + eng[2:]) for mar, eng in bad_indef_def]
         bad_def_indef = [(mar, eng[0:3] + (eng[4],) + (eng[3],)) for mar, eng in bad_def_indef]
-        ungrammatical_sentences = bad_indef_indef + bad_indef_def + bad_def_indef + bad_def_def
+        bad_name_indef = [(mar, (eng[0], eng[1], eng[3], eng[2])) for mar, eng in bad_name_indef]
+        ungrammatical_sentences = bad_indef_indef + bad_indef_def + bad_def_indef + bad_def_def + bad_name_indef + bad_name_def
         ungrammatical_sentences = random.sample(ungrammatical_sentences, num_strings)
         random.shuffle(ungrammatical_sentences)
         if polish:
@@ -279,8 +350,8 @@ class AsymmetricArticlesGrammar(CustomGrammar):
 class AccusativeMarkingAgreementGrammar(CustomGrammar):
     """A grammar fragment where nouns and their adjuncts agree in object marking."""
 
-    def __init__(self, tokens):
-        super().__init__(tokens)
+    def __init__(self, tokens, proper_names):
+        super().__init__(tokens, proper_names)
         def monosyll(string):
             return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
         assert any(monosyll(s) for s in self.tokens)
@@ -303,15 +374,15 @@ class AccusativeMarkingAgreementGrammar(CustomGrammar):
 
     def produce_grammatical(self, num_strings=1, polish=True):
         sentence_pattern_indef = [
-            [ 'she ', 'he ' ],
-            [ 'brought ', 'found ' ],
+            [ 'she', 'he' ] + self.proper_names,
+            [ ' brought ', ' found ' ],
             [ 'a' ],
             [ ' basket', ' chair', ' horse' ],
             [ 'ACC' ]
         ]
         sentence_pattern_quant = [
-            [ 'she ', 'he ' ],
-            [ 'brought ', 'found ' ],
+            [ 'she', 'he' ] + self.proper_names,
+            [ ' brought ', ' found ' ],
             [ 'two', 'good', 'large' ],
             [ 'ACC ' ],
             [ ' basket', ' chair', ' horse' ],
@@ -365,8 +436,8 @@ class AccusativeMarkingAgreementGrammar(CustomGrammar):
 class VerbalAgreementGrammar(CustomGrammar):
     """A grammar fragment where subjects and verbs agree in gender."""
 
-    def __init__(self, tokens):
-        super().__init__(tokens)
+    def __init__(self, tokens, proper_names):
+        super().__init__(tokens, proper_names)
         def monosyll(string):
             return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
         assert any(monosyll(s) for s in self.tokens)
@@ -391,15 +462,15 @@ class VerbalAgreementGrammar(CustomGrammar):
 
     def produce_grammatical(self, num_strings=1, polish=True):
         sentence_pattern_fem = [
-            [ 'she ', 'a girl ', 'two girls ' ],
-            [ 'is ' ],
+            [ 'she', 'a girl', 'two girls', self.proper_names[0] ],
+            [ ' is ' ],
             [ 'eating', 'baking' ],
             [ 'FEM' ],
             [ '', ' pizza', ' a cake' ]
         ]
         sentence_pattern_masc = [
-            [ 'he ', 'a boy ', 'two boys ' ],
-            [ 'is ' ],
+            [ 'he', 'a boy', 'two boys', self.proper_names[1] ],
+            [ ' is ' ],
             [ 'eating', 'baking' ],
             [ 'MASC' ],
             [ '', ' pizza', ' a cake' ]
@@ -413,7 +484,7 @@ class VerbalAgreementGrammar(CustomGrammar):
             return None
         sentences = sentences_fem + sentences_masc
         # Martian is fine, English needs number agreement
-        sentences = [(mar, eng[0:1] + ('are ' if eng[0].startswith('two') else 'is ',) + eng[2:]) for mar, eng in sentences]
+        sentences = [(mar, eng[0:1] + (' are ' if eng[0].startswith('two') else ' is ',) + eng[2:]) for mar, eng in sentences]
         # erase gender markers from the English translations
         sentences = [(mar, eng[0:3] + eng[4:]) for mar, eng in sentences]
         if polish:
@@ -440,8 +511,8 @@ class VerbalAgreementGrammar(CustomGrammar):
 class VerbReduplicationGrammar(CustomGrammar):
     """A grammar fragment where a verb is uttered twice, first before the object and then before an adverb."""
 
-    def __init__(self, tokens):
-        super().__init__(tokens)
+    def __init__(self, tokens, proper_names):
+        super().__init__(tokens, proper_names)
         def monosyll(string):
             return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
         assert any(monosyll(s) for s in self.tokens)
@@ -478,12 +549,28 @@ class VerbReduplicationGrammar(CustomGrammar):
             [ 'DE ' ],
             [ 'often', 'well' ]
         ]
+        sentence_pattern_name_short = [
+            self.proper_names,
+            [ ' speaks ', ' plays ' ],
+            [ 'Dutch ', 'the piano ' ]
+        ]
+        sentence_pattern_name_long = [
+            self.proper_names,
+            [ ' speaks ', ' plays ' ],
+            [ 'Dutch ', 'the piano ' ],
+            [ ' speaks ', ' plays ' ],
+            [ 'DE ' ],
+            [ 'often', 'well' ]
+        ]
         def object_makes_sense(sentence):
             # let the verbs select for the correct type of object, obviously
-            if ((sentence[2] == 'plays '  and sentence[3] == 'the piano ') or
+            if ((sentence[1] == ' plays '  and sentence[2] == 'the piano ') or
+                (sentence[1] == ' speaks ' and sentence[2] == 'Dutch ') or
+                (sentence[2] == 'plays '  and sentence[3] == 'the piano ') or
                 (sentence[2] == 'speaks ' and sentence[3] == 'Dutch ')):
                 try:
-                    if sentence[2] == sentence[4]:
+                    if (sentence[1] == sentence[3] or
+                        sentence[2] == sentence[4]):
                         return True
                     else:
                         return False
@@ -493,14 +580,19 @@ class VerbReduplicationGrammar(CustomGrammar):
                 return False
         try:
             sentences_short = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_short) if object_makes_sense(s)]
-            sentences_short = random.sample(sentences_short, int(num_strings / 2 + 0.5))
+            sentences_short = random.sample(sentences_short, int(num_strings / 4 + 1))
             sentences_long = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_long) if object_makes_sense(s)]
-            sentences_long = random.sample(sentences_long, int(num_strings / 2 + 0.5))
+            sentences_long = random.sample(sentences_long, int(num_strings / 4 + 1))
+            sentences_name_short = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_name_short) if object_makes_sense(s)]
+            sentences_name_short = random.sample(sentences_name_short, min(4, int(num_strings / 4 + 1)))
+            sentences_name_long = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_name_long) if object_makes_sense(s)]
+            sentences_name_long = random.sample(sentences_name_long, min(8, int(num_strings / 4 + 1)))
         except ValueError:
             return None
         # erase reduplication from the English translations
         sentences_long = [(mar, eng[0:4] + eng[6:]) for mar, eng in sentences_long]
-        sentences = sentences_short + sentences_long
+        sentences_name_long = [(mar, eng[0:3] + eng[5:]) for mar, eng in sentences_name_long]
+        sentences = sentences_short + sentences_long + sentences_name_short + sentences_name_long
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
             sentences = polish_sentences(sentences)
@@ -536,8 +628,8 @@ class VerbReduplicationGrammar(CustomGrammar):
 class WackernagelWordOrderGrammar(CustomGrammar):
     """A grammar fragment where a pronoun is always in the 2nd slot of the sentence."""
 
-    def __init__(self, tokens):
-        super().__init__(tokens)
+    def __init__(self, tokens, proper_names):
+        super().__init__(tokens, proper_names)
         def monosyll(string):
             return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
         assert any(monosyll(s) and ('m' in s or 'n' in s) for s in self.tokens)
@@ -564,22 +656,22 @@ class WackernagelWordOrderGrammar(CustomGrammar):
 
     def produce_grammatical(self, num_strings=1, polish=True):
         sentence_pattern_nom_object = [
-            [ 'you ', 'they ' ],
-            [ 'found ', 'left ' ],
-            [ 'a ', 'the ' ],
+            [ 'you', 'they' ] + self.proper_names,
+            [ ' found ', ' left ' ],
+            [ ' a ', ' the ' ],
             [ 'password ', 'room ' ],
             [ '', 'empty', 'immediately' ]
         ]
         sentence_pattern_pro_object = [
-            [ 'you ', 'they ' ],
-            [ 'me ', 'him ' ],
-            [ 'found ', 'left ' ]
+            [ 'you', 'they' ] + self.proper_names,
+            [ ' me ', ' him ' ],
+            [ ' found ', ' left ' ]
         ]
         sentence_pattern_ditransitive = [
-            [ 'you ', 'they ' ],
-            [ 'me ', 'him ' ],
-            [ 'found ', 'left ' ],
-            [ 'a ', 'the ' ],
+            [ 'you', 'they' ] + self.proper_names,
+            [ ' me ', ' him ' ],
+            [ ' found ', ' left ' ],
+            [ ' a ', ' the ' ],
             [ 'password ', 'room ' ],
             [ '', 'immediately' ]
         ]
@@ -625,8 +717,8 @@ class LeadingCopulaGrammar(CustomGrammar):
     """A grammar fragment where all sentences start with a (vacuous) verb 'to be' and feature
     a (similarly vacuous) particle in front of the main predicate."""
 
-    def __init__(self, tokens):
-        super().__init__(tokens)
+    def __init__(self, tokens, proper_names):
+        super().__init__(tokens, proper_names)
         def monosyll(string):
             return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
         assert any(monosyll(s) for s in self.tokens)
@@ -650,18 +742,18 @@ class LeadingCopulaGrammar(CustomGrammar):
     def produce_grammatical(self, num_strings=1, polish=True):
         sentence_pattern_sg_subject = [
             [ 'is ' ],
-            [ 'the baker ', 'the pirate ' ],
-            [ '', 'also ' ],
-            [ 'YN ' ],
-            [ 'like', 'sell' ],
+            [ 'the baker', 'the pirate' ] + self.proper_names,
+            [ '', ' also ' ],
+            [ ' YN ' ],
+            [ ' like', ' sell' ],
             [ ' bubble tea', ' pancakes' ]
         ]
         sentence_pattern_pl_subject = [
             [ 'are ' ],
-            [ 'we ', 'they ' ],
-            [ '', 'also ' ],
-            [ 'YN ' ],
-            [ 'like', 'sell' ],
+            [ 'we', 'they' ],
+            [ '', ' also ' ],
+            [ ' YN ' ],
+            [ ' like', ' sell' ],
             [ ' bubble tea', ' pancakes' ]
         ]
         try:
@@ -709,8 +801,8 @@ class PresentParticipleGrammar(CustomGrammar):
     """A grammar fragment where adjectival present participles are morphologically marked,
     as opposed to present progressive finite verb forms, which are unmarked."""
 
-    def __init__(self, tokens):
-        super().__init__(tokens)
+    def __init__(self, tokens, proper_names):
+        super().__init__(tokens, proper_names)
         def monosyll(string):
             return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
         assert any(monosyll(s) for s in self.tokens)
@@ -748,6 +840,12 @@ class PresentParticipleGrammar(CustomGrammar):
             [ '', 'still ' ],
             [ 'bored', 'happy', 'talking', 'waiting' ]
         ]
+        sentence_pattern_name_no_prt = [
+            self.proper_names,
+            [ ' is ' ],
+            [ '', 'still ' ],
+            [ 'bored', 'happy', 'talking', 'waiting' ]
+        ]
         def num_agrees(sentence):
             # check if the copula is conjugated right
             if ((sentence[-4] == ' postman '  and sentence[-3] == 'is ') or
@@ -757,17 +855,19 @@ class PresentParticipleGrammar(CustomGrammar):
         try:
             while True:
                 sentences_no_prt = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_no_prt) if num_agrees(s)]
-                sentences_no_prt = random.sample(sentences_no_prt, int(num_strings / 2 + 0.5))
+                sentences_no_prt = random.sample(sentences_no_prt, int(num_strings / 3 + 1))
                 # we might have got the same sentence twice on account of the double empty string in slot #2
                 if len(sentences_no_prt) == len(set(sentences_no_prt)):
                     break
             sentences_prt = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_prt) if num_agrees(s)]
-            sentences_prt = random.sample(sentences_prt, int(num_strings / 2 + 0.5))
+            sentences_prt = random.sample(sentences_prt, int(num_strings / 3 + 1))
+            sentences_name_no_prt = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_name_no_prt)]
+            sentences_name_no_prt = random.sample(sentences_name_no_prt, int(num_strings / 3 + 1))
         except ValueError:
             return None
         # erase special participle marker from English translations
         sentences_prt = [(mar, eng[0:2] + eng[3:]) for mar, eng in sentences_prt]
-        sentences = sentences_no_prt + sentences_prt
+        sentences = sentences_no_prt + sentences_prt + sentences_name_no_prt
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
             sentences = polish_sentences(sentences)
@@ -815,8 +915,8 @@ class EvidentialGrammar(CustomGrammar):
     """A grammar fragment that distinguishes three kinds of evidentiality, all overtly marked:
     direct knowledge, hearsay, and circumstantial inference."""
 
-    def __init__(self, tokens):
-        super().__init__(tokens)
+    def __init__(self, tokens, proper_names):
+        super().__init__(tokens, proper_names)
         def monosyll(string):
             return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
         assert any(monosyll(s) for s in self.tokens)
@@ -826,7 +926,9 @@ class EvidentialGrammar(CustomGrammar):
             'the'       : self.tokens[0],
             'dwarves'   : self.tokens[1],
             'monkeys'   : self.tokens[2],
+            'is'        : self.tokens[3],
             'are'       : self.tokens[3],
+            'has'       : self.tokens[4],
             'have'      : self.tokens[4],
             'building'  : self.tokens[5], # tense/aspect morphologically unmarked
             'built'     : self.tokens[5], # tense/aspect morphologically unmarked
@@ -840,53 +942,48 @@ class EvidentialGrammar(CustomGrammar):
         }
 
     def produce_grammatical(self, num_strings=1, polish=True):
-        sentence_pattern_dir = [
+        sentence_pattern = [
             [ 'the ' ],
             [ 'dwarves ', 'monkeys ' ],
-            [ 'are', 'have' ],
+            [ ' are', ' have' ],
             [ ' building', ' built', ' occupying', ' occupied' ],
-            [ 'DIR' ],
+            [ 'DIR', 'HEAR', 'INF' ],
             [ ' a castle', ' a tavern' ]
         ]
-        sentence_pattern_hear = [
-            [ 'the ' ],
-            [ 'dwarves ', 'monkeys ' ],
-            [ 'are', 'have' ],
+        sentence_pattern_name = [
+            self.proper_names,
+            [ ' is', ' has' ],
             [ ' building', ' built', ' occupying', ' occupied' ],
-            [ 'HEAR' ],
-            [ ' a castle', ' a tavern' ]
-        ]
-        sentence_pattern_inf = [
-            [ 'the ' ],
-            [ 'dwarves ', 'monkeys ' ],
-            [ 'are', 'have' ],
-            [ ' building', ' built', ' occupying', ' occupied' ],
-            [ 'INF' ],
+            [ 'DIR', 'HEAR', 'INF' ],
             [ ' a castle', ' a tavern' ]
         ]
         def aux_correct(sentence):
             # check if the auxiliary matches the intended tense
-            if 'are' == sentence[2]:
-                if sentence[3] in [' building', ' occupying']:
+            if sentence[-4] in [' is', ' are']:
+                if sentence[-3] in [' building', ' occupying']:
                     return True
             else:
-                if sentence[3] in [' built', ' occupied']:
+                if sentence[-3] in [' built', ' occupied']:
                     return True
             return False
         try:
-            sentences_dir = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_dir) if aux_correct(s)]
-            sentences_dir = random.sample(sentences_dir, int(num_strings / 3 + 0.67))
-            sentences_hear = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_hear) if aux_correct(s)]
-            sentences_hear = random.sample(sentences_hear, int(num_strings / 3 + 0.67))
-            sentences_inf = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_inf) if aux_correct(s)]
-            sentences_inf = random.sample(sentences_inf, int(num_strings / 3 + 0.67))
+            sentences_vanilla = [(self.translate(s), s) for s in itertools.product(*sentence_pattern) if aux_correct(s)]
+            sentences_vanilla = random.sample(sentences_vanilla, int(num_strings / 2 + 0.5))
+            sentences_name = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_name) if aux_correct(s)]
+            sentences_name = random.sample(sentences_name, int(num_strings / 2 + 0.5))
         except ValueError:
             return None
+        sentences = sentences_vanilla + sentences_name
         # remove grammatical evidentiality marker, add a matrix phrase in English
-        sentences_dir = [(mar, ('I saw that ',) + eng[0:4] + eng[5:]) for mar, eng in sentences_dir]
-        sentences_hear = [(mar, ('I heard that ',) + eng[0:4] + eng[5:]) for mar, eng in sentences_hear]
-        sentences_inf = [(mar, ('It looks like ',) + eng[0:4] + eng[5:]) for mar, eng in sentences_inf]
-        sentences = sentences_dir + sentences_hear + sentences_inf
+        def eng_phrase(eng):
+            if eng[-2] == 'DIR':
+                return 'I saw that '
+            if eng[-2] == 'HEAR':
+                return 'I heard that '
+            if eng[-2] == 'INF':
+                return 'It looks like '
+            assert False
+        sentences = [(mar, (eng_phrase(eng),) + eng[0:-2] + eng[-1:]) for mar, eng in sentences]
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
             sentences = polish_sentences(sentences)
@@ -915,8 +1012,8 @@ class EvidentialGrammar(CustomGrammar):
 class EchoMorphologyGrammar(CustomGrammar):
     """A grammar fragment where each word's first vowel is redoubled after a common consonant."""
 
-    def __init__(self, tokens):
-        super().__init__(tokens)
+    def __init__(self, tokens, proper_names):
+        super().__init__(tokens, proper_names)
         consonant = random.choice(['g', 'm', 't'])
         def redouble_first(string):
             # reduplicate first syllable, kinda
@@ -929,6 +1026,7 @@ class EchoMorphologyGrammar(CustomGrammar):
             'can'         : self.tokens[4],
             'should'      : self.tokens[5],
             'like to'     : self.tokens[6],
+            'likes to'    : self.tokens[6],
             'swim'        : self.tokens[7],
             'help others' : self.tokens[8] + ' ' + self.tokens[9]
         }
@@ -941,11 +1039,19 @@ class EchoMorphologyGrammar(CustomGrammar):
             [ 'can ', 'should ', 'like to ' ],
             [ 'swim', 'help others' ]
         ]
+        sentence_pattern_name = [
+            self.proper_names,
+            [ ' can ', ' should ', ' likes to ' ],
+            [ 'swim', 'help others' ]
+        ]
         try:
-            sentences = [(self.translate(s), s) for s in itertools.product(*sentence_pattern)]
-            sentences = random.sample(sentences, num_strings)
+            sentences_vanilla = [(self.translate(s), s) for s in itertools.product(*sentence_pattern)]
+            sentences_vanilla = random.sample(sentences_vanilla, int(num_strings / 2 + 0.5))
+            sentences_name = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_name)]
+            sentences_name = random.sample(sentences_name, int(num_strings / 2 + 0.5))
         except ValueError:
             return None
+        sentences = sentences_vanilla + sentences_name
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
             sentences = polish_sentences(sentences)
@@ -978,8 +1084,8 @@ class EchoMorphologyGrammar(CustomGrammar):
 class RhymingGrammar(CustomGrammar):
     """A grammar fragment where the two clauses of a conditional construction need to rhyme."""
 
-    def __init__(self, tokens, rhymes):
-        super().__init__(tokens, rhymes)
+    def __init__(self, tokens, proper_names, rhymes):
+        super().__init__(tokens, proper_names, rhymes)
         def monosyll(string):
             return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
         assert any(monosyll(s) for s in self.tokens)
@@ -999,7 +1105,6 @@ class RhymingGrammar(CustomGrammar):
             'will'     : self.tokens[6],
             'be happy' : self.rhymes[0][1],
             'get fat'  : self.rhymes[1][1],
-
             'we'       : self.tokens[7],
             'leave'    : self.tokens[8],
             'early'    : self.rhymes[2][0],
@@ -1031,6 +1136,26 @@ class RhymingGrammar(CustomGrammar):
             [ 'will ' ],
             [ 'get fat' ]  # ...will rhyme with this
         ]
+        sentence_pattern_feed_name_1 = [
+            [ 'if ' ],
+            [ 'you ', 'we ' ],
+            [ 'feed ' ],
+            self.proper_names,
+            [ ' seeds ' ],  # this word...
+            [ 'it ' ],
+            [ 'will ' ],
+            [ 'be happy' ] # ...will rhyme with this
+        ]
+        sentence_pattern_feed_name_2 = [
+            [ 'if ' ],
+            [ 'you ', 'we ' ],
+            [ 'feed ' ],
+            self.proper_names,
+            [ ' snacks ' ], # this word...
+            [ 'it ' ],
+            [ 'will ' ],
+            [ 'get fat' ]  # ...will rhyme with this
+        ]
         sentence_pattern_leave_1 = [
             [ 'if ' ],
             [ 'you ', 'we ' ],
@@ -1054,12 +1179,19 @@ class RhymingGrammar(CustomGrammar):
             sentences_leave_2 = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_leave_2)]
             num_to_go = num_strings - len(sentences_leave_1) - len(sentences_leave_2)
             sentences_feed_1 = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_feed_1)]
-            sentences_feed_1 = random.sample(sentences_feed_1, int(num_to_go / 2 + 0.5))
+            sentences_feed_1 = random.sample(sentences_feed_1, int(num_to_go / 4 + 0.25))
             sentences_feed_2 = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_feed_2)]
-            sentences_feed_2 = random.sample(sentences_feed_2, int(num_to_go / 2 + 0.5))
+            sentences_feed_2 = random.sample(sentences_feed_2, int(num_to_go / 4 + 0.25))
+            sentences_feed_name_1 = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_feed_name_1)]
+            sentences_feed_name_1 = random.sample(sentences_feed_name_1, int(num_to_go / 4 + 0.25))
+            sentences_feed_name_2 = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_feed_name_2)]
+            sentences_feed_name_2 = random.sample(sentences_feed_name_2, int(num_to_go / 4 + 0.25))
         except ValueError:
             return None
-        sentences = sentences_feed_1 + sentences_feed_2 + sentences_leave_1 + sentences_leave_2
+        # fix personal pronouns in English
+        sentences_feed_name_1 = [(mar, eng[0:5] + ('she ' if self.proper_names[0] == eng[3] else 'he ',) + eng[6:]) for mar, eng in sentences_feed_name_1]
+        sentences_feed_name_2 = [(mar, eng[0:5] + ('she ' if self.proper_names[0] == eng[3] else 'he ',) + eng[6:]) for mar, eng in sentences_feed_name_2]
+        sentences = sentences_feed_1 + sentences_feed_2 + sentences_feed_name_1 + sentences_feed_name_2 + sentences_leave_1 + sentences_leave_2
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
             sentences = polish_sentences(sentences)
@@ -1089,6 +1221,26 @@ class RhymingGrammar(CustomGrammar):
             [ 'will ' ],
             [ 'be happy' ]
         ]
+        nonrhyming_pattern_feed_name_1 = [
+            [ 'if ' ],
+            [ 'you ', 'we ' ],
+            [ 'feed ' ],
+            self.proper_names,
+            [ ' seeds ' ],
+            [ 'it ' ],
+            [ 'will ' ],
+            [ 'get fat' ]
+        ]
+        nonrhyming_pattern_feed_name_2 = [
+            [ 'if ' ],
+            [ 'you ', 'we ' ],
+            [ 'feed ' ],
+            self.proper_names,
+            [ ' snacks ' ],
+            [ 'it ' ],
+            [ 'will ' ],
+            [ 'be happy' ]
+        ]
         nonrhyming_pattern_leave_1 = [
             [ 'if ' ],
             [ 'you ', 'we ' ],
@@ -1109,9 +1261,14 @@ class RhymingGrammar(CustomGrammar):
         ]
         nonrhyming_feed_1 = [(self.translate(s), s) for s in itertools.product(*nonrhyming_pattern_feed_1)]
         nonrhyming_feed_2 = [(self.translate(s), s) for s in itertools.product(*nonrhyming_pattern_feed_2)]
+        nonrhyming_feed_name_1 = [(self.translate(s), s) for s in itertools.product(*nonrhyming_pattern_feed_name_1)]
+        nonrhyming_feed_name_2 = [(self.translate(s), s) for s in itertools.product(*nonrhyming_pattern_feed_name_2)]
+        # fix personal pronouns in English
+        nonrhyming_feed_name_1 = [(mar, eng[0:5] + ('she ' if self.proper_names[0] == eng[3] else 'he ',) + eng[6:]) for mar, eng in nonrhyming_feed_name_1]
+        nonrhyming_feed_name_2 = [(mar, eng[0:5] + ('she ' if self.proper_names[0] == eng[3] else 'he ',) + eng[6:]) for mar, eng in nonrhyming_feed_name_2]
         nonrhyming_leave_1 = [(self.translate(s), s) for s in itertools.product(*nonrhyming_pattern_leave_1)]
         nonrhyming_leave_2 = [(self.translate(s), s) for s in itertools.product(*nonrhyming_pattern_leave_2)]
-        nonrhyming = nonrhyming_feed_1 + nonrhyming_feed_2 + nonrhyming_leave_1 + nonrhyming_leave_2
+        nonrhyming = nonrhyming_feed_1 + nonrhyming_feed_2 + nonrhyming_feed_name_1 + nonrhyming_feed_name_2 + nonrhyming_leave_1 + nonrhyming_leave_2
         ungrammatical_sentences = set(random.sample(nonrhyming, k=num_strings))
         while len(ungrammatical_sentences) < num_strings:
             sentence = self.produce_grammatical(1, polish=False)[0]
@@ -1134,8 +1291,8 @@ class RhymingGrammar(CustomGrammar):
 class PalindromeDemonstrativeGrammar(CustomGrammar):
     """A grammar fragment where the form of the word 'that' is always its noun reversed."""
 
-    def __init__(self, tokens, rhymes):
-        super().__init__(tokens, rhymes)
+    def __init__(self, tokens, proper_names):
+        super().__init__(tokens, proper_names)
         def monosyll(string):
             return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
         def palindrome(string):
@@ -1161,14 +1318,26 @@ class PalindromeDemonstrativeGrammar(CustomGrammar):
     def produce_grammatical(self, num_strings=1, polish=True):
         sentence_pattern_colors = [
             [ ' that ', 'the left ', 'the right ' ],
-            [ 'bird ', 'image ', 'totem ' ],
+            [ ' bird ', ' image ', ' totem ' ],
             [ 'colors ' ],
             [ 'nice ', 'strange ' ]
         ]
         sentence_pattern_symbol = [
             [ ' that ', 'the left ', 'the right ' ],
-            [ 'bird ', 'image ', 'totem ' ],
+            [ ' bird ', ' image ', ' totem ' ],
             [ 'symbolizes ' ],
+            [ 'freedom', 'luck' ]
+        ]
+        sentence_pattern_colors_name = [
+            [ ' bird ', ' image ', ' totem ' ],
+            [ name + ('\'' if name[-1] == 's' else '\'s') for name in self.proper_names ],
+            [ ' colors ' ],
+            [ 'nice ', 'strange ' ]
+        ]
+        sentence_pattern_symbol_name = [
+            [ ' bird ', ' image ', ' totem ' ],
+            [ name + ('\'' if name[-1] == 's' else '\'s') for name in self.proper_names ],
+            [ ' symbolizes ' ],
             [ 'freedom', 'luck' ]
         ]
         try:
@@ -1176,11 +1345,17 @@ class PalindromeDemonstrativeGrammar(CustomGrammar):
             sentences_colors = random.sample(sentences_colors, int(num_strings / 2 + 0.5))
             sentences_symbol = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_symbol)]
             sentences_symbol = random.sample(sentences_symbol, int(num_strings / 2 + 0.5))
+            sentences_colors_name = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_colors_name)]
+            sentences_colors_name = random.sample(sentences_colors_name, 1)
+            sentences_symbol_name = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_symbol_name)]
+            sentences_symbol_name = random.sample(sentences_symbol_name, 1)
         except ValueError:
             return None
         # correct English word order
         sentences_colors = [(mar, eng[0:2] + ('has ',) + eng[3:4] + eng[2:3]) for mar, eng in sentences_colors]
-        sentences = sentences_colors + sentences_symbol
+        sentences_colors_name = [(mar, eng[1:2] + eng[0:1] + ('has ',) + eng[3:4] + eng[2:3]) for mar, eng in sentences_colors_name]
+        sentences_symbol_name = [(mar, eng[1:2] + eng[0:1] + eng[2:]) for mar, eng in sentences_symbol_name]
+        sentences = sentences_colors + sentences_symbol + sentences_colors_name + sentences_symbol_name
         # render Martian demonstrative
         def rev(string):
             rev_string = string[::-1]
@@ -1203,6 +1378,8 @@ class PalindromeDemonstrativeGrammar(CustomGrammar):
         while len(ungrammatical_sentences) < num_strings:
             sentence = self.produce_grammatical(1, polish=False)[0]
             form, meaning = sentence
+            if form[1] in self.proper_names:
+                continue
             if meaning[0] == ' that ':
                 # make sure the noun head isn't the reverse of itself
                 if not palindrome(form[1]) and random.choice([True, False]):
@@ -1211,7 +1388,7 @@ class PalindromeDemonstrativeGrammar(CustomGrammar):
                 else:
                     # use last remaining token, not seen in training data
                     form = (self.tokens[11]+' ',) + form[1:]
-            elif not palindrome(form[1]):
+            elif not palindrome(form[1]) and not form[1] in self.proper_names:
                 # reduplicate noun phrase head without reversing it
                 form = (form[1]+' ',) + form[1:]
             else:
@@ -1228,8 +1405,8 @@ class PalindromePastGrammar(CustomGrammar):
     """A grammar fragment where the past tense is indicated by the whole sentence
     being the same read forwards and backwards."""
 
-    def __init__(self, tokens, rhymes):
-        super().__init__(tokens, rhymes)
+    def __init__(self, tokens, proper_names):
+        super().__init__(tokens, proper_names)
         def monosyll(string):
             return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
         while (monosyll(self.tokens[0]) or monosyll(self.tokens[1]) or monosyll(self.tokens[2])
@@ -1250,7 +1427,8 @@ class PalindromePastGrammar(CustomGrammar):
             'to'                 : self.rev(self.tokens[3]),
             'the north'          : self.rev(self.tokens[2]),
             'the south'          : self.rev(self.tokens[1]),
-            'the town square'    : self.rev(self.tokens[0])
+            'the town square'    : self.rev(self.tokens[0]),
+            'the shop'           : self.rev(self.proper_names[0]).lower()
         }
 
     def rev(_self, string):
@@ -1263,6 +1441,7 @@ class PalindromePastGrammar(CustomGrammar):
 
     def produce_grammatical(self, num_strings=1, polish=True):
         subject_with_place = [
+            (self.proper_names[0] + ' ', 'the shop'),
             ('the mayor ', 'the town square'),
             ('the sheriff ', 'the north'),
             ('the fortune-teller ', 'the south')
@@ -1281,12 +1460,12 @@ class PalindromePastGrammar(CustomGrammar):
                 if len(sentences_past) == len(set(sentences_past)):
                     break
             sentence_pattern_fut = [
-                [ 'the mayor ', 'the sheriff ', 'the fortune-teller ' ],
+                [ self.proper_names[0] + ' ', 'the mayor ', 'the sheriff ', 'the fortune-teller ' ],
                 [ 'arrive', 'come' ],
                 [ 'FUT' ],
                 [ '', '', ' alone ', ' as well ' ],
                 [ ' from ', ' to ' ],
-                [ 'the north', 'the south', 'the town square' ]
+                [ 'the north', 'the south', 'the town square', 'the shop' ]
             ]
             while True:
                 sentences_fut = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_fut)]
@@ -1308,7 +1487,7 @@ class PalindromePastGrammar(CustomGrammar):
 
     def produce_ungrammatical(self, num_strings=1, polish=True):
         bad_pattern_past = [
-            [ 'the mayor ', 'the sheriff ', 'the fortune-teller ' ],
+            [ self.proper_names[0] + ' ', 'the mayor ', 'the sheriff ', 'the fortune-teller ' ],
             [ 'arrived', 'came' ],
             [ '', '', ' alone ', ' as well ' ],
             [ ' from ', ' to ' ],
@@ -1316,6 +1495,7 @@ class PalindromePastGrammar(CustomGrammar):
         ]
         def check_bad(sentence):
             subject_with_place = [
+                (self.proper_names[0] + ' ', 'the shop'),
                 ('the mayor ', 'the town square'),
                 ('the sheriff ', 'the north'),
                 ('the fortune-teller ', 'the south')
@@ -1352,8 +1532,8 @@ class RecursiveGrammar(CustomGrammar):
     """A grammar fragment where possession needs to be overtly marked, and btw
     the possessive structure can be self-nested arbitrarily deep."""
 
-    def __init__(self, tokens, rhymes):
-        super().__init__(tokens, rhymes)
+    def __init__(self, tokens, proper_names):
+        super().__init__(tokens, proper_names)
         def monosyll(string):
             return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
         while not monosyll(self.tokens[2]):
@@ -1362,8 +1542,12 @@ class RecursiveGrammar(CustomGrammar):
             'we'         : self.tokens[0],
             'they'       : self.tokens[1],
             'the'        : '',
+            'with'       : '',
             'with the'   : '',
+            '\''         : self.tokens[2],  # awkward special English genitive ending for a noun ending in s
             '\'s'        : self.tokens[2],
+            self.proper_names[0]+'\'s' : self.proper_names[0] + self.tokens[2],
+            self.proper_names[1]+'\'s' : self.proper_names[1] + self.tokens[2],
             'enemy'      : self.tokens[3],
             'brother'    : self.tokens[4],
             'dog'        : self.tokens[5],
@@ -1382,8 +1566,8 @@ class RecursiveGrammar(CustomGrammar):
     def produce_grammatical(self, num_strings=1, polish=True):
         recursables = [ 'enemy', 'brother', 'dog', 'friend', 'student', 'teacher' ]
         sentence_pattern_sg_subject = [
-            [ 'the ' ],
-            recursables,
+            [ 'the ' ] + self.proper_names,
+            [ '' ] + recursables,
             [ ' coffee ' ],
             [ ' is brewing', ' is having' ],
             [ ' with us', ' with them' ]
@@ -1392,31 +1576,41 @@ class RecursiveGrammar(CustomGrammar):
             [ 'we ', 'they ' ],
             [ ' coffee ' ],
             [ ' are brewing', ' are having' ],
-            [ ' with the '],
-            recursables
+            [ ' with '],
+            [ 'the ' ] + self.proper_names,
+            [ '' ] + recursables
         ]
         def expand(sentence):
             # expand the recursive structure
             recursables_remaining = set(recursables)
-            if sentence[0] == 'the ':
-                recursables_remaining.remove(sentence[1])
+            if sentence[0] in ['the '] + self.proper_names:
+                if sentence[1]:
+                    recursables_remaining.remove(sentence[1])
             else:
-                recursables_remaining.remove(sentence[4])
+                if sentence[5]:
+                    recursables_remaining.remove(sentence[5])
+            if sentence[0] in self.proper_names and sentence[1] not in ['', '\'s ']:
+                sentence = sentence[0:1] + ('\'s ',) + sentence[1:]
+            if sentence[4] in self.proper_names and sentence[5] not in ['', '\'s ']:
+                sentence = sentence[0:5] + ('\'s ',) + sentence[5:]
             while random.choice([True, True, True, False]):
                 if not recursables_remaining:
                     break
                 new_noun = random.choice(list(recursables_remaining))
-                if sentence[0] == 'the ':
-                    assert sentence[1] in recursables
-                    sentence = sentence[0:1] + (new_noun, '\'s ') + sentence[1:]
-                    recursables_remaining.remove(new_noun)
+                if sentence[0] in self.proper_names:
+                    # assert sentence[1] in recursables
+                    sentence = sentence[0:1] + ('\'s ', new_noun) + sentence[1:]
+                elif sentence[0] == 'the ':
+                    sentence = sentence[0:2] + ('\'s ', new_noun) + sentence[2:]
                 else:
-                    assert sentence[4] in recursables
-                    sentence = sentence[0:4] + (new_noun, '\'s ') + sentence[4:]
-                    recursables_remaining.remove(new_noun)
+                    # assert sentence[6] in recursables
+                    sentence = sentence + ('\'s ', new_noun)
+                recursables_remaining.remove(new_noun)
+            # fix possessive endings after an s
+            sentence = tuple('\' ' if sentence[i] == '\'s ' and sentence[i-1].endswith('s') else sentence[i] for i in range(len(sentence)))
             return sentence
-        sentences_sg_subject_basic = itertools.product(*sentence_pattern_sg_subject)
-        sentences_pl_subject_basic = itertools.product(*sentence_pattern_pl_subject)
+        sentences_sg_subject_basic = [s for s in itertools.product(*sentence_pattern_sg_subject) if s[0] != 'the ' or s[1]]
+        sentences_pl_subject_basic = [s for s in itertools.product(*sentence_pattern_pl_subject) if s[4] != 'the ' or s[5]]
         sentences_sg_subject = set()
         sentences_pl_subject = set()
         sentences = set()
@@ -1452,10 +1646,10 @@ class RecursiveGrammar(CustomGrammar):
                 if random.choice([True, False, False, False]):
                     # attach unnecessary possessive morpheme to the actual head
                     recursables_in_martian = [self.translate(s) for s in ['enemy', 'brother', 'dog', 'friend', 'student', 'teacher']]
-                    for i in range(len(form)-1, 0, -1):
-                        if form[i] in recursables_in_martian:
+                    for i in range(len(form)-1, -1, -1):
+                        if form[i] in recursables_in_martian + self.proper_names:
                             break
-                    assert form[i] in recursables_in_martian
+                    assert form[i] in recursables_in_martian + self.proper_names
                     form = form[0:i+1] + (self.translate('\'s'),) + form[i+1:] # off by one?
                     done = True
             sentence = (tuple(form), meaning)
@@ -1470,8 +1664,8 @@ class PredicativeEndingGrammar(CustomGrammar):
     """A grammar fragment where adjectives used as predicates are overtly marked, taking the same ending
     as the subject, but adjectives used as an adjunct with a noun are unmarked."""
 
-    def __init__(self, tokens):
-        super().__init__(tokens)
+    def __init__(self, tokens, proper_names):
+        super().__init__(tokens, proper_names)
         def monosyll(string):
             return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
         assert any(monosyll(s) for s in self.tokens)
@@ -1487,6 +1681,7 @@ class PredicativeEndingGrammar(CustomGrammar):
             'red'   : self.tokens[6],
             'nice'  : self.tokens[7],
             'long'  : self.tokens[8],
+            'tall'  : self.tokens[8],
             'short' : self.tokens[9],
             'fast'  : self.tokens[10],
             'slow'  : self.tokens[11],
@@ -1512,16 +1707,25 @@ class PredicativeEndingGrammar(CustomGrammar):
             [ 'nice', 'long', 'fast', 'slow' ],
             [ 'PRED' ]
         ]
+        sentence_pattern_names = [
+            self.proper_names,
+            [ ' is ' ],
+            [ 'nice', 'tall', 'fast', 'slow' ],
+            [ 'PRED' ]
+        ]
         try:
             sentences_clothes = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_clothes)]
             sentences_clothes = list(set(sentences_clothes))
-            sentences_clothes = random.sample(sentences_clothes, int(num_strings / 2 + 0.5))
+            sentences_clothes = random.sample(sentences_clothes, int(num_strings / 3 + 1))
             sentences_vehicles = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_vehicles)]
             sentences_vehicles = list(set(sentences_vehicles))
-            sentences_vehicles = random.sample(sentences_vehicles, int(num_strings / 2 + 0.5))
+            sentences_vehicles = random.sample(sentences_vehicles, int(num_strings / 3 + 1))
+            sentences_names = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_names)]
+            sentences_names = list(set(sentences_names))
+            sentences_names = random.sample(sentences_names, int(num_strings / 3))
         except ValueError:
             return None
-        sentences = sentences_clothes + sentences_vehicles
+        sentences = sentences_clothes + sentences_vehicles + sentences_names
         # render Martian predicative suffix
         def ending(noun):
             return re.search(r"[aeiouy]+?[^aeiouy]*$", noun).group(0)
@@ -1568,16 +1772,14 @@ class ErgativeAbsolutiveGrammar(CustomGrammar):
     """A grammar fragment where the subjects of intransitive verbs and the objects
     of transitive verbs are marked the same way (ergativity)."""
 
-    def __init__(self, tokens):
-        super().__init__(tokens)
+    def __init__(self, tokens, proper_names):
+        super().__init__(tokens, proper_names)
         def monosyll(string):
             return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
         assert any(monosyll(s) for s in self.tokens)
         while not monosyll(self.tokens[10]) or not monosyll(self.tokens[11]):
             random.shuffle(self.tokens)
         self.lexicon = {
-            'Mara'  : 'Mara',
-            'Pavel' : 'Pavel',
             'was sleeping'   : self.tokens[0],
             'were sleeping'   : self.tokens[0],
             'was walking' : self.tokens[1],
@@ -1607,34 +1809,34 @@ class ErgativeAbsolutiveGrammar(CustomGrammar):
 
     def produce_grammatical(self, num_strings=1, polish=True):
         sentence_pattern_intransitive_1 = [
-            [ 'Mara', 'Pavel', 'the chieftain', 'the chieftain of the tribe', 'the man', 'the man of the tribe' ],
+            [ self.proper_names[0], self.proper_names[1], 'the chieftain', 'the chieftain of the tribe', 'the man', 'the man of the tribe' ],
             [ 'ABS' ],
             [ '', '', ' already' ],
             [ ' was sleeping', ' was walking', ' was introduced' ]
         ]
         sentence_pattern_intransitive_2 = [
-            [ 'Mara', 'Pavel', 'the chieftain', 'the chieftain of the tribe', 'the man', 'the man of the tribe' ],
+            [ self.proper_names[0], self.proper_names[1], 'the chieftain', 'the chieftain of the tribe', 'the man', 'the man of the tribe' ],
             [ 'ABS' ],
             [ ' and ' ],
-            [ 'Mara', 'Pavel', 'the chieftain', 'the chieftain of the tribe', 'the man', 'the man of the tribe' ],
+            [ self.proper_names[0], self.proper_names[1], 'the chieftain', 'the chieftain of the tribe', 'the man', 'the man of the tribe' ],
             [ 'ABS' ],
             [ '', '', ' already' ],
             [ ' were sleeping', ' were walking ', ' were introduced' ],
         ]
         sentence_pattern_transitive = [
-            [ 'Mara', 'Pavel', 'the chieftain', 'the chieftain of the tribe', 'the man', 'the man of the tribe' ],
+            [ self.proper_names[0], self.proper_names[1], 'the chieftain', 'the chieftain of the tribe', 'the man', 'the man of the tribe' ],
             [ 'ERG' ],
             [ '', '', ' already' ],
             [ ' knew ', ' introduced ', ' had introduced ', ' asked ', ' had asked ' ],
-            [ 'Mara', 'Pavel', 'the chieftain', 'the chieftain of the tribe', 'the man', 'the man of the tribe' ],
+            [ self.proper_names[0], self.proper_names[1], 'the chieftain', 'the chieftain of the tribe', 'the man', 'the man of the tribe' ],
             [ 'ABS' ]
         ]
         sentence_pattern_passive = [
-            [ 'Mara', 'Pavel', 'the chieftain', 'the chieftain of the tribe', 'the man', 'the man of the tribe' ],
+            [ self.proper_names[0], self.proper_names[1], 'the chieftain', 'the chieftain of the tribe', 'the man', 'the man of the tribe' ],
             [ 'ABS' ],
             [ '', '', ' already' ],
             [ ' was introduced by ', ' was asked by ' ],
-            [ 'Mara', 'Pavel', 'the chieftain', 'the chieftain of the tribe', 'the man', 'the man of the tribe' ],
+            [ self.proper_names[0], self.proper_names[1], 'the chieftain', 'the chieftain of the tribe', 'the man', 'the man of the tribe' ],
             [ 'ERG' ]
         ]
         try:
@@ -1779,14 +1981,17 @@ class CustomExperiment(Experiment):
             return
         # remove default Task created by base class
         self.tasks = []
-        for grammar, tokens in zip(self.my_grammars, random.sample(TOKEN_SETS, k=len(self.my_grammars))):
+        for grammar, tokens, proper_names in zip(self.my_grammars,
+                                                 random.sample(TOKEN_SETS, k=len(self.my_grammars)),
+                                                 random.sample(PROPER_NAME_SETS, k=len(self.my_grammars))):
             random.shuffle(tokens)
+            # don't shuffle proper_names so we can identify "genders"
             custom_task = CustomTask(settings=self.settings)
             try:
-                custom_task.grammar = grammar(tokens)
+                custom_task.grammar = grammar(tokens=tokens, proper_names=proper_names)
             except TypeError:
                 random.shuffle(RHYMES)
-                custom_task.grammar = grammar(tokens=tokens, rhymes=RHYMES)
+                custom_task.grammar = grammar(tokens=tokens, proper_names=proper_names, rhymes=RHYMES)
             self.tasks.append(custom_task)
         assert all(task.grammar is not None for task in self.tasks)
         last_task = NaturalnessJudgementTask(settings=self.settings, anchored_to_end=True)
