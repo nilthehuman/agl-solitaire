@@ -1364,7 +1364,7 @@ class RecursiveGrammar(CustomGrammar):
             'the'        : '',
             'with the'   : '',
             '\'s'        : self.tokens[2],
-            'archrival'  : self.tokens[3],
+            'enemy'      : self.tokens[3],
             'brother'    : self.tokens[4],
             'dog'        : self.tokens[5],
             'friend'     : self.tokens[6],
@@ -1380,7 +1380,7 @@ class RecursiveGrammar(CustomGrammar):
         }
 
     def produce_grammatical(self, num_strings=1, polish=True):
-        recursables = [ 'archrival', 'brother', 'dog', 'friend', 'student', 'teacher' ]
+        recursables = [ 'enemy', 'brother', 'dog', 'friend', 'student', 'teacher' ]
         sentence_pattern_sg_subject = [
             [ 'the ' ],
             recursables,
@@ -1451,7 +1451,7 @@ class RecursiveGrammar(CustomGrammar):
                 form = tuple([form[i] if leave_possessive[i] else ' ' for i in range(len(form))])
                 if random.choice([True, False, False, False]):
                     # attach unnecessary possessive morpheme to the actual head
-                    recursables_in_martian = [self.translate(s) for s in ['archrival', 'brother', 'dog', 'friend', 'student', 'teacher']]
+                    recursables_in_martian = [self.translate(s) for s in ['enemy', 'brother', 'dog', 'friend', 'student', 'teacher']]
                     for i in range(len(form)-1, 0, -1):
                         if form[i] in recursables_in_martian:
                             break
