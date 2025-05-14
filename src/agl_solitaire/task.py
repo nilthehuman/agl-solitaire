@@ -127,9 +127,9 @@ class Task(Loggable, TaskState):
             else:
                 self.duplicate_print(f"The training phase will now begin. You will have {self.settings.training_time} seconds to study a list of {self.settings.training_strings} exemplars of the hidden grammar.")
             if 'Windows' == platform.system():
-                self.duplicate_print('You can use Ctrl-Break to halt the experiment at any time.')
+                self.duplicate_print("You can use Ctrl-Break to halt the experiment at any time. Your progress will be saved to '{self.settings.filename}' and you will be able to finish the experiment later.")
             else:
-                self.duplicate_print('You can use Ctrl-C to halt the experiment at any time.')
+                self.duplicate_print(f"You can use Ctrl-C to halt the experiment at any time. Your progress will be saved to '{self.settings.filename}' and you will be able to finish the experiment later.")
             self.duplicate_print('Please make sure your screen and terminal font are comfortable to read. Press return when you are ready.')
             input()
             if self.settings.training_one_at_a_time:
@@ -160,7 +160,10 @@ class Task(Loggable, TaskState):
             self.training_finished = True
             clear()
         self.duplicate_print(f"The test phase will now begin. You will be shown {len(self.test_set)} new strings one at a time and prompted to judge the grammaticality of each.")
-        self.duplicate_print(f"You can use Ctrl-Break on Windows or Ctrl-C on macOS/Unix to halt the experiment at any time. Your progress will be saved to '{self.settings.filename}' and you will be able to finish the experiment later.")
+        if 'Windows' == platform.system():
+            self.duplicate_print("You can use Ctrl-Break to halt the experiment at any time. Your progress will be saved to '{self.settings.filename}' and you will be able to finish the experiment later.")
+        else:
+            self.duplicate_print(f"You can use Ctrl-C to halt the experiment at any time. Your progress will be saved to '{self.settings.filename}' and you will be able to finish the experiment later.")
         self.duplicate_print("You may type 'y' for yes (i.e. grammatical) and 'n' for no (ungrammatical). Press return when you are ready.")
         # recycle input_thread if it's still running...
         if input_thread and input_thread.is_alive():
