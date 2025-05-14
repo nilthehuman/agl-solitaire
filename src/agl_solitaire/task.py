@@ -156,7 +156,10 @@ class Task(Loggable, TaskState):
                     time.sleep(1)
                     remaining_time -= 1
             print('\rTraining phase finished.' + ' ' * 30)
-            self.duplicate_print('Training phase finished.', log_only=True)
+            try:
+                self.duplicate_print(f"Training phase finished. Remaining time: {remaining_time} seconds.", log_only=True)
+            except NameError:
+                self.duplicate_print('Training phase finished.', log_only=True)
             self.training_finished = True
             clear()
         self.duplicate_print(f"The test phase will now begin. You will be shown {len(self.test_set)} new strings one at a time and prompted to judge the grammaticality of each.")
