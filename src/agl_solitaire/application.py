@@ -232,7 +232,7 @@ class Application(Loggable):
                 settings_enabled.mask_unused(settings_used)
                 settings_display.mask_unused(settings_used, mask_value='--')
             options = [
-                f" 1: [u]sername (for the record):\t\t{settings_display.username}",
+                f" 1: [m]y username (for the record):\t\t{settings_display.username}",
                 f" 2: grammar [c]lass:\t\t\t\t{settings_display.grammar_class}{' (custom)' if self.settings.grammar_class.custom() else ''}",
                 f" 3: number of training [s]trings:\t\t{settings_display.training_strings}",
                 f" 4: [t]ime allotted for training:\t\t{settings_display.training_time} seconds",
@@ -272,7 +272,7 @@ class Application(Loggable):
                 choice = choice[0].lower()
             choice_to_attr_name = {
                 '1'  : 'username',
-                'u'  : 'username',
+                'm'  : 'username',
                 '2'  : 'grammar_class',
                 'c'  : 'grammar_class',
                 '3'  : 'training_strings',
@@ -312,7 +312,7 @@ class Application(Loggable):
                 # fall through and let the logic below handle it
                 pass
             attr_to_change = None
-            if choice in ['1', 'u']:
+            if choice in ['1', 'm']:
                 self.settings.username = input('username: ')
                 if not self.settings.username:
                     self.settings.username = 'anonymous'
