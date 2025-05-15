@@ -51,7 +51,7 @@ def print(string='', end='\n'):
             # back up to the nearest word boundary
             while 0 <= stop_at and not line[stop_at].isspace():
                 stop_at -= 1
-            if -1 == stop_at:
+            if -1 == stop_at or line[:stop_at].isspace():
                 # one giant word, we give up and leave it unwrapped
                 stop_at = len(line)
             wrapped_string += line[:stop_at] + '\n'
