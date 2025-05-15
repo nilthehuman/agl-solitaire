@@ -1014,10 +1014,10 @@ class EchoMorphologyGrammar(CustomGrammar):
 
     def __init__(self, tokens, proper_names):
         super().__init__(tokens, proper_names)
-        consonant = random.choice(['g', 'm', 't'])
+        self.consonant = random.choice(['g', 'm', 't'])
         def redouble_first(string):
             # reduplicate first syllable, kinda
-            return re.sub(r"\b([^aeiouy]*)([aeiou]+|y+)", r"\1\2" + consonant + r"\2", string)
+            return re.sub(r"\b([^aeiouy]*)([aeiou]+|y+)", r"\1\2" + self.consonant + r"\2", string)
         self.unechoed_lexicon = {
             'all'         : self.tokens[0],
             'dogs'        : self.tokens[1],
@@ -1068,11 +1068,16 @@ class EchoMorphologyGrammar(CustomGrammar):
                 # revert a few words to their "unechoed" forms
                 for i in range(len(form)):
                     if form[i] and random.choice([True, False, False]):
-                        try:
-                            form = form[0:i] + self.translate([meaning[i]], lexicon=self.unechoed_lexicon) + form[i+1:]
-                            done = True
-                        except KeyError:
-                            pass  # form is the empty string, go on
+                        altered_word = self.translate([meaning[i]], lexicon=self.unechoed_lexicon)[0]
+                        if random.choice([True, False]):
+                            def redouble_first(string):
+                                # reduplicate first syllable, kinda
+                                consonants = ['g', 'm', 't', 'g']
+                                consonant = consonants[consonants.index(self.consonant)+1]
+                                return re.sub(r"\b([^aeiouy]*)([aeiou]+|y+)", r"\1\2" + consonant + r"\2", string)
+                            altered_word = redouble_first(altered_word)
+                        form = form[0:i] + (altered_word,) + form[i+1:]
+                        done = True
             sentence = (tuple(form), meaning)
             ungrammatical_sentences.add(sentence)
         if polish:
