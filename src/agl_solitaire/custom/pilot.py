@@ -1906,6 +1906,77 @@ class ErgativeAbsolutiveGrammar(CustomGrammar):
         return ungrammatical_sentences
 
 
+class ReduplicationComplementGrammar(CustomGrammar):
+    """A grammar fragment where repeating the same noun twice creates its semantic complement."""
+
+    def __init__(self, tokens, proper_names):
+        super().__init__(tokens, proper_names)
+        def monosyll(string):
+            return 1 == len(list(filter(lambda x: x in 'aeiouyAEIOUY', string)))
+        assert any(monosyll(s) for s in self.tokens)
+        while monosyll(self.tokens[0]) or monosyll(self.tokens[8]) or not monosyll(self.tokens[4]):
+            random.shuffle(self.tokens)
+        self.lexicon = {
+            'a leopard'   : self.tokens[0],
+            'a tortoise'  : self.tokens[1],
+            'a person'    : self.tokens[2],
+            'you'         : self.tokens[3],
+            'got away'    : self.tokens[4] + ' ' + self.tokens[5],
+            'climbed'     : self.tokens[4] + ' ' + self.tokens[6],
+            'found'       : self.tokens[4] + ' ' + self.tokens[7],
+            'a ladder'    : self.tokens[8],
+            'a rock'      : self.tokens[9],
+            'last time'   : self.tokens[10],
+            'yesterday'   : self.tokens[11]
+        }
+
+    def produce_grammatical(self, num_strings=1, polish=True):
+        sentence_pattern_intransitive = [
+            [ self.proper_names[0], self.proper_names[1], 'a leopard', 'a tortoise', 'a person', 'you' ],
+            [ '', ' last time', ' yesterday' ],
+            [ ' got away' ]
+        ]
+        sentence_pattern_transitive = [
+            [ self.proper_names[0], self.proper_names[1], 'a leopard', 'a tortoise', 'a person', 'you' ],
+            [ '', ' last time', ' yesterday' ],
+            [ ' climbed', ' found' ],
+            [ ' a ladder', ' a rock' ]
+        ]
+        sentences_intransitive = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_intransitive)]
+        sentences_transitive = [(self.translate(s), s) for s in itertools.product(*sentence_pattern_transitive)]
+        sentences_intransitive_neg = [((mar[0]+' ',) + mar, ('something that\'s not '+eng[0],) + eng[1:]) for mar, eng in sentences_intransitive]
+        sentences_transitive_neg_subject = [((mar[0]+' ',) + mar, ('something that\'s not '+eng[0],) + eng[1:]) for mar, eng in sentences_transitive]
+        sentences_transitive_neg_object = [(mar + (mar[-1],), eng[:-1] + (' something that\'s not '+eng[-1],)) for mar, eng in sentences_transitive]
+        sentences_transitive_neg_both = [((mar[0]+' ',) + mar + (mar[-1],), ('something that\'s not '+eng[0],) + eng[1:-1] + (' something that\'s not '+eng[-1],)) for mar, eng in sentences_transitive]
+        sentences = sentences_intransitive + sentences_intransitive_neg + sentences_transitive + sentences_transitive_neg_subject + sentences_transitive_neg_object + sentences_transitive_neg_both
+        sentences = [(mar, eng[0:1] + eng[2:] + eng[1:2]) for mar, eng in sentences]
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            sentences = polish_sentences(sentences)
+        sentences = random.sample(sentences, num_strings)
+        random.shuffle(sentences)
+        return sentences
+
+    def produce_ungrammatical(self, num_strings=1, polish=True):
+        ungrammatical_sentences = self.produce_grammatical(num_strings, polish=False)
+        def swap_aux_and_lexical_verb(sentence):
+            mar, eng = sentence
+            mar_pred_index = 3 if mar[0].strip() == mar[1] else 2
+            mar_pred = mar[mar_pred_index]
+            mar_wrong_pred = {
+                self.tokens[4]+' '+self.tokens[5] : ' '+self.tokens[5]+' '+self.tokens[4],
+                self.tokens[4]+' '+self.tokens[6] : ' '+self.tokens[6]+' '+self.tokens[4],
+                self.tokens[4]+' '+self.tokens[7] : ' '+self.tokens[7]+' '+self.tokens[4],
+                             }[mar_pred.strip()]
+            mar_wrong = mar[0:mar_pred_index] + (mar_wrong_pred,) + mar[mar_pred_index+1:]
+            return (mar_wrong, eng)
+        ungrammatical_sentences = [swap_aux_and_lexical_verb(s) for s in ungrammatical_sentences]
+        if polish:
+            # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
+            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+        return ungrammatical_sentences
+
+
 class NaturalnessJudgementTask(Task, Loggable):
     """See how participant rates a few plain English stimuli."""
 
@@ -1972,7 +2043,8 @@ class CustomExperiment(Experiment):
         PalindromePastGrammar,
         RecursiveGrammar,
         PredicativeEndingGrammar,
-        ErgativeAbsolutiveGrammar
+        ErgativeAbsolutiveGrammar,
+        ReduplicationComplementGrammar
     ]
 
     def ready_to_run(self):
