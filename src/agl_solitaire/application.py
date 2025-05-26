@@ -11,18 +11,11 @@ from src.agl_solitaire import custom_helpers
 from src.agl_solitaire import experiment
 from src.agl_solitaire import grammar
 from src.agl_solitaire import settings
+from src.agl_solitaire import utils  # caveas: this module may be overridden by gui_utils
 from src.agl_solitaire import version
-from src.agl_solitaire.utils import (print,
-                                     input,
-                                     clear,
-                                     ansi_term_color_codes,
-                                     pretty_print_color_codes,
-                                     colorize,
-                                     get_grammar_from_obfuscated_repr,
-                                     Loggable)
 
 
-class Application(Loggable):
+class Application(utils.Loggable):
     """The main class responsible for basic user interactions and initiating experiments."""
 
     def __init__(self):
@@ -30,25 +23,25 @@ class Application(Loggable):
         try:
             self.settings.load_all()
         except settings.Settings.VersionException as ve:
-            print(ve)
-            print()
+            utils.print(ve)
+            utils.print()
         # load custom experiment scripts from the custom/ directory
         self.custom_experiments = custom_helpers.load_custom_experiments()
 
     def main_menu(self):
         """Show the starting menu screen."""
         my_version = version.get_version()
-        print('agl-solitaire ' + my_version + '\n-------------------\n\n(a terminal-based tool for double-blind Artificial Grammar Learning experiments)')
+        utils.print('agl-solitaire ' + my_version + '\n-------------------\n\n(a terminal-based tool for double-blind Artificial Grammar Learning experiments)')
         while True:
-            print('\n--------  MAIN MENU  --------')
-            print('1: [s]tart new experiment session')
-            print('2: [l]oad/resume experiment')
-            print('3: [g]enerate and save experiment for later sessions')
-            print('4: [c]onfigure settings')
-            print('0: [q]uit')
+            utils.print('\n--------  MAIN MENU  --------')
+            utils.print('1: [s]tart new experiment session')
+            utils.print('2: [l]oad/resume experiment')
+            utils.print('3: [g]enerate and save experiment for later sessions')
+            utils.print('4: [c]onfigure settings')
+            utils.print('0: [q]uit')
             choice = ''
             while not choice:
-                choice = input()
+                choice = utils.input()
             choice = choice[0].lower()
             if choice in ['1', 's']:
                 self.start_new_experiment()
@@ -61,7 +54,7 @@ class Application(Loggable):
             elif choice in ['0', 'q']:
                 break
             else:
-                print('no such option')
+                utils.print('no such option')
 
     def generate_grammar(self):
         """Find a grammar that satisfies the experimental protocol's requirements as defined by the user."""
@@ -124,18 +117,18 @@ class Application(Loggable):
         try:
             gmr, _, _ = self.generate_grammar()
         except NotImplementedError:
-            print('error: saving custom grammars to file is not supported (yet)')
+            utils.print('error: saving custom grammars to file is not supported (yet)')
             return
         if not gmr:
             return
         while True:
-            filename = input('save to filename (leave empty to cancel): ')
+            filename = utils.input('save to filename (leave empty to cancel): ')
             if not filename:
                 return
             go_ahead = True
             if os.path.exists(filename):
                 go_ahead = False
-                choice = input('warning: file exists, overwrite? (y/n)> ')
+                choice = utils.input('warning: file exists, overwrite? (y/n)> ')
                 if choice and choice[0].lower() == 'y':
                     go_ahead = True
             if go_ahead:
@@ -148,42 +141,42 @@ class Application(Loggable):
     def load_experiment(self):
         """Resume a previously generated experiment from a file of the user's choice
         and (re)run the experiment with the same grammar."""
-        filename = input('file to load grammar from (leave blank to use default settings file): ')
+        filename = utils.input('file to load grammar from (leave blank to use default settings file): ')
         if not filename:
             filename = None
         else:
             if not os.path.exists(filename):
-                print('error: file not found')
+                utils.print('error: file not found')
                 return
             if not os.path.isfile(filename):
-                print('error: not a file (maybe a folder?)')
+                utils.print('error: not a file (maybe a folder?)')
                 return
         settings_and_gmr = settings.Settings()
         try:
             settings_and_gmr.load_all(filename)
         except settings.Settings.VersionException as ve:
-            print(ve)
+            utils.print(ve)
         except Exception:
-            print('error: loading experiment from file failed')
+            utils.print('error: loading experiment from file failed')
             return
         if settings_and_gmr.halted_experiment is None or not settings_and_gmr.halted_experiment.ready_to_produce():
             if settings_and_gmr.grammar is None:
-                print('error: file does not include a grammar or a paused experiment')
+                utils.print('error: file does not include a grammar or a paused experiment')
                 return
             try:
-                get_grammar_from_obfuscated_repr(settings_and_gmr)
+                utils.get_grammar_from_obfuscated_repr(settings_and_gmr)
             except ValueError:
-                print('error: loading grammar from file failed')
+                utils.print('error: loading grammar from file failed')
                 return
             settings_and_gmr.halted_experiment = experiment.Experiment(settings_and_gmr)
-        print(f"Experiment loaded from '{settings_and_gmr.filename}'.")
+        utils.print(f"Experiment loaded from '{settings_and_gmr.filename}'.")
         if not self.settings.settings_equal(settings_and_gmr):
-            print('warning: your current settings differ from those loaded from file:\n')
-            print(f"settings in '{filename}':\n" + settings_and_gmr.diff(self.settings))
-            print(f"current settings:\n" + self.settings.diff(settings_and_gmr))
+            utils.print('warning: your current settings differ from those loaded from file:\n')
+            utils.print(f"settings in '{filename}':\n" + settings_and_gmr.diff(self.settings))
+            utils.print(f"current settings:\n" + self.settings.diff(settings_and_gmr))
             choice = ''
             while not choice:
-                choice = input('use the current settings instead? (y/n)> ')
+                choice = utils.input('use the current settings instead? (y/n)> ')
             if choice[0].lower() == 'y':
                 settings_and_gmr.override(self.settings)
         if not settings_and_gmr.halted_experiment.started():
@@ -193,14 +186,14 @@ class Application(Loggable):
         elif not settings_and_gmr.halted_experiment.finished():
             self.duplicate_print('You are now resuming a previously paused session.')
         else:
-            print('You have loaded a previously completed experiment. Do you want to repeat the same experiment all over again? (y/n)')
+            utils.print('You have loaded a previously completed experiment. Do you want to repeat the same experiment all over again? (y/n)')
             do_repeat = None
             while not do_repeat or do_repeat[0].lower() not in ['y', 'n']:
-                do_repeat = input()
+                do_repeat = utils.input()
             if 'y' != do_repeat[0].lower():
                 return
             if settings_and_gmr.grammar is None:
-                print('warning: no grammar found in file, the old strings will be used to repeat the experiment')
+                utils.print('warning: no grammar found in file, the old strings will be used to repeat the experiment')
                 settings_and_gmr.halted_experiment.reset_answers()
             else:
                 def callback():
@@ -211,7 +204,7 @@ class Application(Loggable):
     def settings_menu(self):
         """Enable user to configure and adjust the experimental protocol."""
         while True:
-            print('\n--------  SETTINGS  --------')
+            utils.print('\n--------  SETTINGS  --------')
             # used for disabling currently unavailable options
             settings_enabled = settings.SettingsEnabled()
             # used for not showing currently unavailable options
@@ -263,11 +256,11 @@ class Application(Loggable):
                 except UnboundLocalError:
                     # choice variable has not been assigned
                     pass
-            options[15] = colorize(options[15], self.settings)
-            print("\n".join(options))
+            options[15] = utils.colorize(options[15], self.settings)
+            utils.print("\n".join(options))
             choice = ''
             while not choice:
-                choice = input('what to change> ')
+                choice = utils.input('what to change> ')
             if choice.isalpha():
                 choice = choice[0].lower()
             choice_to_attr_name = {
@@ -305,7 +298,7 @@ class Application(Loggable):
             }
             try:
                 if not getattr(settings_enabled, choice_to_attr_name[choice]):
-                    print('error: that option is not available for this kind of experiment')
+                    utils.print('error: that option is not available for this kind of experiment')
                     choice = ''
                     continue
             except KeyError:
@@ -313,10 +306,10 @@ class Application(Loggable):
                 pass
             attr_to_change = None
             if choice in ['1', 'm']:
-                self.settings.username = input('username: ')
+                self.settings.username = utils.input('username: ')
                 if not self.settings.username:
                     self.settings.username = 'anonymous'
-                print(f"good to see you, {self.settings.username}")
+                utils.print(f"good to see you, {self.settings.username}")
             elif choice in ['2', 'c']:
                 self.settings.grammar_class = self.settings.grammar_class.next()
             elif choice in ['3', 's']:
@@ -338,42 +331,42 @@ class Application(Loggable):
                 prompt = 'maximum string length: '
                 attr_to_change = 'maximum_string_length'
             elif choice in ['9', 'l']:
-                new_tokens = input('tokens to use in strings: ')
+                new_tokens = utils.input('tokens to use in strings: ')
                 if not new_tokens:
-                    print('no tokens provided')
+                    utils.print('no tokens provided')
                 elif not re.match(r"^[\s\w]+$", new_tokens):
-                    print('error: please type letters only')
+                    utils.print('error: please type letters only')
                 elif len(set([*new_tokens])) < 2:
-                    print('error: at least two different tokens required')
+                    utils.print('error: at least two different tokens required')
                 else:
                     if re.search(r"\d", new_tokens):
-                        print('warning: using numbers in stimuli is not recommended')
+                        utils.print('warning: using numbers in stimuli is not recommended')
                     if re.search(r"[A-Z]", new_tokens) and re.search(r"[a-z]", new_tokens):
-                        print('warning: mixing uppercase and lowercase letters is not recommended')
+                        utils.print('warning: mixing uppercase and lowercase letters is not recommended')
                     if re.search(r"\s", new_tokens):
                         new_tokens = new_tokens.split()
                     self.settings.string_tokens = sorted(list(set([*new_tokens])))
             elif choice in ['10']:
                 self.settings.recursion = not self.settings.recursion
             elif choice in ['11', 'f']:
-                new_filename = input('logfile name: ')
-                print('\'' + new_filename + '\'')
+                new_filename = utils.input('logfile name: ')
+                utils.print('\'' + new_filename + '\'')
                 if not new_filename:
                     continue  # nevermind
                 elif os.path.exists(new_filename):
                     if not os.path.isfile(new_filename):
-                        print('error: not a file (maybe a folder?)')
+                        utils.print('error: not a file (maybe a folder?)')
                     with open(new_filename, 'r', encoding='UTF-8') as logfile:
                         first_few_lines = logfile.readlines()[:10]
                     if not re.search(r'agl-solitaire', '\n'.join(first_few_lines)):
-                        print('file does not look like an agl-solitaire log file')
+                        utils.print('file does not look like an agl-solitaire log file')
                         while choice not in ['y', 'n']:
-                            choice = input('are you sure you want to use this file? (y/n)> ')
+                            choice = utils.input('are you sure you want to use this file? (y/n)> ')
                             if choice:
                                 choice = choice[0].lower()
                 else:
                     while choice not in ['y', 'n']:
-                        choice = input('file does not exist, create it? (y/n)> ')
+                        choice = utils.input('file does not exist, create it? (y/n)> ')
                         if choice:
                             choice = choice[0].lower()
                 if choice in ['11', 'f', 'y']:
@@ -388,21 +381,21 @@ class Application(Loggable):
             elif choice in ['15', 'e']:
                 self.settings.email_logs = not self.settings.email_logs
             elif choice in ['16', 'h']:
-                print('available colors:')
-                pretty_print_color_codes(self.settings)
-                new_color = input('new highlight color (leave blank to go back): ')
+                utils.print('available colors:')
+                utils.pretty_print_color_codes(self.settings)
+                new_color = utils.input('new highlight color (leave blank to go back): ')
                 if not new_color:
                     continue
                 if new_color not in ansi_term_color_codes.keys():
-                    print('error: no such color name in the list above')
+                    utils.print('error: no such color name in the list above')
                     continue
                 self.settings.highlight_color = new_color
             elif choice in ['0', 'b']:
                 break
             else:
-                print('error: no such setting')
+                utils.print('error: no such setting')
             if attr_to_change is not None:
-                new_value = input(prompt)
+                new_value = utils.input(prompt)
                 try:
                     if int(new_value) != float(new_value):
                         raise ValueError('error: please provide an integer')
@@ -416,16 +409,16 @@ class Application(Loggable):
                     if (self.settings.training_strings +
                         self.settings.test_strings_grammatical +
                         self.settings.test_strings_ungrammatical) > 100:
-                        print('warning: you are advised to keep the total number of training items plus test items under 100')
+                        utils.print('warning: you are advised to keep the total number of training items plus test items under 100')
                 except ValueError as err:
                     if err:
-                        print(str(err))
+                        utils.print(str(err))
                     else:
-                        print('error: invalid number')
+                        utils.print('error: invalid number')
 
     def start_new_experiment(self):
         """Create a brand new random grammar based on user's settings, run the experimental procedure and record everything in the log file."""
-        clear()
+        utils.clear()
         self.duplicate_print('=' * 120, log_only=True)
         self.duplicate_print('agl-solitaire session started with the following settings:')
         self.duplicate_print(self.settings.pretty_print())
@@ -470,31 +463,31 @@ class Application(Loggable):
                 self.duplicate_print('A few questions before we begin. Feel free to answer as briefly or in as much detail as you like.')
                 self.duplicate_print('Your answers are going to be recorded in the log file.')
                 self.duplicate_print('Have you heard about artificial grammar learning experiments before?')
-                answer = input()
+                answer = utils.input()
                 self.duplicate_print(answer, log_only=True)
                 self.duplicate_print('How old are you?')
-                answer = input()
+                answer = utils.input()
                 self.duplicate_print(answer, log_only=True)
                 self.duplicate_print('What languages do you speak?')
-                answer = input()
+                answer = utils.input()
                 self.duplicate_print(answer, log_only=True)
                 self.duplicate_print('What is your profession if you care to share?')
-                answer = input()
+                answer = utils.input()
                 self.duplicate_print(answer, log_only=True)
             self.duplicate_print(f"You may add any {'further ' if stngs.run_questionnaire else ''}notes or comments for the record before the experiment begins (optional). Please enter an empty line when you're done:")
-            comments = '\n'.join(iter(input, ''))
+            comments = '\n'.join(iter(utils.input, ''))
             self.duplicate_print(comments, log_only=True)
-            clear()
+            utils.clear()
             ### now perform the main part of the experiment ###
             experiment_to_run.run()
             ### ### ### ### ### ### ### ### ### ### ### ### ###
-            print()
+            utils.print()
             self.duplicate_print('Experiment finished. Thank you for playing!')
             if stngs.email_logs:
                 go_ahead = True
                 while go_ahead:
                     go_ahead = False
-                    print('Sending experiment logs to the author of the application. Please stand by...')
+                    utils.print('Sending experiment logs to the author of the application. Please stand by...')
                     with open(stngs.logfile_filename, 'r', encoding='UTF-8') as fh:
                         log_lines = fh.read().split('\n')
                     try:
@@ -508,17 +501,17 @@ class Application(Loggable):
                             # all in plaintext, probably not a good idea :(
                             server.login('aglsolitaire@gmail.com', 'llot gfpy csfw wuyt')
                             server.sendmail('aglsolitaire@gmail.com', 'aglsolitaire@gmail.com', message_body.encode('utf-8'))
-                        print('Success. Thank you for your contribution!')
+                        utils.print('Success. Thank you for your contribution!')
                     except OSError:
-                        print('Failed. Perhaps your internet connection is not working.')
-                        print('Do you want to try again? (y/n)')
-                        answer = input()
+                        utils.print('Failed. Perhaps your internet connection is not working.')
+                        utils.print('Do you want to try again? (y/n)')
+                        answer = utils.input()
                         if answer and answer[0].lower() == 'y':
                             go_ahead = True
                     except Exception:
-                        print('Failed, reason unknown. Sorry. :(')
+                        utils.print('Failed, reason unknown. Sorry. :(')
         except KeyboardInterrupt:
-            print()
+            utils.print()
             self.duplicate_print(f"Experiment halted by user. Progress saved to '{stngs.filename}'.")
             # returning to main menu
         finally:

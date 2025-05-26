@@ -17,14 +17,7 @@ except AttributeError:
 from src.agl_solitaire.grammar import Grammar
 from src.agl_solitaire.settings import Settings
 from src.agl_solitaire.experiment_state import TaskState
-from src.agl_solitaire.utils import (print,
-                                     input,
-                                     _builtin_input,
-                                     clear,
-                                     colorize,
-                                     Loggable,
-                                     pad_sentences,
-                                     get_grammar_from_obfuscated_repr)
+from src.agl_solitaire import utils
 
 
 # Task lifecycle: (1.A and 1.B can happen in either order)
@@ -35,7 +28,7 @@ from src.agl_solitaire.utils import (print,
 #     3.  inactive
 
 @dataclasses.dataclass
-class Task(Loggable, TaskState):
+class Task(utils.Loggable, TaskState):
     """Represents one AGL test to be done by the user, possibly in a series of several.
     This class provides a default implementation that may be overridden by more specific
     custom Tasks."""
@@ -64,7 +57,7 @@ class Task(Loggable, TaskState):
         assert 0 < self.settings.test_strings_ungrammatical
         if not self.ready_to_produce():
             assert not self.settings.grammar_class.custom()
-            self.grammar = get_grammar_from_obfuscated_repr(self.settings)
+            self.grammar = utils.get_grammar_from_obfuscated_repr(self.settings)
         num_required_grammatical = self.settings.training_strings + self.settings.test_strings_grammatical
         if not self.settings.grammar_class.custom():
             grammatical_strings = self.grammar.produce_grammatical(num_strings=num_required_grammatical,
@@ -90,10 +83,10 @@ class Task(Loggable, TaskState):
             # we got pairs of (form, meaning) from the grammar
             assert all(type(string) is tuple for string in grammatical_strings)
             assert all(type(string) is tuple for string in ungrammatical_strings)
-            self.training_set = pad_sentences(self.training_set)
+            self.training_set = utils.pad_sentences(self.training_set)
             test_strings = [string for string, _, _ in self.test_set]
             test_answers = [(right, user) for _, right, user in self.test_set]
-            self.test_set = [(string, right, user) for (string, (right, user)) in zip(pad_sentences(test_strings), test_answers)]
+            self.test_set = [(string, right, user) for (string, (right, user)) in zip(utils.pad_sentences(test_strings), test_answers)]
         else:
             # we got plain strings
             assert all(type(string) is str for string in grammatical_strings)
@@ -131,37 +124,37 @@ class Task(Loggable, TaskState):
             else:
                 self.duplicate_print(f"You can use Ctrl-C to halt the experiment at any time. Your progress will be saved to '{self.settings.filename}' and you will be able to finish the experiment later.")
             self.duplicate_print('Please make sure your screen and terminal font are comfortable to read. Press return when you are ready.')
-            input()
+            utils.input()
             if self.settings.training_one_at_a_time:
                 for training_rep in range(1, self.settings.training_reps + 1):
                     for string in self.training_set:
-                        clear()
-                        print()
-                        self.duplicate_print(colorize(string, self.settings))
+                        utils.clear()
+                        utils.print()
+                        self.duplicate_print(utils.colorize(string, self.settings))
                         time.sleep(float(self.settings.training_time) / self.settings.training_strings)
                     if training_rep < self.settings.training_reps:
-                        clear()
+                        utils.clear()
                         self.duplicate_print(f"Round {training_rep} out of {self.settings.training_reps} done. Press return to start round {training_rep+1}.")
-                        input()
+                        utils.input()
             else:
                 self.duplicate_print('Training phase started. Please study the following list of strings:')
-                print()
-                self.duplicate_print('\n'.join([colorize(s, self.settings) for s in self.training_set]))
-                print()
-                input_thread = threading.Thread(target=_builtin_input, daemon=True)
+                utils.print()
+                self.duplicate_print('\n'.join([utils.colorize(s, self.settings) for s in self.training_set]))
+                utils.print()
+                input_thread = threading.Thread(target=utils._builtin_input, daemon=True)
                 input_thread.start()
                 remaining_time = self.settings.training_time
                 while input_thread.is_alive() and 0 < remaining_time:
-                    print(f"\r{remaining_time} seconds remaining (press return to finish early)...  ", end='')
+                    utils.print(f"\r{remaining_time} seconds remaining (press return to finish early)...  ", end='')
                     time.sleep(1)
                     remaining_time -= 1
-            print('\rTraining phase finished.' + ' ' * 30)
+            utils.print('\rTraining phase finished.' + ' ' * 30)
             try:
                 self.duplicate_print(f"Training phase finished. Remaining time: {remaining_time} seconds.", log_only=True)
             except NameError:
                 self.duplicate_print('Training phase finished.', log_only=True)
             self.training_finished = True
-            clear()
+            utils.clear()
         self.duplicate_print(f"The test phase will now begin. You will be shown {len(self.test_set)} new strings one at a time and prompted to judge the grammaticality of each.")
         if 'Windows' == platform.system():
             self.duplicate_print("You can use Ctrl-Break to halt the experiment at any time. Your progress will be saved to '{self.settings.filename}' and you will be able to finish the experiment later.")
@@ -172,22 +165,22 @@ class Task(Loggable, TaskState):
         if input_thread and input_thread.is_alive():
             input_thread.join()
         else:
-            input()
+            utils.input()
         # N.B. you can't do the following because you want to update the original test_set
         #for i, item in enumerate(self.test_set):
         for i in range(len(self.test_set)):
             if self.test_set[i][2] is not None:
                 # already answered in a previous session
                 continue
-            clear()
+            utils.clear()
             self.duplicate_print(f"Test item #{i+1} out of {len(self.test_set)}. Is the following string grammatical? (y/n)")
-            print()
-            self.duplicate_print(colorize(self.test_set[i][0], self.settings))
+            utils.print()
+            self.duplicate_print(utils.colorize(self.test_set[i][0], self.settings))
             answer = '_'
             while answer[0] not in ['y', 'n']:
                 answer = None
                 while not answer:
-                    answer = input()
+                    answer = utils.input()
                     self.duplicate_print(answer, log_only=True)
                 answer = answer[0].lower()
                 if answer == 'g':
@@ -197,7 +190,7 @@ class Task(Loggable, TaskState):
             self.test_set[i] = (self.test_set[i][0], self.test_set[i][1], answer)
             # FIXME: need to call this manually because __setattr__ doesn't get called if you update a member variable in-place :(
             self.settings.save_all()
-        clear()
+        utils.clear()
         self.duplicate_print('Test phase finished. Hope you had fun!')
 
     def cleanup(self):

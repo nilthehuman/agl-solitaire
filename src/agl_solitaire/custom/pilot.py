@@ -13,7 +13,7 @@ from src.agl_solitaire.experiment import Experiment
 from src.agl_solitaire.grammar import CustomGrammar
 from src.agl_solitaire.settings import SettingsEnabled
 from src.agl_solitaire.task import Task
-from src.agl_solitaire.utils import clear, print, input, polish_sentences, Loggable
+from src.agl_solitaire import utils
 
 
 TOKEN_SETS = [
@@ -148,7 +148,7 @@ class DefiniteArticleAgreementGrammar(CustomGrammar):
         sentences = sentences_def + sentences_indef + sentences_name
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            sentences = polish_sentences(sentences)
+            sentences = utils.polish_sentences(sentences)
         random.shuffle(sentences)
         return sentences
 
@@ -174,7 +174,7 @@ class DefiniteArticleAgreementGrammar(CustomGrammar):
             ungrammatical_sentences.add(sentence)
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+            ungrammatical_sentences = utils.polish_sentences(ungrammatical_sentences)
         return ungrammatical_sentences
 
 
@@ -271,7 +271,7 @@ class AsymmetricArticlesGrammar(CustomGrammar):
         sentences = sentences_indef_indef + sentences_indef_def + sentences_def_indef + sentences_def_def + sentences_name_def
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            sentences = polish_sentences(sentences)
+            sentences = utils.polish_sentences(sentences)
         random.shuffle(sentences)
         return sentences
 
@@ -343,7 +343,7 @@ class AsymmetricArticlesGrammar(CustomGrammar):
         random.shuffle(ungrammatical_sentences)
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+            ungrammatical_sentences = utils.polish_sentences(ungrammatical_sentences)
         return ungrammatical_sentences
 
 
@@ -403,7 +403,7 @@ class AccusativeMarkingAgreementGrammar(CustomGrammar):
         sentences = sentences_indef + sentences_quant
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            sentences = polish_sentences(sentences)
+            sentences = utils.polish_sentences(sentences)
         random.shuffle(sentences)
         return sentences
 
@@ -429,7 +429,7 @@ class AccusativeMarkingAgreementGrammar(CustomGrammar):
             ungrammatical_sentences.add(sentence)
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+            ungrammatical_sentences = utils.polish_sentences(ungrammatical_sentences)
         return ungrammatical_sentences
 
 
@@ -489,7 +489,7 @@ class VerbalAgreementGrammar(CustomGrammar):
         sentences = [(mar, eng[0:3] + eng[4:]) for mar, eng in sentences]
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            sentences = polish_sentences(sentences)
+            sentences = utils.polish_sentences(sentences)
         random.shuffle(sentences)
         return sentences
 
@@ -504,7 +504,7 @@ class VerbalAgreementGrammar(CustomGrammar):
             ungrammatical_sentences.add(sentence)
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+            ungrammatical_sentences = utils.polish_sentences(ungrammatical_sentences)
         return ungrammatical_sentences
 
 
@@ -595,7 +595,7 @@ class VerbReduplicationGrammar(CustomGrammar):
         sentences = sentences_short + sentences_long + sentences_name_short + sentences_name_long
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            sentences = polish_sentences(sentences)
+            sentences = utils.polish_sentences(sentences)
         random.shuffle(sentences)
         return sentences
 
@@ -621,7 +621,7 @@ class VerbReduplicationGrammar(CustomGrammar):
             ungrammatical_sentences.add(sentence)
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+            ungrammatical_sentences = utils.polish_sentences(ungrammatical_sentences)
         return ungrammatical_sentences
 
 
@@ -690,7 +690,7 @@ class WackernagelWordOrderGrammar(CustomGrammar):
         sentences = sentences_nom_object + sentences_pro_object + sentences_dtr_object
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            sentences = polish_sentences(sentences)
+            sentences = utils.polish_sentences(sentences)
         random.shuffle(sentences)
         return sentences
 
@@ -709,7 +709,7 @@ class WackernagelWordOrderGrammar(CustomGrammar):
             ungrammatical_sentences.add(sentence)
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+            ungrammatical_sentences = utils.polish_sentences(ungrammatical_sentences)
         return ungrammatical_sentences
 
 
@@ -770,7 +770,7 @@ class LeadingCopulaGrammar(CustomGrammar):
         sentences = [(mar, eng[1:3] + eng[4:]) for mar, eng in sentences]
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            sentences = polish_sentences(sentences)
+            sentences = utils.polish_sentences(sentences)
         random.shuffle(sentences)
         return sentences
 
@@ -793,7 +793,7 @@ class LeadingCopulaGrammar(CustomGrammar):
             ungrammatical_sentences.add(sentence)
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+            ungrammatical_sentences = utils.polish_sentences(ungrammatical_sentences)
         return ungrammatical_sentences
 
 
@@ -870,7 +870,7 @@ class PresentParticipleGrammar(CustomGrammar):
         sentences = sentences_no_prt + sentences_prt + sentences_name_no_prt
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            sentences = polish_sentences(sentences)
+            sentences = utils.polish_sentences(sentences)
         random.shuffle(sentences)
         return sentences
 
@@ -907,7 +907,7 @@ class PresentParticipleGrammar(CustomGrammar):
             ungrammatical_sentences.add(sentence)
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+            ungrammatical_sentences = utils.polish_sentences(ungrammatical_sentences)
         return ungrammatical_sentences
 
 
@@ -986,7 +986,7 @@ class EvidentialGrammar(CustomGrammar):
         sentences = [(mar, (eng_phrase(eng),) + eng[0:-2] + eng[-1:]) for mar, eng in sentences]
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            sentences = polish_sentences(sentences)
+            sentences = utils.polish_sentences(sentences)
         random.shuffle(sentences)
         return sentences
 
@@ -1005,7 +1005,7 @@ class EvidentialGrammar(CustomGrammar):
             ungrammatical_sentences.add(sentence)
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+            ungrammatical_sentences = utils.polish_sentences(ungrammatical_sentences)
         return ungrammatical_sentences
 
 
@@ -1054,7 +1054,7 @@ class EchoMorphologyGrammar(CustomGrammar):
         sentences = sentences_vanilla + sentences_name
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            sentences = polish_sentences(sentences)
+            sentences = utils.polish_sentences(sentences)
         random.shuffle(sentences)
         return sentences
 
@@ -1082,7 +1082,7 @@ class EchoMorphologyGrammar(CustomGrammar):
             ungrammatical_sentences.add(sentence)
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+            ungrammatical_sentences = utils.polish_sentences(ungrammatical_sentences)
         return ungrammatical_sentences
 
 
@@ -1199,7 +1199,7 @@ class RhymingGrammar(CustomGrammar):
         sentences = sentences_feed_1 + sentences_feed_2 + sentences_feed_name_1 + sentences_feed_name_2 + sentences_leave_1 + sentences_leave_2
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            sentences = polish_sentences(sentences)
+            sentences = utils.polish_sentences(sentences)
         random.shuffle(sentences)
         return sentences
 
@@ -1289,7 +1289,7 @@ class RhymingGrammar(CustomGrammar):
             ungrammatical_sentences.add(sentence)
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+            ungrammatical_sentences = utils.polish_sentences(ungrammatical_sentences)
         return ungrammatical_sentences
 
 
@@ -1371,7 +1371,7 @@ class PalindromeDemonstrativeGrammar(CustomGrammar):
         sentences = [((rev(mar[1])+' ' if 'THAT' in mar[0] else mar[0],) + mar[1:], eng) for mar, eng in sentences]
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            sentences = polish_sentences(sentences)
+            sentences = utils.polish_sentences(sentences)
         random.shuffle(sentences)
         return sentences
 
@@ -1402,7 +1402,7 @@ class PalindromeDemonstrativeGrammar(CustomGrammar):
             ungrammatical_sentences.add(sentence)
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+            ungrammatical_sentences = utils.polish_sentences(ungrammatical_sentences)
         return ungrammatical_sentences
 
 
@@ -1486,7 +1486,7 @@ class PalindromePastGrammar(CustomGrammar):
         sentences = sentences_past + sentences_fut
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            sentences = polish_sentences(sentences)
+            sentences = utils.polish_sentences(sentences)
         random.shuffle(sentences)
         return sentences
 
@@ -1529,7 +1529,7 @@ class PalindromePastGrammar(CustomGrammar):
             ungrammatical_sentences.add(sentence)
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+            ungrammatical_sentences = utils.polish_sentences(ungrammatical_sentences)
         return ungrammatical_sentences
 
 
@@ -1631,7 +1631,7 @@ class RecursiveGrammar(CustomGrammar):
             sentences = sentences_sg_subject.union(sentences_pl_subject)
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            sentences = polish_sentences(sentences)
+            sentences = utils.polish_sentences(sentences)
         sentences = list(sentences)
         random.shuffle(sentences)
         return sentences
@@ -1661,7 +1661,7 @@ class RecursiveGrammar(CustomGrammar):
             ungrammatical_sentences.add(sentence)
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+            ungrammatical_sentences = utils.polish_sentences(ungrammatical_sentences)
         return ungrammatical_sentences
 
 
@@ -1739,7 +1739,7 @@ class PredicativeEndingGrammar(CustomGrammar):
         sentences = [(mar, eng[:-1]) for mar, eng in sentences]
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            sentences = polish_sentences(sentences)
+            sentences = utils.polish_sentences(sentences)
         random.shuffle(sentences)
         return sentences
 
@@ -1769,7 +1769,7 @@ class PredicativeEndingGrammar(CustomGrammar):
             ungrammatical_sentences.add(sentence)
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+            ungrammatical_sentences = utils.polish_sentences(ungrammatical_sentences)
         return ungrammatical_sentences
 
 
@@ -1874,7 +1874,7 @@ class ErgativeAbsolutiveGrammar(CustomGrammar):
         sentences = [(mar, remove_markers(eng)) for mar, eng in sentences]
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            sentences = polish_sentences(sentences)
+            sentences = utils.polish_sentences(sentences)
         random.shuffle(sentences)
         return sentences
 
@@ -1902,7 +1902,7 @@ class ErgativeAbsolutiveGrammar(CustomGrammar):
             ungrammatical_sentences.add(sentence)
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+            ungrammatical_sentences = utils.polish_sentences(ungrammatical_sentences)
         return ungrammatical_sentences
 
 
@@ -1952,7 +1952,7 @@ class ReduplicationComplementGrammar(CustomGrammar):
         sentences = [(mar, eng[0:1] + eng[2:] + eng[1:2]) for mar, eng in sentences]
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            sentences = polish_sentences(sentences)
+            sentences = utils.polish_sentences(sentences)
         sentences = random.sample(sentences, num_strings)
         random.shuffle(sentences)
         return sentences
@@ -1973,11 +1973,11 @@ class ReduplicationComplementGrammar(CustomGrammar):
         ungrammatical_sentences = [swap_aux_and_lexical_verb(s) for s in ungrammatical_sentences]
         if polish:
             # assemble real(-looking) sentences from tuples, mold into pleasing orthographic form
-            ungrammatical_sentences = polish_sentences(ungrammatical_sentences)
+            ungrammatical_sentences = utils.polish_sentences(ungrammatical_sentences)
         return ungrammatical_sentences
 
 
-class NaturalnessJudgementTask(Task, Loggable):
+class NaturalnessJudgementTask(Task, utils.Loggable):
     """See how participant rates a few plain English stimuli."""
 
     def ready_to_produce(self):
@@ -2002,16 +2002,16 @@ class NaturalnessJudgementTask(Task, Loggable):
 a scale of 1 to 7. Feel free to include any further comments alongside a number, e.g. '3, sounds odd' or similar.'''
         )
         self.duplicate_print(f"You will be shown {len(sentences)} sentences total and then you're done. Press return when you are ready.")
-        input()
+        utils.input()
         for i, sentence in enumerate(sentences):
-            clear()
+            utils.clear()
             self.duplicate_print(f"Sentence #{i+1} out of {len(sentences)}. How natural would you rate the following sentence on a scale of 1 to 7?")
-            print()
+            utils.print()
             self.duplicate_print(sentence)
             while True:
                 answer = ''
                 while not answer:
-                    answer = input()
+                    answer = utils.input()
                 self.duplicate_print(answer, log_only=True)
                 if not any(c.isdigit() for c in answer):
                     self.duplicate_print('Please include a numerical rating in your answer.')

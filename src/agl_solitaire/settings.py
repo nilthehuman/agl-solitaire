@@ -19,7 +19,7 @@ import typing
 
 from src.agl_solitaire import custom_helpers
 from src.agl_solitaire import version
-from src.agl_solitaire.experiment_state import TaskState, ExperimentState
+from src.agl_solitaire.experiment_state import ExperimentState
 
 
 _PROJECT_ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '..'))

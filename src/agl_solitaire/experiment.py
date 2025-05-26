@@ -6,11 +6,11 @@ import random
 from src.agl_solitaire import experiment_state
 from src.agl_solitaire import settings
 from src.agl_solitaire import task
-from src.agl_solitaire.utils import print, input, clear, colorize, get_grammar_from_obfuscated_repr, Loggable
+from src.agl_solitaire import utils
 
 
 @dataclasses.dataclass
-class Experiment(Loggable, experiment_state.ExperimentState):
+class Experiment(utils.Loggable, experiment_state.ExperimentState):
     """Container for one or more Tasks, responsible for preparing and running them."""
 
     settings: settings.Settings
@@ -81,7 +81,7 @@ class Experiment(Loggable, experiment_state.ExperimentState):
         self.track_state()
         remaining_tasks = self.tasks[self.tasks_done:]
         for i, task in [(n + self.tasks_done, t) for n, t in enumerate(remaining_tasks)]:
-            clear()
+            utils.clear()
             if 1 < len(self.tasks) and not task.anchored_to_end:
                 num_challenges = len([t for t in self.tasks if not t.anchored_to_end])
                 self.duplicate_print(f"***  Welcome to Challenge #{i+1} out of {num_challenges}  ***\n")
@@ -94,14 +94,14 @@ class Experiment(Loggable, experiment_state.ExperimentState):
             if self.settings.run_questionnaire and not task.anchored_to_end:
                 self.duplicate_print('A few more questions if you feel like it:')
                 self.duplicate_print('Did you feel like you got the hang of the grammar or were you just guessing?')
-                answer = input()
+                answer = utils.input()
                 self.duplicate_print(answer, log_only=True)
                 self.duplicate_print('Did you seem to find any concrete giveaways or hints in the strings?')
-                answer = input()
+                answer = utils.input()
                 self.duplicate_print(answer, log_only=True)
             if not self.settings.grammar_class.custom() and self.settings.grammar is not None:
                 self.duplicate_print(f"And now for the big reveal... Strings were generated using the following {self.settings.grammar_class} grammar:")
-                gmr = get_grammar_from_obfuscated_repr(self.settings)
+                gmr = utils.get_grammar_from_obfuscated_repr(self.settings)
                 self.duplicate_print(str(gmr))
             if task.test_set:
                 correct = sum(item[1] == item[2] for item in task.test_set)
@@ -110,11 +110,11 @@ class Experiment(Loggable, experiment_state.ExperimentState):
                 width = max(16, 2 + max(len(item[0]) for item in task.test_set))
                 self.duplicate_print(f"{'Test string':<{width}}{'Correct answer':<16}{'Your answer':<16}")
                 for item in task.test_set:
-                    color_string = colorize(item[0], self.settings)
+                    color_string = utils.colorize(item[0], self.settings)
                     real_width = width + len(color_string) - len(item[0])
                     self.duplicate_print(f"{color_string:<{real_width}}{'yes' if 'y' == item[1] else 'no':<16}{'yes' if 'y' == item[2] else 'no':<16}")
             self.duplicate_print('You now have a chance to add any other post hoc notes or comments for the record if you wish. Please enter an empty line when you\'re done:')
-            comments = '\n'.join(iter(input, ''))
+            comments = '\n'.join(iter(utils.input, ''))
             self.duplicate_print(comments, log_only=True)
 
     def cleanup(self):

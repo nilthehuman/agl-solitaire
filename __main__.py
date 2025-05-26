@@ -38,11 +38,12 @@ def help():
     for name, descr in settings.items():
         pretty_print(name, descr)
 
-def main():
-    """Run the application."""
+def legacy_main():
+    """Run the application in the terminal."""
+    print('warning: you are using the legacy terminal-based user interface which is soon to be deprecated\n')
     Application().main_menu()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     if 1 < len(argv) and argv[1] in ['-h', '--help']:
         help()
     else:
