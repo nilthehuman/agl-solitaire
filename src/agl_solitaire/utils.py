@@ -26,7 +26,7 @@ _LEFT_MARGIN_WIDTH = 2
 
 _builtin_print = print
 
-def print(string='', end='\n'):
+def print(string='', end='\n', left_margin=_LEFT_MARGIN_WIDTH, silent=False):
     """Smarter print function, adds left margin and wraps long lines automatically."""
     string = str(string)
     # add some color to make settings keys and error messages pop too
@@ -43,7 +43,7 @@ def print(string='', end='\n'):
         carriage_return = re.match(r'\r', line)
         if carriage_return:
             line = line[1:]
-        line = ' ' * _LEFT_MARGIN_WIDTH + line
+        line = ' ' * left_margin + line
         if carriage_return:
             line = '\r' + line
         while max_width < len(line):
@@ -56,10 +56,11 @@ def print(string='', end='\n'):
                 stop_at = len(line)
             wrapped_string += line[:stop_at] + '\n'
             line = line[stop_at+1:]
-            line = ' ' * _LEFT_MARGIN_WIDTH + line
+            line = ' ' * left_margin + line
         wrapped_string += line + '\n'
-    # leave off the last newline
-    _builtin_print(wrapped_string[:-1], end=end)
+    if not silent:
+        _builtin_print(wrapped_string[:-1], end=end)  # leave off the last newline though
+    return wrapped_string
 
 
 _builtin_input = input

@@ -43,8 +43,17 @@ def legacy_main():
     print('warning: you are using the legacy terminal-based user interface which is soon to be deprecated\n')
     Application().main_menu()
 
+def gui_main():
+    """Run the application using the windowed interface."""
+    # import GUI here to keep the utils module un-monkeypatched for the legacy terminal UI
+    from src.agl_solitaire.gui import GUIWindow
+    GUIWindow().main_menu()
+
 if __name__ == '__main__':
     if 1 < len(argv) and argv[1] in ['-h', '--help']:
         help()
+    elif len(argv) <= 1 or (1 < len(argv) and argv[1] in ['-t', '--terminal']):
+        # launch legacy text-based UI
+        legacy_main()
     else:
-        main()
+        gui_main()
