@@ -59,7 +59,7 @@ PROPER_NAME_SETS = [
     [ 'Kagora',  'Lem' ],
     [ 'Lasha',   'Kuor' ],
     [ 'Mara',    'Neri' ],
-    [ 'Nekki',   'Munlo' ],
+    [ 'Nakara',  'Munlo' ],
     [ 'Onte',    'Pavel' ],
     [ 'Pembosh', 'Ortin' ],
     [ 'Quesse',  'Ruos' ],
