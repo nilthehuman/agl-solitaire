@@ -131,7 +131,7 @@ class Task(utils.Loggable, TaskState):
                         utils.clear()
                         utils.print()
                         self.duplicate_print(utils.center(utils.colorize(string, self.settings)))
-                        time.sleep(float(self.settings.training_time) / self.settings.training_strings)
+                        utils.sleep(float(self.settings.training_time) / self.settings.training_strings)
                     if training_rep < self.settings.training_reps:
                         utils.clear()
                         self.duplicate_print(f"Round {training_rep} out of {self.settings.training_reps} done. Press return to start round {training_rep+1}.")
@@ -142,12 +142,10 @@ class Task(utils.Loggable, TaskState):
                 self.duplicate_print('\n'.join([utils.colorize(s, self.settings) for s in self.training_set]))
                 utils.print('\n')
                 input_thread = threading.Thread(target=utils._builtin_input, daemon=True)
-                input_thread.start()
                 remaining_time = self.settings.training_time
-                while input_thread.is_alive() and 0 < remaining_time:
-                    utils.print(f"\r{remaining_time} seconds remaining (press return to finish early)...  ", end='')
-                    time.sleep(1)
-                    remaining_time -= 1
+                def countdown(remaining_time):
+                    utils.print(f"\r{remaining_time} seconds remaining (press return to finish early)...  ", end='', flush=True)
+                utils.breakable_loop(self.settings.training_time, 1, countdown, input_thread)
             utils.print('\rTraining phase finished.' + ' ' * 30)
             try:
                 self.duplicate_print(f"Training phase finished. Remaining time: {remaining_time} seconds.", log_only=True)

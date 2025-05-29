@@ -1,6 +1,7 @@
 """Miscellaneous auxiliary functions that don't necessarily belong in any one class."""
 
 import datetime
+import time
 import os
 import re
 try:
@@ -26,7 +27,7 @@ _LEFT_MARGIN_WIDTH = 2
 
 _builtin_print = print
 
-def print(string='', end='\n', left_margin=_LEFT_MARGIN_WIDTH, silent=False):
+def print(string='', left_margin=_LEFT_MARGIN_WIDTH, silent=False, **moreargs):
     """Smarter print function, adds left margin and wraps long lines automatically."""
     string = str(string)
     # add some color to make settings keys and error messages pop too
@@ -59,7 +60,7 @@ def print(string='', end='\n', left_margin=_LEFT_MARGIN_WIDTH, silent=False):
             line = ' ' * left_margin + line
         wrapped_string += line + '\n'
     if not silent:
-        _builtin_print(wrapped_string[:-1], end=end)  # leave off the last newline though
+        _builtin_print(wrapped_string[:-1], **moreargs)  # leave off the last newline though
     return wrapped_string
 
 
@@ -145,6 +146,24 @@ class Loggable:
             stamped_list = ['[' + str(datetime.datetime.now().replace(microsecond=0)) + '] ' + line.strip() for line in string_to_log.split('\n')]
             stamped_string = '\n'.join(stamped_list)
             logfile.write(stamped_string + '\n')
+
+
+def sleep(seconds, callback=None):
+    """Wait until either the given time is up or user presses the Return key."""
+    time.sleep(seconds)
+    if callback:
+        return callback()
+
+def breakable_loop(total_time, wait_per_cycle=1, step=None, input_thread=None):
+    """Keep repeating the same action according to a timer unless interrupted by user input."""
+    if input_thread is not None:
+        input_thread.start()
+    remaining_time = total_time
+    while 0 < remaining_time and (input_thread.is_alive() if input_thread else True):
+        if step is not None:
+            step(remaining_time)
+        sleep(wait_per_cycle)
+        remaining_time -= wait_per_cycle
 
 
 ###  ###  ###  ###  ###  ###  ###  ###

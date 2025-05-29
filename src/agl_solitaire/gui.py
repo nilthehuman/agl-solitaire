@@ -171,10 +171,10 @@ class GUIWindow(application.Application):
 
     #### I/O member functions, replacing the OG terminal based functions from utils ####
 
-    def print(string='', end='\n'):
+    def print(string='', **moreargs):
         # TODO update screen width dynamically based on Text widget width
         assert GUIWindow._SELF.label or GUIWindow._SELF.text
-        formatted_string = _old_print(string, end=end, left_margin=0, silent=True)
+        formatted_string = _old_print(string, left_margin=0, silent=True, **moreargs)
         if GUIWindow._SELF.label:
             existing_text = GUIWindow._SELF.label['text']
             # remove ANSI control sequences from terminal output
@@ -188,9 +188,12 @@ class GUIWindow(application.Application):
             # all Text widgets contain a '\n' at the end which is stupid but what can you do
             num_existing_lines = GUIWindow._SELF.text.get('1.0', tkinter.END).count('\n')
             if formatted_string.startswith('\r'):
-                GUIWindow._SELF.text.delete(f'{num_existing_lines-1}.0', tkinter.END)
-                formatted_string = '\n' + formatted_string[1:]
-            GUIWindow._SELF.text.insert(tkinter.END, formatted_string)
+                GUIWindow._SELF.text.delete(f'{num_existing_lines-1}.0', tkinter.END+'-1c')
+                GUIWindow._SELF.text.insert(tkinter.END, formatted_string[1:])
+                # no Text.yview, don't jerk the screen while counting down time
+            else:
+                GUIWindow._SELF.text.insert(tkinter.END, formatted_string)
+                GUIWindow._SELF.text.yview(tkinter.END)
             # replace ANSI control sequences with Text tags
             open_tags = []
             closed_tags = []
@@ -226,12 +229,12 @@ class GUIWindow(application.Application):
             for (line, _from, to) in spans_to_delete[::-1]:
                 GUIWindow._SELF.text.delete(f'{line}.{_from}', f'{line}.{to}')
             GUIWindow._SELF.text.configure(state=tkinter.DISABLED)
-            GUIWindow._SELF.text.yview(tkinter.END)
             GUIWindow._SELF.root.update_idletasks()
  
     def input(prompt=''):
         assert GUIWindow._SELF.entry
-        #print(prompt)
+        if prompt:
+            utils.print(prompt)
         GUIWindow._SELF.root.wait_variable(GUIWindow._SELF.user_input)
         user_input = GUIWindow._SELF.user_input.get()
         GUIWindow._SELF.user_input.set(None)
@@ -242,17 +245,47 @@ class GUIWindow(application.Application):
         if GUIWindow._SELF.label:
             GUIWindow._SELF.label.config(text='')
         if GUIWindow._SELF.text:
-            # remove all text from the text widget:
             GUIWindow._SELF.text.configure(state=tkinter.NORMAL)
             GUIWindow._SELF.text.delete('1.0', tkinter.END)
             GUIWindow._SELF.text.configure(state=tkinter.DISABLED)
 
+    def sleep(seconds, callback=None):
+        def callback_wrapper():
+            if callback is not None:
+                callback()
+            # trigger user input variable manually
+            GUIWindow._SELF.user_input.set('')
+        clock = GUIWindow._SELF.root.after(int(seconds * 1000), callback_wrapper)
+        GUIWindow._SELF.root.wait_variable(GUIWindow._SELF.user_input)
+        GUIWindow._SELF.root.after_cancel(clock)
+
+    def breakable_loop(total_time, wait_per_cycle=1, step=None, _input_thread=None):
+        assert 0 < total_time
+        # ignore _input_thread, we use the tkinter event loop instead
+        try:
+            def loop(remaining_time):
+                if remaining_time <= 0:
+                    return
+                if step is not None:
+                    step(remaining_time)
+                utils.sleep(wait_per_cycle, lambda: loop(remaining_time - wait_per_cycle))
+            loop(total_time)
+        except StopIteration:
+            pass
+
+
 
 # monkey patching: override a bunch of I/O functions from utils
+# TODO: maybe refactor so that the Application > GUIWindow inheritance does this
 _old_print = utils.print
+_old_sleep = utils.sleep
 
 utils.print = GUIWindow.print
-assert not _old_print is utils.print  # make sure we avoided infinite recursion
+utils.sleep = GUIWindow.sleep
+utils.breakable_loop = GUIWindow.breakable_loop
+# make sure we avoided infinite recursion
+assert not _old_print is utils.print
+assert not _old_print is utils.print
 utils.input = GUIWindow.input
 utils.clear = GUIWindow.clear
 
