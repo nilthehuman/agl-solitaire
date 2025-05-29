@@ -262,17 +262,13 @@ class GUIWindow(application.Application):
     def breakable_loop(total_time, wait_per_cycle=1, step=None, _input_thread=None):
         assert 0 < total_time
         # ignore _input_thread, we use the tkinter event loop instead
-        try:
-            def loop(remaining_time):
-                if remaining_time <= 0:
-                    return
-                if step is not None:
-                    step(remaining_time)
-                utils.sleep(wait_per_cycle, lambda: loop(remaining_time - wait_per_cycle))
-            loop(total_time)
-        except StopIteration:
-            pass
-
+        def loop(remaining_time):
+            if remaining_time <= 0:
+                return
+            if step is not None:
+                step(remaining_time)
+            utils.sleep(wait_per_cycle, lambda: loop(remaining_time - wait_per_cycle))
+        loop(total_time)
 
 
 # monkey patching: override a bunch of I/O functions from utils
