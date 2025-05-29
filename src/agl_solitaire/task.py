@@ -130,7 +130,7 @@ class Task(utils.Loggable, TaskState):
                     for string in self.training_set:
                         utils.clear()
                         utils.print()
-                        self.duplicate_print(utils.colorize(string, self.settings))
+                        self.duplicate_print(utils.center(utils.colorize(string, self.settings)))
                         time.sleep(float(self.settings.training_time) / self.settings.training_strings)
                     if training_rep < self.settings.training_reps:
                         utils.clear()
@@ -140,7 +140,7 @@ class Task(utils.Loggable, TaskState):
                 self.duplicate_print('Training phase started. Please study the following list of strings:')
                 utils.print()
                 self.duplicate_print('\n'.join([utils.colorize(s, self.settings) for s in self.training_set]))
-                utils.print()
+                utils.print('\n')
                 input_thread = threading.Thread(target=utils._builtin_input, daemon=True)
                 input_thread.start()
                 remaining_time = self.settings.training_time

@@ -70,41 +70,46 @@ def input(prompt='> '):
     return _builtin_input(' ' * _LEFT_MARGIN_WIDTH + prompt)
 
 
-_which_clear = None
-
 def clear():
     """Find the right clear screen command by trial-and-error and remember it."""
-    global which_clear
+    global _which_clear
     try:
-        which_clear
+        _which_clear
     except NameError:
-        which_clear = 'cls'
-    if os.system(which_clear):
+        _which_clear = 'cls'
+    if os.system(_which_clear):
         # non-zero exit code, try the other command
-        (which_clear,) = set(['cls', 'clear']) - set([which_clear])
-        os.system(which_clear)
+        (_which_clear,) = set(['cls', 'clear']) - set([_which_clear])
+        os.system(_which_clear)
 
 
 ansi_term_color_codes = {
-    'default'        : 39,
-    'red'            : 31,
-    'green'          : 32,
-    'yellow'         : 33,
-    'blue'           : 34,
-    'magenta'        : 35,
-    'cyan'           : 36,
-    'white'          : 37,
-    'bright red'     : 91,
-    'bright green'   : 92,
-    'bright yellow'  : 93,
-    'bright blue'    : 94,
-    'bright magenta' : 95,
-    'bright cyan'    : 96,
-    'bright white'   : 97
+    'default'       : 39,
+    'red'           : 31,
+    'green'         : 32,
+    'yellow'        : 33,
+    'blue'          : 34,
+    'magenta'       : 35,
+    'cyan'          : 36,
+    'white'         : 37,
+    'light red'     : 91,
+    'light green'   : 92,
+    'light yellow'  : 93,
+    'light blue'    : 94,
+    'light magenta' : 95,
+    'light cyan'    : 96,
+    'light white'   : 97,
+    #### miscellaneous control codes ####
+    'bold'          : 1,
+    'center'        : 11111  # fake made-up escape code for centered text
 }
+
+ansi_codes_to_names = { val : key for key, val in ansi_term_color_codes.items() }
 
 def pretty_print_color_codes(settings):
     for name, code in ansi_term_color_codes.items():
+        if name in ['bold', 'center']:
+            continue
         blimp = '*' if name == settings.highlight_color else ' '
         print(f"[{blimp}] \033[{code}m{name}\033[0m")
 
@@ -120,6 +125,10 @@ def colorize(string, settings):
         string = re.sub(r"\033\[\d+m", '', string)
         # apply highlight color
         return re.sub(r"(.*:.*):(.*)", r"\1:\033[" + str(code) + r"m\2\033[0m", string)
+    return f"\033[{code}m" + string + "\033[0m"
+
+def center(string):
+    code = ansi_term_color_codes['center']
     return f"\033[{code}m" + string + "\033[0m"
 
 

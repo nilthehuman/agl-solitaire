@@ -84,7 +84,7 @@ class Experiment(utils.Loggable, experiment_state.ExperimentState):
             utils.clear()
             if 1 < len(self.tasks) and not task.anchored_to_end:
                 num_challenges = len([t for t in self.tasks if not t.anchored_to_end])
-                self.duplicate_print(f"***  Welcome to Challenge #{i+1} out of {num_challenges}  ***\n")
+                self.duplicate_print(f"\033[1m***  Welcome to Challenge #{i+1} out of {num_challenges}  ***\033[0m\n")
             # TODO: this function could return the next task and then iterating would be even easier
             self.activate_next_task()
             ### ### ### ### ### ###

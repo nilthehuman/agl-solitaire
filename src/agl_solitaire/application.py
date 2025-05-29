@@ -31,9 +31,9 @@ class Application(utils.Loggable):
     def main_menu(self):
         """Show the starting menu screen."""
         my_version = version.get_version()
-        utils.print('agl-solitaire ' + my_version + '\n-------------------\n\n(a terminal-based tool for double-blind Artificial Grammar Learning experiments)')
+        utils.print('\033[94magl-solitaire ' + my_version + '\033[0m\n-------------------\n\n(a terminal-based tool for double-blind Artificial Grammar Learning experiments)')
         while True:
-            utils.print('\n--------  MAIN MENU  --------')
+            utils.print('\n--------  \033[1mMAIN MENU\033[0m  --------')
             utils.print('1: [s]tart new experiment session')
             utils.print('2: [l]oad/resume experiment')
             utils.print('3: [g]enerate and save experiment for later sessions')
@@ -204,7 +204,7 @@ class Application(utils.Loggable):
     def settings_menu(self):
         """Enable user to configure and adjust the experimental protocol."""
         while True:
-            utils.print('\n--------  SETTINGS  --------')
+            utils.print('\n--------  \033[1mSETTINGS\033[0m  --------')
             # used for disabling currently unavailable options
             settings_enabled = settings.SettingsEnabled()
             # used for not showing currently unavailable options
@@ -225,22 +225,22 @@ class Application(utils.Loggable):
                 settings_enabled.mask_unused(settings_used)
                 settings_display.mask_unused(settings_used, mask_value='--')
             options = [
-                f" 1: [m]y username (for the record):\t\t{settings_display.username}",
-                f" 2: grammar [c]lass:\t\t\t\t{settings_display.grammar_class}{' (custom)' if self.settings.grammar_class.custom() else ''}",
-                f" 3: number of training [s]trings:\t\t{settings_display.training_strings}",
-                f" 4: [t]ime allotted for training:\t\t{settings_display.training_time} seconds",
-                f" 5: number of [g]rammatical test strings:\t{settings_display.test_strings_grammatical}",
-                f" 6: number of [u]ngrammatical test strings:\t{settings_display.test_strings_ungrammatical}",
-                f" 7: mi[n]imum string length:\t\t\t{settings_display.minimum_string_length}",
-                f" 8: ma[x]imum string length:\t\t\t{settings_display.maximum_string_length}",
-                f" 9: [l]etters or words to use in strings:\t{settings_display.string_tokens}",
-                f"10: allow recursion in the grammar:\t\t{settings_display.recursion}",
-                f"11: log[f]ile to record sessions in:\t\t{settings_display.logfile_filename}",
-                f"12: show training strings [o]ne at a time:\t{settings_display.training_one_at_a_time}",
-                f"13: number of training [r]epetitions:\t\t{settings_display.training_reps}{' round(s)' if settings_enabled.training_reps else ''}",
-                f"14: run pre and post session [q]uestionnaire:\t{settings_display.run_questionnaire}",
-                f"15: automatically [e]mail logs to author:\t{settings_display.email_logs}",
-                f"16: string [h]ighlight color:\t\t\t{settings_display.highlight_color}",
+                f" 1: [m]y username (for the record):           {settings_display.username}",
+                f" 2: grammar [c]lass:                          {settings_display.grammar_class}{' (custom)' if self.settings.grammar_class.custom() else ''}",
+                f" 3: number of training [s]trings:             {settings_display.training_strings}",
+                f" 4: [t]ime allotted for training:             {settings_display.training_time} seconds",
+                f" 5: number of [g]rammatical test strings:     {settings_display.test_strings_grammatical}",
+                f" 6: number of [u]ngrammatical test strings:   {settings_display.test_strings_ungrammatical}",
+                f" 7: mi[n]imum string length:                  {settings_display.minimum_string_length}",
+                f" 8: ma[x]imum string length:                  {settings_display.maximum_string_length}",
+                f" 9: [l]etters or words to use in strings:     {settings_display.string_tokens}",
+                f"10: allow recursion in the grammar:           {settings_display.recursion}",
+                f"11: log[f]ile to record sessions in:          {settings_display.logfile_filename}",
+                f"12: show training strings [o]ne at a time:    {settings_display.training_one_at_a_time}",
+                f"13: number of training [r]epetitions:         {settings_display.training_reps}{' round(s)' if settings_enabled.training_reps else ''}",
+                f"14: run pre and post session [q]uestionnaire: {settings_display.run_questionnaire}",
+                f"15: automatically [e]mail logs to author:     {settings_display.email_logs}",
+                f"16: string [h]ighlight color:                 {settings_display.highlight_color}",
                 ' 0: [b]ack to main menu'
             ]
             for i, option in enumerate(options):
@@ -386,7 +386,7 @@ class Application(utils.Loggable):
                 new_color = utils.input('new highlight color (leave blank to go back): ')
                 if not new_color:
                     continue
-                if new_color not in ansi_term_color_codes.keys():
+                if new_color not in utils.ansi_term_color_codes.keys():
                     utils.print('error: no such color name in the list above')
                     continue
                 self.settings.highlight_color = new_color
