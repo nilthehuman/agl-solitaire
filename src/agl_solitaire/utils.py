@@ -143,7 +143,7 @@ class Loggable:
         string_to_log = re.sub(r"\033\[\d+m", '', string)
         with open(self.settings.logfile_filename, 'a', encoding='UTF-8') as logfile:
             # prepend timestamp
-            stamped_list = ['[' + str(datetime.datetime.now().replace(microsecond=0)) + '] ' + line.strip() for line in string_to_log.split('\n')]
+            stamped_list = ['[' + str(datetime.datetime.now().strftime('%F %T.%f')[:-3]) + '] ' + line.strip() for line in string_to_log.split('\n')]
             stamped_string = '\n'.join(stamped_list)
             logfile.write(stamped_string + '\n')
 
