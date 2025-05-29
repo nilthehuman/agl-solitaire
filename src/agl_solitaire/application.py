@@ -1,4 +1,4 @@
-"""The application's user interface including the terminal-based menu and the experimental procedure itself."""
+"""The application's user interface including the terminal-based menu and the general framework of the experimental procedure."""
 
 import copy
 import os

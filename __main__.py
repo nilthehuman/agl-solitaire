@@ -10,6 +10,9 @@ def help():
     my_version = get_version()
     print('agl-solitaire ' + my_version + '\n')
     print('Terminal-based tool for running Artificial Grammar Learning experiments.\n')
+    print('  -h, --help          Display this help message.\n')
+    print('  -g, --gui           Use fancy experimental graphical UI (soon to be the default).\n')
+    print('  -t, --terminal      Use legacy terminal based UI instead of the graphical UI.\n')
     print('You can change the following settings in the application to configure your experiments.')
     print('Note that not all settings are applicable to all kinds of grammars or experiments.')
     settings = {
@@ -27,7 +30,8 @@ def help():
         'show training strings one at a time' : 'present each training stimulus to the participant for a short time separately.',
         'number of training repetitions' : 'how many times to display the list of training stimuli (in the same order).',
         'run pre and post session questionnaire' : 'ask the participant a few basic questions about facts that might affect their performance,\nas well as their impression of the experiment after the fact.',
-        'automatically email logs to author' : 'allow sending the newest segment of experiment log file to the author\nof the application once it\'s completed.'
+        'automatically email logs to author' : 'allow sending the newest segment of experiment log file to the author\nof the application once it\'s completed.',
+        'string highlight color' : 'training and test strings will be presented in this color if your terminal supports it.'
     }
     def pretty_print(name, descr):
         print('\n' + name + ': ', end='')
