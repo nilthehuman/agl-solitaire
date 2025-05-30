@@ -54,7 +54,7 @@ class GUIWindow(application.Application):
         self.root.configure(background='grey20')
         self.root.grid_rowconfigure(0, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
-        self.root.geometry('800x480')
+        self.root.geometry('800x560')
         self.frame = None
         self.label = None
         self.text = None
