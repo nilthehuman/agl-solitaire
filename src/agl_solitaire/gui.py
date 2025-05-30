@@ -251,19 +251,11 @@ class GUIWindow(application.Application):
             self.root.after_cancel(self.root.timed_callback)
         return super().halt_experiment()
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
     ##########################################################################################
     ####    I/O member functions, replacing the OG terminal based functions from utils    ####
     ##########################################################################################
 
     @staticmethod
->>>>>>> cec6db1 (Missing bit from 26565c2, oops)
-=======
-
-    @staticmethod
->>>>>>> c37fda7 (Declare monkey patched methods static)
     def print(string='', **moreargs):
         if match := re.match(r'\s*(warning|error):\s*(.*)', string):
             header = match.group(1).capitalize()
