@@ -1,6 +1,9 @@
 import re
+import platform
+#import signal
 import tkinter
-#import tkinter.font
+import tkinter.font
+import tkinter.messagebox
 from tkinter import ttk
 
 
@@ -48,6 +51,9 @@ class GUIWindow(application.Application):
         self.style.configure('TFrame', background='grey20', foreground='grey90')
         self.style.configure('TLabel', background='grey20', foreground='grey90')
         self.style.configure('Highlight.TLabel', background='grey20', foreground='lightgreen')
+        # use a normal sized font in message windows as well
+        default_font = tkinter.font.nametofont('TkDefaultFont').actual()['family'].replace(' ', '_')
+        self.root.option_add('*Dialog.msg.font', default_font+' 12')
         self.style.map('TButton',
             foreground = [('!active', 'grey70'),  ('active', 'gray30'), ('pressed', 'gray30')],
             background = [('!active', '#8800DD'), ('active', 'gray70'), ('pressed', 'gray90')]
@@ -86,7 +92,7 @@ class GUIWindow(application.Application):
         self.frame.grid_columnconfigure(0, weight=1)
         self.frame.grid_rowconfigure(0, weight=1)
 
-        #self.label = ttk.Label(self.frame, font=('Consolas', 11), text='', style='TLabel')
+        #self.label = ttk.Label(self.frame, font=('Consolas', 12), text='', style='TLabel')
         #vsb = ttk.Scrollbar(self.frame, command=self.label.yview, orient='vertical')
         #self.label.configure(yscrollcommand=vsb.set)
         #self.label.grid(column=0, row=0, sticky=tkinter.N)
@@ -94,8 +100,14 @@ class GUIWindow(application.Application):
         #self.label.configure(wraplength=char_width * 60)
 
         # TODO move this to CustomText class
-        self.text = tkinter.Text(self.frame, font=('Consolas', 11), height=MAX_LINES_ON_SCREEN, borderwidth=0, takefocus=False, wrap=tkinter.WORD)
-        self.text.configure(background=self.style.lookup('TLabel', 'background'), foreground=self.style.lookup('TLabel', 'foreground'))
+        self.text = tkinter.Text(self.frame,
+                                 font=('Consolas', 12),
+                                 height=MAX_LINES_ON_SCREEN,
+                                 borderwidth=0,
+                                 takefocus=False,
+                                 wrap=tkinter.WORD)
+        self.text.configure(background=self.style.lookup('TLabel', 'background'),
+                            foreground=self.style.lookup('TLabel', 'foreground'))
         self.text.tag_configure('red', foreground='red')
         self.text.tag_configure('green', foreground='green')
         self.text.tag_configure('yellow', foreground='yellow')
@@ -111,7 +123,7 @@ class GUIWindow(application.Application):
         self.text.tag_configure('lightcyan', foreground='lightcyan')
         self.text.tag_configure('lightwhite', foreground='snow')
         self.text.tag_configure('highlight', foreground='red')
-        self.text.tag_configure('bold', font=('Consolas', 11, 'bold'))
+        self.text.tag_configure('bold', font=('Consolas', 12, 'bold'))
         self.text.tag_configure('center', justify=tkinter.CENTER)
         self.text.grid(column=0, row=0, sticky=tkinter.NSEW)
 
@@ -141,7 +153,7 @@ class GUIWindow(application.Application):
 
         #self.text = tkinter.Text(self.frame, height=10, borderwidth=0, wrap=tkinter.WORD)
         #self.text.configure(background=self.style.lookup('TLabel', 'background'), foreground=self.style.lookup('TLabel', 'foreground'))
-        #self.text.tag_configure('highlight', foreground='red', font=('Arial', 11))
+        #self.text.tag_configure('highlight', foreground='red', font=('Arial', 12))
         #self.text.insert(tkinter.END, martian_string, 'highlight')
         #self.text.insert(tkinter.END, '  ' + english_translation)
         #self.text.configure(state=tkinter.DISABLED)
@@ -150,9 +162,9 @@ class GUIWindow(application.Application):
 
         #string_frame = ttk.Frame(self.frame, relief=tkinter.FLAT, borderwidth=0)
         #string_frame.grid(column=0, row=1, columnspan=2)
-        #martian_label = ttk.Label(string_frame, font=('Consolas', 11), text=martian_string, style='Highlight.TLabel')
+        #martian_label = ttk.Label(string_frame, font=('Consolas', 12), text=martian_string, style='Highlight.TLabel')
         #martian_label.grid(column=0, row=1, padx=10)
-        #english_label = ttk.Label(string_frame, font=('Consolas', 11), text=english_translation, style='TLabel')
+        #english_label = ttk.Label(string_frame, font=('Consolas', 12), text=english_translation, style='TLabel')
         #english_label.grid(column=1, row=1, padx=10)
 
         #self.entry = ttk.Entry(self.frame)
@@ -172,6 +184,12 @@ class GUIWindow(application.Application):
     #### I/O member functions, replacing the OG terminal based functions from utils ####
 
     def print(string='', **moreargs):
+        if match := re.match(r'\s*(warning|error):\s*(.*)', string):
+            header = match.group(1).capitalize()
+            body_text = match.group(2)
+            body_text = body_text.capitalize() + ('.' if not body_text.endswith('.') else '')
+            tkinter.messagebox.showwarning(header, body_text, parent=GUIWindow._SELF.root)
+            return
         # TODO update screen width dynamically based on Text widget width
         assert GUIWindow._SELF.label or GUIWindow._SELF.text
         formatted_string = _old_print(string, left_margin=0, silent=True, **moreargs)
