@@ -457,6 +457,7 @@ class Application(utils.Loggable):
                 self.duplicate_print('Done.')
             # FIXME: this assert can fail if you change the code of a CustomExperiment after saving it to file
             assert experiment_to_run.ready_to_run()
+            experiment_to_run.track_state()
             # FIXME: the latter condition is too broad, you need to use a specific variable here
             if stngs.run_questionnaire and (not experiment_to_run.tasks_done and not experiment_to_run.tasks[0].training_finished):
                 self.duplicate_print('A few questions before we begin. Feel free to answer as briefly or in as much detail as you like.')
