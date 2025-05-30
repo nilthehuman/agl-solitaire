@@ -268,7 +268,7 @@ class GUIWindow(application.Application):
         if match := re.match(r'\s*(warning|error):\s*(.*)', string):
             header = match.group(1).capitalize()
             body_text = match.group(2)
-            body_text = body_text.capitalize() + ('.' if not body_text.endswith('.') else '')
+            body_text = body_text[0].upper() + body_text[1:] + ('.' if not body_text.endswith('.') else '')
             tkinter.messagebox.showwarning(header, body_text, parent=GUIWindow._SELF.root)
             return
         # TODO update screen width dynamically based on Text widget width
