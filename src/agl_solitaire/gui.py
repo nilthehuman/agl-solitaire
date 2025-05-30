@@ -252,6 +252,7 @@ class GUIWindow(application.Application):
         return super().halt_experiment()
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     ##########################################################################################
     ####    I/O member functions, replacing the OG terminal based functions from utils    ####
@@ -259,6 +260,10 @@ class GUIWindow(application.Application):
 
     @staticmethod
 >>>>>>> cec6db1 (Missing bit from 26565c2, oops)
+=======
+
+    @staticmethod
+>>>>>>> c37fda7 (Declare monkey patched methods static)
     def print(string='', **moreargs):
         if match := re.match(r'\s*(warning|error):\s*(.*)', string):
             header = match.group(1).capitalize()
@@ -324,7 +329,8 @@ class GUIWindow(application.Application):
                 GUIWindow._SELF.text.delete(f'{line}.{_from}', f'{line}.{to}')
             GUIWindow._SELF.text.configure(state=tkinter.DISABLED)
             GUIWindow._SELF.root.update_idletasks()
- 
+
+    @staticmethod
     def input(prompt=''):
         assert GUIWindow._SELF.entry
         if prompt:
@@ -334,6 +340,7 @@ class GUIWindow(application.Application):
         GUIWindow._SELF.user_input.set(None)
         return user_input
 
+    @staticmethod
     def clear():
         assert GUIWindow._SELF.label or GUIWindow._SELF.text
         if GUIWindow._SELF.label:
@@ -343,6 +350,7 @@ class GUIWindow(application.Application):
             GUIWindow._SELF.text.delete('1.0', tkinter.END)
             GUIWindow._SELF.text.configure(state=tkinter.DISABLED)
 
+    @staticmethod
     def sleep(seconds, callback=None):
         def callback_wrapper():
             if callback is not None:
@@ -353,6 +361,7 @@ class GUIWindow(application.Application):
         GUIWindow._SELF.root.wait_variable(GUIWindow._SELF.user_input)
         GUIWindow._SELF.root.after_cancel(GUIWindow._SELF.root.timed_callback)
 
+    @staticmethod
     def breakable_loop(total_time, wait_per_cycle=1, step=None, _input_thread=None):
         assert 0 < total_time
         # ignore _input_thread, we use the tkinter event loop instead
