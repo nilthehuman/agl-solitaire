@@ -27,7 +27,7 @@ _LEFT_MARGIN_WIDTH = 2
 
 _builtin_print = print
 
-def print(string='', left_margin=_LEFT_MARGIN_WIDTH, silent=False, **moreargs):
+def print(string='', left_margin=_LEFT_MARGIN_WIDTH, silent=False, wrap=False, **moreargs):
     """Smarter print function, adds left margin and wraps long lines automatically."""
     string = str(string)
     # add some color to make settings keys and error messages pop too
@@ -38,7 +38,6 @@ def print(string='', left_margin=_LEFT_MARGIN_WIDTH, silent=False, **moreargs):
     except re.PatternError:
         # pattern not found, that's fine
         pass
-    max_width = os.get_terminal_size().columns
     wrapped_string = ''
     for line in string.split('\n'):
         carriage_return = re.match(r'\r', line)
@@ -47,17 +46,19 @@ def print(string='', left_margin=_LEFT_MARGIN_WIDTH, silent=False, **moreargs):
         line = ' ' * left_margin + line
         if carriage_return:
             line = '\r' + line
-        while max_width < len(line):
-            stop_at = max_width - 1
-            # back up to the nearest word boundary
-            while 0 <= stop_at and not line[stop_at].isspace():
-                stop_at -= 1
-            if -1 == stop_at or line[:stop_at].isspace():
-                # one giant word, we give up and leave it unwrapped
-                stop_at = len(line)
-            wrapped_string += line[:stop_at] + '\n'
-            line = line[stop_at+1:]
-            line = ' ' * left_margin + line
+        if wrap:
+            max_width = os.get_terminal_size().columns
+            while max_width < len(line):
+                stop_at = max_width - 1
+                # back up to the nearest word boundary
+                while 0 <= stop_at and not line[stop_at].isspace():
+                    stop_at -= 1
+                if -1 == stop_at or line[:stop_at].isspace():
+                    # one giant word, we give up and leave it unwrapped
+                    stop_at = len(line)
+                wrapped_string += line[:stop_at] + '\n'
+                line = line[stop_at+1:]
+                line = ' ' * left_margin + line
         wrapped_string += line + '\n'
     if not silent:
         _builtin_print(wrapped_string[:-1], **moreargs)  # leave off the last newline though
