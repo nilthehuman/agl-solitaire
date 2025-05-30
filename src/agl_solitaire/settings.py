@@ -27,12 +27,17 @@ _DEFAULT_INI_FILENAME  = os.path.join(_PROJECT_ROOT_DIR, 'settings.ini')
 _DEFAULT_TOML_FILENAME = os.path.join(_PROJECT_ROOT_DIR, 'settings.toml')
 
 
-GrammarClass = enum.StrEnum('GrammarClass', {name:name.lower() for name in ['REGULAR', 'PATTERN'] + custom_helpers.get_custom_experiment_names()})
+GrammarClass = enum.StrEnum('GrammarClass', {name:name.lower() for name in ['REGULAR', 'PATTERN']} | {name:name for name in custom_helpers.get_custom_experiment_names()})
 GrammarClass.custom = lambda self: self.name.lower() not in ['regular', 'pattern']
 def _next_gc(self):
     gc_names = [name for name in GrammarClass]
     i = gc_names.index(self)
-    next_name = gc_names[i + 1] if i < len(gc_names) - 1 else gc_names[0]
+    i = (i + 1) % len(gc_names)
+    next_name = gc_names[i]
+    # avoid selecting an invalid custom grammar class
+    while next_name.custom() and not custom_helpers.has_custom_experiment(next_name):
+        i = (i + 1) % len(gc_names)
+        next_name = gc_names[i]
     return next_name
 GrammarClass.next = _next_gc
 
