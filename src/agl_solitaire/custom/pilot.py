@@ -1360,6 +1360,9 @@ class PalindromeDemonstrativeGrammar(CustomGrammar):
         sentences_colors = [(mar, eng[0:2] + ('has ',) + eng[3:4] + eng[2:3]) for mar, eng in sentences_colors]
         sentences_colors_name = [(mar, eng[1:2] + eng[0:1] + ('has ',) + eng[3:4] + eng[2:3]) for mar, eng in sentences_colors_name]
         sentences_symbol_name = [(mar, eng[1:2] + eng[0:1] + eng[2:]) for mar, eng in sentences_symbol_name]
+        # remove Saxon genitive from Martian strings
+        sentences_colors_name = [(mar[0:1] + (mar[1].split('\'')[0],) + mar[2:], eng) for mar, eng in sentences_colors_name]
+        sentences_symbol_name = [(mar[0:1] + (mar[1].split('\'')[0],) + mar[2:], eng) for mar, eng in sentences_symbol_name]
         sentences = sentences_colors + sentences_symbol + sentences_colors_name + sentences_symbol_name
         # render Martian demonstrative
         def rev(string):
