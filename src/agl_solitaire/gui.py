@@ -47,7 +47,7 @@ class GUIWindow(application.Application):
         EXPERIMENT = 3  # an experiment is already underway
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        # sic, delay calling super().__init__() on purpose
         GUIWindow._SELF = self
         self.root = tkinter.Tk()
         self.root.title('agl-solitaire')
@@ -83,6 +83,7 @@ class GUIWindow(application.Application):
         self.root.timed_callback = None
         self.user_input = tkinter.StringVar(value=None)
         self.root.protocol('WM_DELETE_WINDOW', self.quit_app)
+        super().__init__(*args, **kwargs)
         self.status = GUIWindow.Status.INITIALIZED
 
     ##############################
@@ -197,7 +198,7 @@ class GUIWindow(application.Application):
         self.status = GUIWindow.Status.MENU
         utils.clear()
         super().main_menu()
-        # if this function finishes that means we're quitting
+        # if this function finishes that means we're quitting the application
         self.root.destroy()
 
     def run_experiment(self, *args, **kwargs):
@@ -257,7 +258,7 @@ class GUIWindow(application.Application):
 
     @staticmethod
     def print(string='', **moreargs):
-        if match := re.match(r'\s*(warning|error):\s*(.*)', string):
+        if match := re.match(r'\s*(warning|error):\s*(.*)', str(string)):
             header = match.group(1).capitalize()
             body_text = match.group(2)
             body_text = body_text[0].upper() + body_text[1:] + ('.' if not body_text.endswith('.') else '')

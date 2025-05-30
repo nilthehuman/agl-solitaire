@@ -49,7 +49,7 @@ class Settings:
 
     class VersionException(Exception):
         def __init__(self):
-            super().__init__("warning: settings file is from an older version of the application, this does not bode well for loading previous experiments")
+            super().__init__('warning: settings file is from an older version of the application, this does not bode well for loading previous experiments\n')
 
     filename:                   typing.Optional[str] = None
     version:                    str = version.get_version()

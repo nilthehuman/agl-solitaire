@@ -24,7 +24,6 @@ class Application(utils.Loggable):
             self.settings.load_all()
         except settings.Settings.VersionException as ve:
             utils.print(ve)
-            utils.print()
         # load custom experiment scripts from the custom/ directory
         self.custom_experiments = custom_helpers.load_custom_experiments()
 
