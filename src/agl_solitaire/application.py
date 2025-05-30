@@ -31,8 +31,9 @@ class Application(utils.Loggable):
     def main_menu(self):
         """Show the starting menu screen."""
         my_version = version.get_version()
-        utils.print('\033[94magl-solitaire ' + my_version + '\033[0m\n-------------------\n\n(a tool for double-blind Artificial Grammar Learning experiments)')
         while True:
+            utils.clear()
+            utils.print('\033[94magl-solitaire ' + my_version + '\033[0m\n-------------------\n\n(a tool for double-blind Artificial Grammar Learning experiments)')
             utils.print('\n--------  \033[1mMAIN MENU\033[0m  --------')
             utils.print('1: [s]tart new experiment session')
             utils.print('2: [l]oad/resume experiment')
@@ -203,7 +204,10 @@ class Application(utils.Loggable):
 
     def settings_menu(self):
         """Enable user to configure and adjust the experimental protocol."""
+        my_version = version.get_version()
         while True:
+            utils.clear()
+            utils.print('\033[94magl-solitaire ' + my_version + '\033[0m\n-------------------\n\n(a tool for double-blind Artificial Grammar Learning experiments)')
             utils.print('\n--------  \033[1mSETTINGS\033[0m  --------')
             # used for disabling currently unavailable options
             settings_enabled = settings.SettingsEnabled()
