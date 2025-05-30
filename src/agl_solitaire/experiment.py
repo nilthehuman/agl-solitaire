@@ -93,7 +93,7 @@ class Experiment(utils.Loggable, experiment_state.ExperimentState):
             self.tasks_done += 1
             if self.settings.run_questionnaire and not task.anchored_to_end:
                 self.duplicate_print('A few more questions if you feel like it:')
-                self.duplicate_print('Did you feel like you got the hang of the grammar or were you just guessing?')
+                self.duplicate_print('Did you feel like you got the hang of the grammar?')
                 answer = utils.input()
                 self.duplicate_print(answer, log_only=True)
                 self.duplicate_print('Did you seem to find any concrete giveaways or hints in the strings?')
