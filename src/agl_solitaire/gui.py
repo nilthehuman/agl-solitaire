@@ -1,6 +1,11 @@
-import re
+"""Brand new basic experimental graphical user interface using the built-in tkinter toolkit.
+The application is eventually meant to be migrated to a web-based form, towards which this is
+an intermediate step."""
+
+import enum
 import platform
-#import signal
+import re
+import sys
 import tkinter
 import tkinter.font
 import tkinter.messagebox
@@ -14,6 +19,14 @@ from src.agl_solitaire import utils
 MAX_LINES_ON_SCREEN = 20
 
 
+# FIXME: this won't be needed once the GUI is refactored to a proper event driven design
+def handle_loose_exceptions(ex_type, value, _traceback):
+    assert ex_type is tkinter.TclError
+    # let this slide and quit silently
+
+sys.excepthook = handle_loose_exceptions
+
+
 # TODO
 class CustomText(tkinter.Text):
     pass
@@ -23,11 +36,15 @@ class GUIWindow(application.Application):
     """The windowed graphical user interface for the application, meant to replace
     the old terminal based UI."""
 
-    # this is a singleton class, and some member functions will need to know about self
+    # this is a singleton class, and some member functions called from outside
+    # will need to know about self
     _SELF = None
 
-    class UserInput(KeyboardInterrupt):
-        pass
+    class Status(enum.Enum):
+        """Where we are in the lifecycle of the applicaton."""
+        INITIALIZED = 1 # the GUIWindow object has been created but not run yet
+        MENU = 2        # anywhere in the menu tree, including settings, generation etc.
+        EXPERIMENT = 3  # an experiment is already underway
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -59,30 +76,55 @@ class GUIWindow(application.Application):
             background = [('!active', '#8800DD'), ('active', 'gray70'), ('pressed', 'gray90')]
         )
         self.root.bind('<Configure>', self.redraw_now)
-        self.root.bind('<Return>', self.return_pressed)
+        self.root.bind('<Return>', self.on_return_pressed)
+        self.root.bind('<Control-c>', self.on_ctrl_c_pressed)
+        self.root.bind('<Control-Break>', self.on_ctrl_c_pressed)
+        self.root.timed_callback = None
         self.user_input = tkinter.StringVar(value=None)
-        def quit_app():
-            # TODO: offer to save experiment state before exiting for good
-            self.root.destroy()
-            # TODO: avoid forceful panic exit if we can
-            import os
-            os._exit(os.EX_OK)
-        self.root.protocol('WM_DELETE_WINDOW', quit_app)
+        self.root.protocol('WM_DELETE_WINDOW', self.quit_app)
+        self.status = GUIWindow.Status.INITIALIZED
+
+    ##############################
+    ####    event handlers    ####
+    ##############################
 
     def redraw_now(self, _event):
         self.root.update_idletasks()
 
-    def return_pressed(self, _event):
+    def on_return_pressed(self, _event):
         """Handle user input in Entry widget."""
         assert self.entry
-        input = self.entry.get()
-        self.entry.delete(0, len(input))
-        self.user_input.set(input)
+        input_string = self.entry.get()
+        self.entry.delete(0, len(input_string))
+        self.user_input.set(input_string)
 
-    #### overridden Application member functions ####
+    def on_ctrl_c_pressed(self, _event):
+        assert self.status != GUIWindow.Status.INITIALIZED
+        if self.status == GUIWindow.Status.MENU:
+            # looks like the user is trying to quit the application
+            self.quit_app()
+        elif self.status == GUIWindow.Status.EXPERIMENT:
+            self.halt_experiment()
+            # this is really crude but at least kinda works...
+            # TODO it really highlights how the blocking wait for input approach sucks though,
+            # need to restructure the whole GUI I/O
+            self.main_menu_loop()
+        else:
+            assert False
+
+    def quit_app(self):
+        # TODO: offer to save experiment state before exiting for good
+        self.root.destroy()
+        # TODO: avoid forceful panic exit if we can
+        import os
+        os._exit(os.EX_OK)
+
+    #######################################################
+    ####    overridden Application member functions    ####
+    #######################################################
 
     def main_menu(self):
-        """Present the starting screen of the application."""
+        """Prepare to present the starting screen of the application."""
         if self.frame:
             self.frame.destroy()
 
@@ -135,7 +177,15 @@ class GUIWindow(application.Application):
         self.root.update_idletasks()
         self.root.minsize(self.frame.winfo_width(), self.frame.winfo_height())
 
+        # we're ready to ask the user for input
+        self.main_menu_loop()
+
+    def main_menu_loop(self):
+        """Activate the starting screen where the user can choose what to do next."""
+        self.status = GUIWindow.Status.MENU
+        utils.clear()
         super().main_menu()
+        # if this function finishes that means we're quitting
         self.root.destroy()
 
     def run_experiment(self, *args, **kwargs):
@@ -179,10 +229,22 @@ class GUIWindow(application.Application):
         self.root.minsize(self.frame.winfo_width(), self.frame.winfo_height())
 
         # start the actual experiment procedure
+        self.status = GUIWindow.Status.EXPERIMENT
         super().run_experiment(*args, **kwargs)
 
-    #### I/O member functions, replacing the OG terminal based functions from utils ####
+    def halt_experiment(self):
+        if self.root.timed_callback is not None:
+            self.root.after_cancel(self.root.timed_callback)
+        return super().halt_experiment()
 
+<<<<<<< HEAD
+=======
+    ##########################################################################################
+    ####    I/O member functions, replacing the OG terminal based functions from utils    ####
+    ##########################################################################################
+
+    @staticmethod
+>>>>>>> cec6db1 (Missing bit from 26565c2, oops)
     def print(string='', **moreargs):
         if match := re.match(r'\s*(warning|error):\s*(.*)', string):
             header = match.group(1).capitalize()
@@ -273,9 +335,9 @@ class GUIWindow(application.Application):
                 callback()
             # trigger user input variable manually
             GUIWindow._SELF.user_input.set('')
-        clock = GUIWindow._SELF.root.after(int(seconds * 1000), callback_wrapper)
+        GUIWindow._SELF.root.timed_callback = GUIWindow._SELF.root.after(int(seconds * 1000), callback_wrapper)
         GUIWindow._SELF.root.wait_variable(GUIWindow._SELF.user_input)
-        GUIWindow._SELF.root.after_cancel(clock)
+        GUIWindow._SELF.root.after_cancel(GUIWindow._SELF.root.timed_callback)
 
     def breakable_loop(total_time, wait_per_cycle=1, step=None, _input_thread=None):
         assert 0 < total_time

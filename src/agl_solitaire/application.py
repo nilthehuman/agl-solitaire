@@ -515,14 +515,18 @@ class Application(utils.Loggable):
                     except Exception:
                         utils.print('Failed, reason unknown. Sorry. :(')
         except KeyboardInterrupt:
-            utils.print()
-            self.duplicate_print(f"Experiment halted by user. Progress saved to '{stngs.filename}'.")
-            # returning to main menu
+            self.halt_experiment()
         finally:
             try:
                 experiment_to_run.cleanup()
             except UnboundLocalError:
                 pass
+
+    def halt_experiment(self):
+        """Pause the experiment currently being run and return to main menu."""
+        utils.print()
+        # FIXME: is this true though? what is stngs != self.settings?
+        self.duplicate_print(f"warning: Experiment halted by user. Progress saved to '{self.settings.filename}'. Returning to main menu.")
 
 
 if __name__ == '__main__':
