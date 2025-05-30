@@ -79,6 +79,7 @@ class GUIWindow(application.Application):
         self.root.bind('<Return>', self.on_return_pressed)
         self.root.bind('<Control-c>', self.on_ctrl_c_pressed)
         self.root.bind('<Control-Break>', self.on_ctrl_c_pressed)
+        self.root.bind('<F11>', self.on_f11_pressed)
         self.root.timed_callback = None
         self.user_input = tkinter.StringVar(value=None)
         self.root.protocol('WM_DELETE_WINDOW', self.quit_app)
@@ -111,6 +112,17 @@ class GUIWindow(application.Application):
             self.main_menu_loop()
         else:
             assert False
+
+    def on_f11_pressed(self, _event):
+        # platform specific, sadly
+        if 'Windows' == platform.system():
+            if self.root.state() == 'normal':
+                self.root.state('zoomed')
+            else:
+                self.root.state('normal')
+        else:
+            current_state = self.root.attributes('-zoomed')
+            self.root.attributes('-zoomed', not current_state)
 
     def quit_app(self):
         # TODO: offer to save experiment state before exiting for good
@@ -192,6 +204,8 @@ class GUIWindow(application.Application):
         """Create message labels and controls needed for the experiment."""
         #if self.frame:
         #    self.frame.destroy()
+
+        # TODO: put a progress bar at the top to show how far into the experiment we are, like PsyToolkit does
 
         #self.frame = ttk.Frame(self.root, relief=tkinter.RAISED, borderwidth=12)
         #self.frame.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
