@@ -31,7 +31,7 @@ class Application(utils.Loggable):
     def main_menu(self):
         """Show the starting menu screen."""
         my_version = version.get_version()
-        utils.print('\033[94magl-solitaire ' + my_version + '\033[0m\n-------------------\n\n(a terminal-based tool for double-blind Artificial Grammar Learning experiments)')
+        utils.print('\033[94magl-solitaire ' + my_version + '\033[0m\n-------------------\n\n(a tool for double-blind Artificial Grammar Learning experiments)')
         while True:
             utils.print('\n--------  \033[1mMAIN MENU\033[0m  --------')
             utils.print('1: [s]tart new experiment session')
@@ -54,7 +54,7 @@ class Application(utils.Loggable):
             elif choice in ['0', 'q']:
                 break
             else:
-                utils.print('no such option')
+                utils.print('error: no such option')
 
     def generate_grammar(self):
         """Find a grammar that satisfies the experimental protocol's requirements as defined by the user."""
@@ -350,7 +350,6 @@ class Application(utils.Loggable):
                 self.settings.recursion = not self.settings.recursion
             elif choice in ['11', 'f']:
                 new_filename = utils.input('logfile name: ')
-                utils.print('\'' + new_filename + '\'')
                 if not new_filename:
                     continue  # nevermind
                 elif os.path.exists(new_filename):

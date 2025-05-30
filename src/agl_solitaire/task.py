@@ -119,6 +119,7 @@ class Task(utils.Loggable, TaskState):
                 self.duplicate_print(f"The training phase will now begin. You will be presented with {the_same}{self.settings.training_strings} exemplars of the hidden grammar {in_rounds}for {time_per_item} seconds each.")
             else:
                 self.duplicate_print(f"The training phase will now begin. You will have {self.settings.training_time} seconds to study a list of {self.settings.training_strings} exemplars of the hidden grammar.")
+            self.duplicate_print('Be advised that you won\'t be expected to memorize the made-up strings, the questions will merely test your understanding of the hidden grammar.')
             if 'Windows' == platform.system():
                 self.duplicate_print("You can use Ctrl-Break to halt the experiment at any time. Your progress will be saved to '{self.settings.filename}' and you will be able to finish the experiment later.")
             else:

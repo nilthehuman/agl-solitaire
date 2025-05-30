@@ -534,7 +534,6 @@ class PatternGrammar(FormalGrammar):
                 for my_pattern, others_pattern in zip(self.patterns, other.patterns):
                     my_pairings = dict([(c, None) for c in my_pattern])
                     others_pairings = dict([(c, None) for c in others_pattern])
-                    # try:
                     for my_class, others_class in zip(my_pattern, others_pattern):
                         if my_pairings[my_class]:
                             if others_class != my_pairings[my_class]:

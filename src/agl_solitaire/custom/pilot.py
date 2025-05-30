@@ -2014,7 +2014,7 @@ a scale of 1 to 7. Feel free to include any further comments alongside a number,
                     answer = utils.input()
                 self.duplicate_print(answer, log_only=True)
                 if not any(c.isdigit() for c in answer):
-                    self.duplicate_print('Please include a numerical rating in your answer.')
+                    self.duplicate_print('error: Please include a numerical rating in your answer.')
                 else:
                     break
 
