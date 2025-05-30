@@ -371,6 +371,12 @@ class Settings:
         callback()
         self.autosave = autosave_backup
 
+    def batched_save(self, callback):
+        """Let the callback update a whole bunch of state before we save to file _once_."""
+        self.without_autosave(callback)
+        if self.autosave:
+            self.save_all()
+
     def mask_unused(self, settings_enabled, mask_value=None):
         """Remove settings that are currently not relevant according to the SettingsEnabled object."""
         for field in dataclasses.fields(self):
@@ -382,6 +388,8 @@ class Settings:
 
     def __setattr__(self, attr, value):
         """Save any and all settings changes automatically if required."""
+        if hasattr(self, attr) and getattr(self, attr) == value:
+            return
         super().__setattr__(attr, value)
         if attr != 'autosave':
             try:

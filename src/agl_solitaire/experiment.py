@@ -67,8 +67,12 @@ class Experiment(utils.Loggable, experiment_state.ExperimentState):
     def prepare(self):
         """Load all tasks with concrete generated material."""
         for task in self.tasks:
+            success = None
             ### ### ### ### ### ###
-            success = task.prepare()
+            def prepare_task():
+                nonlocal success
+                success = task.prepare()
+            self.settings.batched_save(prepare_task)
             ### ### ### ### ### ###
             if not success:
                 return False

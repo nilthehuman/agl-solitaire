@@ -439,12 +439,19 @@ class Application(utils.Loggable):
         try:
             if stngs is None:
                 stngs = self.settings
+            experiment_to_run = None
             if not stngs.grammar_class.custom():
                 assert stngs.halted_experiment is not None or stngs.grammar is not None
-                experiment_to_run = experiment.Experiment(stngs)
+                def create_experiment():
+                    nonlocal experiment_to_run
+                    experiment_to_run = experiment.Experiment(stngs)
+                self.settings.batched_save(create_experiment)
             else:
                 custom_module = sys.modules[custom_helpers.CUSTOM_MODULE_PREFIX + stngs.grammar_class.name]
-                experiment_to_run = custom_module.CustomExperiment(stngs)
+                def create_experiment():
+                    nonlocal experiment_to_run
+                    experiment_to_run = custom_module.CustomExperiment(stngs)
+                self.settings.batched_save(create_experiment)
             if stngs.halted_experiment is not None:
                 experiment_to_run.resume(stngs.halted_experiment)
             if not experiment_to_run.ready_to_run():
