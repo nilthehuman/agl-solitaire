@@ -32,12 +32,14 @@ class Application(utils.Loggable):
         my_version = version.get_version()
         while True:
             utils.clear()
-            utils.print('\033[94magl-solitaire ' + my_version + '\033[0m\n-------------------\n\n(a tool for double-blind Artificial Grammar Learning experiments)')
+            utils.print('\033[92magl-solitaire ' + my_version + '\033[0m\n-------------------\n\n(a tool for double-blind Artificial Grammar Learning experiments)')
             utils.print('\n--------  \033[1mMAIN MENU\033[0m  --------')
             utils.print('1: [s]tart new experiment session')
             utils.print('2: [l]oad/resume experiment')
             utils.print('3: [g]enerate and save experiment for later sessions')
             utils.print('4: [c]onfigure settings')
+            if type(self) is Application:
+                utils.print('5: \033[92mlaunch experimental graphical user interface\033[0m')
             utils.print('0: [q]uit')
             choice = ''
             while not choice:
@@ -51,6 +53,9 @@ class Application(utils.Loggable):
                 self.generate_experiment()
             elif choice in ['4', 'c']:
                 self.settings_menu()
+            elif choice == '5' and type(self) is Application:
+                from __main__ import gui_main
+                gui_main()
             elif choice in ['0', 'q']:
                 break
             else:
@@ -206,7 +211,7 @@ class Application(utils.Loggable):
         my_version = version.get_version()
         while True:
             utils.clear()
-            utils.print('\033[94magl-solitaire ' + my_version + '\033[0m\n-------------------\n\n(a tool for double-blind Artificial Grammar Learning experiments)')
+            utils.print('\033[92magl-solitaire ' + my_version + '\033[0m\n-------------------\n\n(a tool for double-blind Artificial Grammar Learning experiments)')
             utils.print('\n--------  \033[1mSETTINGS\033[0m  --------')
             # used for disabling currently unavailable options
             settings_enabled = settings.SettingsEnabled()
