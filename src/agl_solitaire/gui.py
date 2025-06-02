@@ -102,11 +102,14 @@ class GUIWindow(application.Application):
         self.root.update_idletasks()
 
     def on_return_pressed(self, _event):
-        """Handle user input in Entry widget."""
-        assert self.entry
-        input_string = self.entry.get()
-        self.entry.delete(0, len(input_string))
-        self.user_input.set(input_string)
+        """Handle user input from Entry widget."""
+        if self.entry:
+            input_string = self.entry.get()
+            self.entry.delete(0, len(input_string))
+            self.user_input.set(input_string)
+        else:
+            # no Entry being shown on screen
+            self.user_input.set('')
 
     def on_ctrl_c_pressed(self, _event):
         assert GUIWindow.Status.INITIALIZED < self.status
@@ -335,7 +338,6 @@ class GUIWindow(application.Application):
 
     @staticmethod
     def input(prompt=''):
-        assert GUIWindow._SELF.entry
         if prompt:
             utils.print(prompt)
         GUIWindow._SELF.root.wait_variable(GUIWindow._SELF.user_input)
