@@ -26,9 +26,81 @@ def handle_loose_exceptions(ex_type, value, _traceback):
 sys.excepthook = handle_loose_exceptions
 
 
-# TODO
 class CustomText(tkinter.Text):
-    pass
+    """More convenient to use Text widget, with pleasing default style."""
+
+    def __init__(self, *args, **kwargs):
+        """Set up styling and custom tags."""
+        super().__init__(*args, **kwargs)
+        style = ttk.Style()
+        self.configure(background=style.lookup('TLabel', 'background'),
+                       foreground=style.lookup('TLabel', 'foreground'))
+        self.tag_configure('red', foreground='red')
+        self.tag_configure('green', foreground='green')
+        self.tag_configure('yellow', foreground='yellow')
+        self.tag_configure('blue', foreground='blue')
+        self.tag_configure('magenta', foreground='magenta')
+        self.tag_configure('cyan', foreground='cyan')
+        self.tag_configure('white', foreground='white')
+        self.tag_configure('lightred', foreground='tomato')
+        self.tag_configure('lightgreen', foreground='lightgreen')
+        self.tag_configure('lightyellow', foreground='lightyellow')
+        self.tag_configure('lightblue', foreground='lightblue')
+        self.tag_configure('lightmagenta', foreground='orchid1')
+        self.tag_configure('lightcyan', foreground='lightcyan')
+        self.tag_configure('lightwhite', foreground='snow')
+        self.tag_configure('highlight', foreground='red')
+        self.tag_configure('bold', font=('Consolas', 12, 'bold'))
+        self.tag_configure('center', justify=tkinter.CENTER)
+
+    def append(self, string):
+        """Add more lines to the end of current content."""
+        self.configure(state=tkinter.NORMAL)
+        # all tkinter.Text widgets contain a '\n' at the end which is stupid but what can you do
+        num_existing_lines = self.get('1.0', tkinter.END).count('\n')
+        if string.startswith('\r'):
+            self.delete(f'{num_existing_lines-1}.0', tkinter.END+'-1c')
+            self.insert(tkinter.END, string[1:])
+            # no Text.yview, don't jerk the screen while counting down time
+        else:
+            self.insert(tkinter.END, string)
+            self.yview(tkinter.END)
+        # replace ANSI control sequences with Text tags
+        open_tags = []
+        closed_tags = []
+        for match in re.finditer(r'\033\[(\d+)m', string):
+            code = int(match.group(1))
+            if 0 != code:
+                # beginning of a colored span, will require an opening tag
+                open_from, open_to = match.span()
+                # N.B. tkinter.Text line indexes start from 1
+                open_line = num_existing_lines + string[:open_from].count('\n')
+                nearest_newline = string[:open_from].rfind('\n')
+                if nearest_newline != -1:
+                    open_from -= nearest_newline + 1
+                    open_to -= nearest_newline + 1
+                tag = utils.ansi_codes_to_names[code].replace(' ', '')
+                open_tags.append((tag, (open_line, open_from, open_to)))
+            else:
+                # end of a colored span, will require a closing tag
+                close_from, close_to = match.span()
+                close_line = num_existing_lines + string[:close_from].count('\n')
+                nearest_newline = string[:close_from].rfind('\n')
+                if nearest_newline != -1:
+                    close_from -= nearest_newline + 1
+                    close_to -= nearest_newline + 1
+                # pop the stack
+                last_open_tag = open_tags[-1]
+                close_pos = (close_line, close_from, close_to)
+                closed_tags.append(last_open_tag + (close_pos,))
+                tag, (open_line, open_from, open_to) = last_open_tag
+                open_tags = open_tags[:-1]
+                self.tag_add(tag, f'{open_line}.{open_from}', f'{close_line}.{close_from}')
+        spans_to_delete = sorted([pos for tag in closed_tags for pos in tag[1:]])
+        for line, _from, to in spans_to_delete[::-1]:
+            self.delete(f'{line}.{_from}', f'{line}.{to}')
+        self.configure(state=tkinter.DISABLED)
+        self.update_idletasks()
 
 
 class GUIWindow(application.Application):
@@ -165,32 +237,12 @@ class GUIWindow(application.Application):
         #char_width = tkinter.font.Font(font=self.label.cget('font')).measure('N')
         #self.label.configure(wraplength=char_width * 60)
 
-        # TODO move this to CustomText class
-        self.text = tkinter.Text(self.frame,
-                                 font=('Consolas', 12),
-                                 height=MAX_LINES_ON_SCREEN,
-                                 borderwidth=0,
-                                 takefocus=False,
-                                 wrap=tkinter.WORD)
-        self.text.configure(background=self.style.lookup('TLabel', 'background'),
-                            foreground=self.style.lookup('TLabel', 'foreground'))
-        self.text.tag_configure('red', foreground='red')
-        self.text.tag_configure('green', foreground='green')
-        self.text.tag_configure('yellow', foreground='yellow')
-        self.text.tag_configure('blue', foreground='blue')
-        self.text.tag_configure('magenta', foreground='magenta')
-        self.text.tag_configure('cyan', foreground='cyan')
-        self.text.tag_configure('white', foreground='white')
-        self.text.tag_configure('lightred', foreground='tomato')
-        self.text.tag_configure('lightgreen', foreground='lightgreen')
-        self.text.tag_configure('lightyellow', foreground='lightyellow')
-        self.text.tag_configure('lightblue', foreground='lightblue')
-        self.text.tag_configure('lightmagenta', foreground='orchid1')
-        self.text.tag_configure('lightcyan', foreground='lightcyan')
-        self.text.tag_configure('lightwhite', foreground='snow')
-        self.text.tag_configure('highlight', foreground='red')
-        self.text.tag_configure('bold', font=('Consolas', 12, 'bold'))
-        self.text.tag_configure('center', justify=tkinter.CENTER)
+        self.text = CustomText(self.frame,
+                               font=('Consolas', 12),
+                               height=MAX_LINES_ON_SCREEN,
+                               borderwidth=0,
+                               takefocus=False,
+                               wrap=tkinter.WORD)
         self.text.grid(column=0, row=0, sticky=tkinter.NSEW)
 
         self.entry = ttk.Entry(self.frame)
@@ -219,7 +271,7 @@ class GUIWindow(application.Application):
         #self.frame.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
         #self.frame['padding'] = (10, 15, 10, 15)
 
-        #self.text = tkinter.Text(self.frame, height=10, borderwidth=0, wrap=tkinter.WORD)
+        #self.text = CustomText(self.frame, height=10, borderwidth=0, wrap=tkinter.WORD)
         #self.text.configure(background=self.style.lookup('TLabel', 'background'), foreground=self.style.lookup('TLabel', 'foreground'))
         #self.text.tag_configure('highlight', foreground='red', font=('Arial', 12))
         #self.text.insert(tkinter.END, martian_string, 'highlight')
@@ -277,7 +329,6 @@ class GUIWindow(application.Application):
             body_text = body_text[0].upper() + body_text[1:] + ('.' if not body_text.endswith('.') else '')
             tkinter.messagebox.showwarning(header, body_text, parent=GUIWindow._SELF.root)
             return
-        # TODO update screen width dynamically based on Text widget width
         assert GUIWindow._SELF.label or GUIWindow._SELF.text
         formatted_string = _old_print(string, left_margin=0, silent=True, **moreargs)
         if GUIWindow._SELF.label:
@@ -288,53 +339,8 @@ class GUIWindow(application.Application):
             text_kept_on_screen = '\n'.join(all_text.split('\n')[-MAX_LINES_ON_SCREEN:])
             GUIWindow._SELF.label.config(text=text_kept_on_screen)
         else:
-            # TODO: create a class derived from tkinter.Text to do all this on its own
-            GUIWindow._SELF.text.configure(state=tkinter.NORMAL)
-            # all Text widgets contain a '\n' at the end which is stupid but what can you do
-            num_existing_lines = GUIWindow._SELF.text.get('1.0', tkinter.END).count('\n')
-            if formatted_string.startswith('\r'):
-                GUIWindow._SELF.text.delete(f'{num_existing_lines-1}.0', tkinter.END+'-1c')
-                GUIWindow._SELF.text.insert(tkinter.END, formatted_string[1:])
-                # no Text.yview, don't jerk the screen while counting down time
-            else:
-                GUIWindow._SELF.text.insert(tkinter.END, formatted_string)
-                GUIWindow._SELF.text.yview(tkinter.END)
-            # replace ANSI control sequences with Text tags
-            open_tags = []
-            closed_tags = []
-            for match in re.finditer(r'\033\[(\d+)m', formatted_string):
-                code = int(match.group(1))
-                if 0 != code:
-                    # beginning of a colored span, will require an opening tag
-                    open_from, open_to = match.span()
-                    # N.B. tkinter.Text line indexes start from 1
-                    open_line = num_existing_lines + formatted_string[:open_from].count('\n')
-                    nearest_newline = formatted_string[:open_from].rfind('\n')
-                    if nearest_newline != -1:
-                        open_from -= nearest_newline + 1
-                        open_to -= nearest_newline + 1
-                    tag = utils.ansi_codes_to_names[code].replace(' ', '')
-                    open_tags.append((tag, (open_line, open_from, open_to)))
-                else:
-                    # end of a colored span, will require a closing tag
-                    close_from, close_to = match.span()
-                    close_line = num_existing_lines + formatted_string[:close_from].count('\n')
-                    nearest_newline = formatted_string[:close_from].rfind('\n')
-                    if nearest_newline != -1:
-                        close_from -= nearest_newline + 1
-                        close_to -= nearest_newline + 1
-                    # pop the stack
-                    last_open_tag = open_tags[-1]
-                    close_pos = (close_line, close_from, close_to)
-                    closed_tags.append(last_open_tag + (close_pos,))
-                    tag, (open_line, open_from, open_to) = last_open_tag
-                    open_tags = open_tags[:-1]
-                    GUIWindow._SELF.text.tag_add(tag, f'{open_line}.{open_from}', f'{close_line}.{close_from}')
-            spans_to_delete = sorted([pos for tag in closed_tags for pos in tag[1:]])
-            for (line, _from, to) in spans_to_delete[::-1]:
-                GUIWindow._SELF.text.delete(f'{line}.{_from}', f'{line}.{to}')
-            GUIWindow._SELF.text.configure(state=tkinter.DISABLED)
-            GUIWindow._SELF.root.update_idletasks()
+            assert GUIWindow._SELF.text
+            GUIWindow._SELF.text.append(formatted_string)
 
     @staticmethod
     def input(prompt=''):
