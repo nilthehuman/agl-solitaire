@@ -280,8 +280,9 @@ class GUIWindow(application.Application):
         #self.text.configure(width=len(martian_string) + len(english_translation) + 2)
         #self.text.grid(column=0, row=0, columnspan=2, pady=10)
 
-        self.entry.destroy()
-        self.entry = None
+        if self.entry:
+            self.entry.destroy()
+            self.entry = None
         #self.entry = ttk.Entry(self.frame)
         #self.entry.grid(column=0, row=2, columnspan=2, pady=10)
 
@@ -298,6 +299,10 @@ class GUIWindow(application.Application):
         #martian_label.grid(column=0, row=1, padx=10)
         #english_label = ttk.Label(string_frame, font=('Consolas', 12), text=english_translation, style='TLabel')
         #english_label.grid(column=1, row=1, padx=10)
+
+        if self.entry:
+            self.entry.destroy()
+            self.entry = None
 
         self.frame.grid_columnconfigure(1, weight=1)
         self.text.grid(column=0, row=0, columnspan=2, sticky=tkinter.NSEW)
