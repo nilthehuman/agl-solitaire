@@ -127,7 +127,7 @@ class Settings:
         pretty += f"Logfile to record session in: {self.logfile_filename}\n"
         if settings_used.training_one_at_a_time:
             pretty += f"Show training strings one at a time: {self.training_one_at_a_time}\n"
-        if settings_used.training_reps:
+        if settings_used.training_reps and self.training_one_at_a_time:
             pretty += f"Number of training rounds: {self.training_reps}\n"
         pretty += f"Run pre and post session questionnaire: {self.run_questionnaire}\n"
         pretty += f"Automatically email logs to author: {self.email_logs}\n"
@@ -152,7 +152,7 @@ class Settings:
         pretty += f"Logfile to record session in: {self.logfile_filename}\n"
         if settings_used.training_one_at_a_time:
             pretty += f"Show training strings one at a time: {self.training_one_at_a_time}\n"
-        if settings_used.training_reps:
+        if settings_used.training_reps and self.training_one_at_a_time:
             pretty += f"Number of training rounds: {self.training_reps}\n"
         pretty += f"Run pre and post session questionnaire: {self.run_questionnaire}\n"
         return pretty
