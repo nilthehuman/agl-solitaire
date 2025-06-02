@@ -160,7 +160,10 @@ class Task(utils.Loggable, TaskState):
             self.duplicate_print("You can use Ctrl-Break to halt the experiment at any time. Your progress will be saved to '{self.settings.filename}' and you will be able to finish the experiment later.")
         else:
             self.duplicate_print(f"You can use Ctrl-C to halt the experiment at any time. Your progress will be saved to '{self.settings.filename}' and you will be able to finish the experiment later.")
-        self.duplicate_print("You may type 'y' for yes (i.e. grammatical) and 'n' for no (ungrammatical). Press return when you are ready.")
+        # FIXME: awful kludge, thank you very much
+        if 'GUIWindow' not in str(type(utils.get_application())):
+            self.duplicate_print("You may type 'y' for yes (i.e. grammatical) and 'n' for no (ungrammatical).")
+        self.duplicate_print('Press return when you are ready.')
         # recycle input_thread if it's still running...
         if input_thread and input_thread.is_alive():
             input_thread.join()
