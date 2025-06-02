@@ -16,8 +16,7 @@ class CustomExperiment(Experiment):
         EchoMorphologyGrammar,
         RhymingGrammar,
         PalindromeDemonstrativeGrammar,
-        RecursiveGrammar,
-        ReduplicationComplementGrammar
+        RecursiveGrammar
     ]
 
     def ready_to_run(self):
