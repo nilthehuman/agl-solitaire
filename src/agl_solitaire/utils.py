@@ -32,7 +32,7 @@ def print(string='', left_margin=_LEFT_MARGIN_WIDTH, silent=False, wrap=False, *
     string = str(string)
     # add some color to make settings keys and error messages pop too
     try:
-        string = re.sub(r"\[(\w)\]", r'[\033[94m\1\033[0m]', string)  # light blue
+        string = re.sub(r"\[(\w)\]", r'[\033[92m\1\033[0m]', string)  # light green
         string = re.sub(r"warning:", r'\033[33mwarning:\033[0m', string)  # yellow
         string = re.sub(r"error:", r'\033[31merror:\033[0m', string)  # red
     except re.PatternError:
