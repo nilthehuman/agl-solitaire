@@ -66,7 +66,7 @@ class CustomGrammar(Grammar):
                 else:
                     assert string in self.proper_names
                 return string
-        if type(string) is str:
+        if isinstance(string, str):
             return lookup(string)
         def translate_word(word):
             if word.endswith("'s"):
@@ -578,7 +578,7 @@ class PatternGrammar(FormalGrammar):
         grammar = cls()
         grammar.patterns = eval(repr_string)
         for pattern in grammar.patterns:
-            assert all(type(c) is frozenset for c in pattern)
+            assert all(isinstance(c, frozenset) for c in pattern)
         grammar.tokens = None
         return grammar
 

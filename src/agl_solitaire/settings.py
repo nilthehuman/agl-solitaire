@@ -207,7 +207,7 @@ class Settings:
             # value is None which you cannot cast to
             assert getattr(self, attr_name) is None
             if 'grammar' == attr_name:
-                assert type(value) is str
+                assert isinstance(value, str)
                 setattr(self, attr_name, value)
                 return
             try:
@@ -282,7 +282,7 @@ class Settings:
             except FileNotFoundError:
                 return  # alright
             for key in settings_dict:
-                if type(settings_dict[key]) is dict:
+                if isinstance(settings_dict[key], dict):
                     for subkey in settings_dict[key]:
                         self.process_loaded_entry(subkey, settings_dict[key][subkey])
                 else:
@@ -352,14 +352,14 @@ class Settings:
                     elif 'halted_experiment' == field.name:
                         # serialize to byte string
                         value = str(pickle.dumps(self.halted_experiment))
-                    if type(value) is str:
+                    if isinstance(value, str):
                         # N.B.: can't use repr(value) because Python and TOML treat single quotes
                         # differently: Python interpolates inside single quotes but TOML does not
                         value = value.replace('\\', r'\\')
                         value = value.replace('"', r'\"')
                         value = '"' + value + '"'
                     # 'true' and 'false' are lowercase in TOML
-                    if type(value) is bool:
+                    if isinstance(value, bool):
                         value = str(value).lower()
                     value = str(value)
                     configfile.write(field.name + ' = ' + value + '\n')

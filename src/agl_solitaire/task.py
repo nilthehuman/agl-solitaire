@@ -79,18 +79,18 @@ class Task(utils.Loggable, TaskState):
         self.training_set = [grammatical_strings[i] for i in picked_for_training]
         self.test_set = [(grammatical_strings[i], 'y', None) for i in set(range(0,num_required_grammatical)) - set(picked_for_training)]
         self.test_set += [(string, 'n', None) for string in ungrammatical_strings]
-        if type(grammatical_strings[0]) is tuple:
+        if isinstance(grammatical_strings[0], tuple):
             # we got pairs of (form, meaning) from the grammar
-            assert all(type(string) is tuple for string in grammatical_strings)
-            assert all(type(string) is tuple for string in ungrammatical_strings)
+            assert all(isinstance(string, tuple) for string in grammatical_strings)
+            assert all(isinstance(string, tuple) for string in ungrammatical_strings)
             self.training_set = utils.pad_sentences(self.training_set)
             test_strings = [string for string, _, _ in self.test_set]
             test_answers = [(right, user) for _, right, user in self.test_set]
             self.test_set = [(string, right, user) for (string, (right, user)) in zip(utils.pad_sentences(test_strings), test_answers)]
         else:
             # we got plain strings
-            assert all(type(string) is str for string in grammatical_strings)
-            assert all(type(string) is str for string in ungrammatical_strings)
+            assert all(isinstance(string, str) for string in grammatical_strings)
+            assert all(isinstance(string, str) for string in ungrammatical_strings)
         assert len(self.test_set) == self.settings.test_strings_grammatical + self.settings.test_strings_ungrammatical
         # permute test set
         random.shuffle(self.test_set)

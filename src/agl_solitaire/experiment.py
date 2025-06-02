@@ -60,7 +60,7 @@ class Experiment(utils.Loggable, experiment_state.ExperimentState):
             assert self.settings is not None
             self.track_state()
         else:
-            assert type(other) is dict
+            assert isinstance(other, dict)
             for key, value in other.items():
                 setattr(self, key, value)
 
