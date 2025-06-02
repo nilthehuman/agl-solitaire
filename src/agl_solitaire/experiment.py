@@ -95,6 +95,7 @@ class Experiment(utils.Loggable, experiment_state.ExperimentState):
             task.run()
             ### ### ### ### ### ###
             self.tasks_done += 1
+            utils.get_application().prepare_transition_to('POST_TASK')
             if self.settings.run_questionnaire and not task.anchored_to_end:
                 self.duplicate_print('A few more questions if you feel like it:')
                 self.duplicate_print('Did you feel like you got the hang of the grammar?')

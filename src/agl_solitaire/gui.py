@@ -2,7 +2,6 @@
 The application is eventually meant to be migrated to a web-based form, towards which this is
 an intermediate step."""
 
-import enum
 import platform
 import re
 import sys
@@ -40,12 +39,6 @@ class GUIWindow(application.Application):
     # will need to know about self
     _SELF = None
 
-    class Status(enum.Enum):
-        """Where we are in the lifecycle of the applicaton."""
-        INITIALIZED = 1 # the GUIWindow object has been created but not run yet
-        MENU = 2        # anywhere in the menu tree, including settings, generation etc.
-        EXPERIMENT = 3  # an experiment is already underway
-
     def __init__(self, *args, **kwargs):
         # sic, delay calling super().__init__() on purpose
         GUIWindow._SELF = self
@@ -59,6 +52,7 @@ class GUIWindow(application.Application):
         self.label = None
         self.text = None
         self.entry = None
+        self.button = None
         self.style = ttk.Style(self.root)
         try:
             self.style.theme_use('clam')
@@ -84,7 +78,21 @@ class GUIWindow(application.Application):
         self.user_input = tkinter.StringVar(value=None)
         self.root.protocol('WM_DELETE_WINDOW', self.quit_app)
         super().__init__(*args, **kwargs)
-        self.status = GUIWindow.Status.INITIALIZED
+
+    def prepare_transition_to(self, new_status):
+        """Mark transitions between different stages of the application. Necessary for rearranging the GUI."""
+        if new_status == GUIWindow.Status.MENU:
+            if self.status != GUIWindow.Status.POST_TASK:
+                self.set_up_default_screen()
+        elif new_status == GUIWindow.Status.PRE_TASK:
+            pass
+        elif new_status == GUIWindow.Status.TRAINING:
+            self.set_up_training_screen()
+        elif new_status == GUIWindow.Status.TEST:
+            self.set_up_test_screen()
+        elif new_status == GUIWindow.Status.POST_TASK:
+            self.set_up_default_screen()
+        super().prepare_transition_to(new_status)
 
     ##############################
     ####    event handlers    ####
@@ -101,18 +109,18 @@ class GUIWindow(application.Application):
         self.user_input.set(input_string)
 
     def on_ctrl_c_pressed(self, _event):
-        assert self.status != GUIWindow.Status.INITIALIZED
+        assert GUIWindow.Status.INITIALIZED < self.status
         if self.status == GUIWindow.Status.MENU:
             # looks like the user is trying to quit the application
             self.quit_app()
-        elif self.status == GUIWindow.Status.EXPERIMENT:
+        elif GUIWindow.Status.MENU < self.status:
             self.halt_experiment()
             # this is really crude but at least kinda works...
             # TODO it really highlights how the blocking wait for input approach sucks though,
             # need to restructure the whole GUI I/O
-            self.main_menu_loop()
+            self.main_menu()
         else:
-            assert False
+            raise ValueError
 
     def on_f11_pressed(self, _event):
         # platform specific, sadly
@@ -136,7 +144,7 @@ class GUIWindow(application.Application):
     ####    overridden Application member functions    ####
     #######################################################
 
-    def main_menu(self):
+    def set_up_default_screen(self):
         """Prepare to present the starting screen of the application."""
         if self.frame:
             self.frame.destroy()
@@ -190,19 +198,15 @@ class GUIWindow(application.Application):
         self.root.update_idletasks()
         self.root.minsize(self.frame.winfo_width(), self.frame.winfo_height())
 
-        # we're ready to ask the user for input
-        self.main_menu_loop()
-
-    def main_menu_loop(self):
+    def main_menu(self):
         """Activate the starting screen where the user can choose what to do next."""
-        self.status = GUIWindow.Status.MENU
-        utils.clear()
         super().main_menu()
         # if this function finishes that means we're quitting the application
         self.root.destroy()
 
-    def run_experiment(self, *args, **kwargs):
-        """Create message labels and controls needed for the experiment."""
+    def set_up_training_screen(self):
+        """Remove Entry widget for the first half of an experiment task where the participant is
+        just observing the training stimuli."""
         #if self.frame:
         #    self.frame.destroy()
 
@@ -211,10 +215,6 @@ class GUIWindow(application.Application):
         #self.frame = ttk.Frame(self.root, relief=tkinter.RAISED, borderwidth=12)
         #self.frame.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
         #self.frame['padding'] = (10, 15, 10, 15)
-
-        #string = "Vongo as dakhkhad sa ognov.       'The mayor came from the town square alone.'"
-        #martian_string = 'Vongo as dakhkhad sa ognov.'
-        #english_translation = "'The mayor came from the town square alone.'"
 
         #self.text = tkinter.Text(self.frame, height=10, borderwidth=0, wrap=tkinter.WORD)
         #self.text.configure(background=self.style.lookup('TLabel', 'background'), foreground=self.style.lookup('TLabel', 'foreground'))
@@ -225,6 +225,18 @@ class GUIWindow(application.Application):
         #self.text.configure(width=len(martian_string) + len(english_translation) + 2)
         #self.text.grid(column=0, row=0, columnspan=2, pady=10)
 
+        self.entry.destroy()
+        self.entry = None
+        #self.entry = ttk.Entry(self.frame)
+        #self.entry.grid(column=0, row=2, columnspan=2, pady=10)
+
+    def set_up_test_screen(self):
+        """Create controls needed for the latter half of an experiment task where the participant
+        judges novel stimuli."""
+        #string = "Vongo as dakhkhad sa ognov.       'The mayor came from the town square alone.'"
+        #martian_string = 'Vongo as dakhkhad sa ognov.'
+        #english_translation = "'The mayor came from the town square alone.'"
+
         #string_frame = ttk.Frame(self.frame, relief=tkinter.FLAT, borderwidth=0)
         #string_frame.grid(column=0, row=1, columnspan=2)
         #martian_label = ttk.Label(string_frame, font=('Consolas', 12), text=martian_string, style='Highlight.TLabel')
@@ -232,22 +244,20 @@ class GUIWindow(application.Application):
         #english_label = ttk.Label(string_frame, font=('Consolas', 12), text=english_translation, style='TLabel')
         #english_label.grid(column=1, row=1, padx=10)
 
-        #self.entry = ttk.Entry(self.frame)
-        #self.entry.grid(column=0, row=2, columnspan=2, pady=10)
+        self.frame.grid_columnconfigure(1, weight=1)
+        self.text.grid(column=0, row=0, columnspan=2, sticky=tkinter.NSEW)
 
-        # TODO: use nice buttons for user judgements
-        #ttk.Button(self.frame, text='Good', command=self.user_answered_yes).grid(column=0, row=3, padx=10)
-        #ttk.Button(self.frame, text='Bad', command=self.user_answered_no).grid(column=1, row=3, padx=10)
+        self.button = ttk.Button(self.frame, text='Yes', command=lambda: self.on_user_answer('yes'))
+        self.button.grid(column=0, row=3, sticky=tkinter.E, padx=40, pady=15)
+        ttk.Button(self.frame, text='No', command=lambda: self.on_user_answer('no')).grid(column=1, row=3, sticky=tkinter.W, padx=40, pady=15)
 
-        # widen root to fit largest widget
-        self.root.update_idletasks()
-        self.root.minsize(self.frame.winfo_width(), self.frame.winfo_height())
-
-        # start the actual experiment procedure
-        self.status = GUIWindow.Status.EXPERIMENT
-        super().run_experiment(*args, **kwargs)
+    def on_user_answer(self, answer):
+        """Handle user's judgement about a test string in the experiment."""
+        assert GUIWindow.Status.MENU < self.status
+        self.user_input.set(answer)
 
     def halt_experiment(self):
+        assert GUIWindow.Status.MENU < self.status
         if self.root.timed_callback is not None:
             self.root.after_cancel(self.root.timed_callback)
         return super().halt_experiment()

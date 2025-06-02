@@ -1,6 +1,7 @@
 """The application's user interface including the terminal-based menu and the general framework of the experimental procedure."""
 
 import copy
+import enum
 import os
 os.system("")  # apparently makes Windows terminal handle ANSI escape sequences too
 import re
@@ -18,7 +19,18 @@ from src.agl_solitaire import version
 class Application(utils.Loggable):
     """The main class responsible for basic user interactions and initiating experiments."""
 
+    """Where we are in the lifecycle of the applicaton."""
+    Status = enum.StrEnum('Application.Status', { value : value for value in [
+        'INITIALIZED',  # the GUIWindow object has been created but not run yet
+        'MENU',         # anywhere in the menu tree, including settings, generation etc.
+        'PRE_TASK',     # a task is about to begin, instructions are presented here
+        'TRAINING',     # the first phase of an experiment task: showing training strings
+        'TEST',         # the second phase of an experiment task: eliciting judgements
+        'POST_TASK'     # the session is over, participant may add additional comments
+    ] })
+
     def __init__(self):
+        utils.set_application(self)
         self.settings = settings.Settings()
         try:
             self.settings.load_all()
@@ -26,9 +38,30 @@ class Application(utils.Loggable):
             utils.print(ve)
         # load custom experiment scripts from the custom/ directory
         self.custom_experiments = custom_helpers.load_custom_experiments()
+        self.status = Application.Status.INITIALIZED
+
+    def prepare_transition_to(self, new_status):
+        """Notify Application of its own progress through different stages. The GUIWindow class overrides this."""
+        if self.status == Application.Status.INITIALIZED:
+            assert new_status == Application.Status.MENU
+        elif self.status == Application.Status.MENU:
+            assert new_status in [ Application.Status.MENU, Application.Status.PRE_TASK ]
+        elif self.status == Application.Status.PRE_TASK:
+            assert new_status in [ Application.Status.TRAINING, Application.Status.TEST, Application.Status.MENU ]
+        elif self.status == Application.Status.TRAINING:
+            assert new_status in [ Application.Status.TEST, Application.Status.MENU ]
+        elif self.status == Application.Status.TEST:
+            assert new_status in [ Application.Status.POST_TASK, Application.Status.MENU ]
+        elif self.status == Application.Status.POST_TASK:
+            assert new_status in [ Application.Status.TRAINING, Application.Status.MENU ]
+        else:
+            raise ValueError
+        self.status = new_status
+        # other than that, nothing to do
 
     def main_menu(self):
         """Show the starting menu screen."""
+        self.prepare_transition_to(Application.Status.MENU)
         my_version = version.get_version()
         while True:
             utils.clear()
@@ -441,6 +474,7 @@ class Application(utils.Loggable):
         """Run one session of training and testing with a random grammar and record everything in the log file."""
         # wrap the whole function body in a try block to handle a keyboard interrupt
         try:
+            self.prepare_transition_to(Application.Status.PRE_TASK)
             if stngs is None:
                 stngs = self.settings
             experiment_to_run = None
@@ -532,12 +566,14 @@ class Application(utils.Loggable):
                 experiment_to_run.cleanup()
             except UnboundLocalError:
                 pass
+            self.prepare_transition_to(Application.Status.MENU)
 
     def halt_experiment(self):
         """Pause the experiment currently being run and return to main menu."""
         utils.print()
         # FIXME: is this true though? what is stngs != self.settings?
         self.duplicate_print(f"warning: Experiment halted by user. Progress saved to '{self.settings.filename}'. Returning to main menu.")
+        self.prepare_transition_to(Application.Status.MENU)
 
 
 if __name__ == '__main__':

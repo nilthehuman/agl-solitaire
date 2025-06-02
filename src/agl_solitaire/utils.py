@@ -218,3 +218,21 @@ def get_grammar_from_obfuscated_repr(stngs):
         return gmr
     except (IndexError, SyntaxError, TypeError):
         raise ValueError
+
+
+def set_application(app):
+    """Register the singleton Application object that basically controls the whole program."""
+    global _APPLICATION_INSTANCE
+    # FIXME: this function should only ever be called once, except now (version 0.7.0) we
+    # temporarily allow the user to create a second Application instance to try out the GUI
+    #try:
+    #    _APPLICATION_INSTANCE
+    #    assert False
+    #except NameError:
+    #    # not set yet, this is expected
+    #    pass
+    _APPLICATION_INSTANCE = app
+
+def get_application():
+    """Return the sole instance of the singleton class that basically controls the whole program."""
+    return _APPLICATION_INSTANCE

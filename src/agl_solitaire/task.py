@@ -112,6 +112,7 @@ class Task(utils.Loggable, TaskState):
         # used for sleeping but keeping the keyboard awake
         input_thread = None
         if not self.training_finished:
+            utils.get_application().prepare_transition_to('TRAINING')  # ugh, can't refer to Application.Status here...
             if self.settings.training_one_at_a_time:
                 the_same = 'the same ' if 1 < self.settings.training_reps else ''
                 in_rounds = f"in {self.settings.training_reps} rounds " if 1 < self.settings.training_reps else ''
@@ -165,6 +166,7 @@ class Task(utils.Loggable, TaskState):
             input_thread.join()
         else:
             utils.input()
+        utils.get_application().prepare_transition_to('TEST')
         # N.B. you can't do the following because you want to update the original test_set
         #for i, item in enumerate(self.test_set):
         for i in range(len(self.test_set)):
