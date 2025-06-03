@@ -1990,6 +1990,8 @@ class NaturalnessJudgementTask(Task, utils.Loggable):
         return True
 
     def run(self):
+        # FIXME: fast forward to post task phase :/
+        utils.get_application().prepare_transition_to('POST_TASK')
         sentences = [
             'You caught me off guard.',
             'Little do they know, I have my own plans for these giraffes.',
@@ -2001,7 +2003,7 @@ class NaturalnessJudgementTask(Task, utils.Loggable):
             'Silent stood the ancient trees.'
         ]
         self.duplicate_print(
-'''And now for the easiest part! You will be asked to rate a few different English sentences as to how natural they sound on
+'''And now for the easiest part! You will be asked to rate a few different English sentences as to how natural they sound on \
 a scale of 1 to 7. Feel free to include any further comments alongside a number, e.g. '3, sounds odd' or similar.'''
         )
         self.duplicate_print(f"You will be shown {len(sentences)} sentences total and then you're done. Press return when you are ready.")

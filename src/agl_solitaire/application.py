@@ -53,7 +53,8 @@ class Application(utils.Loggable):
         elif self.status == Application.Status.TEST:
             assert new_status in [ Application.Status.POST_TASK, Application.Status.MENU ]
         elif self.status == Application.Status.POST_TASK:
-            assert new_status in [ Application.Status.TRAINING, Application.Status.MENU ]
+            # FIXME: POST_TASK should not be allowed here, work something out for pilot experiment
+            assert new_status in [ Application.Status.TRAINING, Application.Status.POST_TASK, Application.Status.MENU ]
         else:
             raise ValueError
         self.status = new_status
