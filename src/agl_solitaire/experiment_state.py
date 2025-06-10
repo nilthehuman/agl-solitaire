@@ -80,6 +80,8 @@ class ExperimentState:
         if not self.tasks:
             return None
         that_task = [t for t in self.tasks if t.active]
+        #if not that_task:
+        #    return None
         assert 1 == len(that_task)
         that_task = that_task[0]
         assert self.tasks_done == self.tasks.index(that_task)
