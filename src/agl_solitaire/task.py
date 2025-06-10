@@ -111,8 +111,8 @@ class Task(utils.Loggable, TaskState):
         assert self.active
         # used for sleeping but keeping the keyboard awake
         input_thread = None
+        utils.get_application().prepare_transition_to('TRAINING')  # ugh, can't refer to Application.Status here...
         if not self.training_finished:
-            utils.get_application().prepare_transition_to('TRAINING')  # ugh, can't refer to Application.Status here...
             if self.settings.training_one_at_a_time:
                 the_same = 'the same ' if 1 < self.settings.training_reps else ''
                 in_rounds = f"in {self.settings.training_reps} rounds " if 1 < self.settings.training_reps else ''
@@ -155,6 +155,11 @@ class Task(utils.Loggable, TaskState):
                 self.duplicate_print('Training phase finished.', log_only=True)
             self.training_finished = True
             utils.clear()
+        # FIXME: this is just gross
+        try:
+            utils.get_application().progressbar.step(len(self.training_set))
+        except AttributeError:
+            pass
         self.duplicate_print(f"The test phase will now begin. You will be shown {len(self.test_set)} new strings one at a time and prompted to judge the grammaticality of each.")
         if 'Windows' == platform.system():
             self.duplicate_print(f"You can use Ctrl-Break to halt the experiment at any time. Your progress will be saved to '{self.settings.filename}' and you will be able to finish the experiment later.")
@@ -194,6 +199,11 @@ class Task(utils.Loggable, TaskState):
             self.test_set[i] = (self.test_set[i][0], self.test_set[i][1], answer)
             # FIXME: need to call this manually because __setattr__ doesn't get called if you update a member variable in-place :(
             self.settings.save_all()
+            # FIXME: this is just gross
+            try:
+                utils.get_application().progressbar.step(1)
+            except AttributeError:
+                pass
         utils.clear()
         self.duplicate_print('Test phase finished. Hope you had fun!')
 

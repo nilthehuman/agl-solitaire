@@ -124,7 +124,7 @@ class GUIWindow(application.Application):
         self.label = None
         self.text = None
         self.entry = None
-        self.button = None
+        self.buttonframe = None
         self.style = ttk.Style(self.root)
         try:
             self.style.theme_use('clam')
@@ -134,12 +134,13 @@ class GUIWindow(application.Application):
         self.style.configure('TFrame', background='grey20', foreground='grey90')
         self.style.configure('TLabel', background='grey20', foreground='grey90')
         self.style.configure('Highlight.TLabel', background='grey20', foreground='lightgreen')
+        self.style.configure('TProgressbar', troughcolor='grey30', background='#44EE77')
         # use a normal sized font in message windows as well
         default_font = tkinter.font.nametofont('TkDefaultFont').actual()['family'].replace(' ', '_')
         self.root.option_add('*Dialog.msg.font', default_font+' 12')
         self.style.map('TButton',
-            foreground = [('!active', 'grey70'),  ('active', 'gray30'), ('pressed', 'gray30')],
-            background = [('!active', '#8800DD'), ('active', 'gray70'), ('pressed', 'gray90')]
+            foreground = [('!active', 'grey70'),  ('active', 'grey30'), ('pressed', 'grey30')],
+            background = [('!active', '#8800DD'), ('active', 'grey70'), ('pressed', 'grey90')]
         )
         self.root.bind('<Configure>', self.redraw_now)
         self.root.bind('<Return>', self.on_return_pressed)
@@ -155,15 +156,16 @@ class GUIWindow(application.Application):
         """Mark transitions between different stages of the application. Necessary for rearranging the GUI."""
         if new_status == GUIWindow.Status.MENU:
             if self.status != GUIWindow.Status.POST_TASK:
-                self.set_up_default_screen()
+                self.set_up_menu_screen()
         elif new_status == GUIWindow.Status.PRE_TASK:
-            pass
+            self.set_up_progress_bar()
+            self.set_up_entry(wide=True)
         elif new_status == GUIWindow.Status.TRAINING:
             self.set_up_training_screen()
         elif new_status == GUIWindow.Status.TEST:
             self.set_up_test_screen()
         elif new_status == GUIWindow.Status.POST_TASK:
-            self.set_up_default_screen()
+            self.set_up_entry(wide=True)
         super().prepare_transition_to(new_status)
 
     ##############################
@@ -219,16 +221,18 @@ class GUIWindow(application.Application):
     ####    overridden Application member functions    ####
     #######################################################
 
-    def set_up_default_screen(self):
+    def set_up_menu_screen(self):
         """Prepare to present the starting screen of the application."""
         if self.frame:
             self.frame.destroy()
 
         self.frame = ttk.Frame(self.root, relief=tkinter.RAISED, borderwidth=12)
         self.frame.grid(column=0, row=0, sticky=tkinter.NSEW, columnspan=1)
-        self.frame['padding'] = (10, 15, 10, 15)
+        self.frame['padding'] = (10, 5, 10, 5)
         self.frame.grid_columnconfigure(0, weight=1)
-        self.frame.grid_rowconfigure(0, weight=1)
+        self.frame.grid_rowconfigure(0, minsize=0)
+        self.frame.grid_rowconfigure(1, weight=1)
+        self.frame.grid_rowconfigure(2, minsize=0)
 
         #self.label = ttk.Label(self.frame, font=('Consolas', 12), text='', style='TLabel')
         #vsb = ttk.Scrollbar(self.frame, command=self.label.yview, orient='vertical')
@@ -245,9 +249,7 @@ class GUIWindow(application.Application):
                                wrap=tkinter.WORD)
         self.text.grid(column=0, row=0, sticky=tkinter.NSEW)
 
-        self.entry = ttk.Entry(self.frame)
-        self.entry.grid(column=0, row=1, sticky=tkinter.S, pady=15)
-        self.entry.focus_set()
+        self.set_up_entry()
 
         # widen root to fit largest widget
         self.root.update_idletasks()
@@ -259,13 +261,18 @@ class GUIWindow(application.Application):
         # if this function finishes that means we're quitting the application
         self.root.destroy()
 
+    def set_up_progress_bar(self):
+        self.progressbar = ttk.Progressbar(self.frame, orient=tkinter.HORIZONTAL)
+        self.progressbar.grid(column=0, row=0, sticky=tkinter.EW, pady=10)
+
+        self.text.grid(column=0, row=1, sticky=tkinter.NSEW)
+        # self.entry stays where it is
+
     def set_up_training_screen(self):
         """Remove Entry widget for the first half of an experiment task where the participant is
         just observing the training stimuli."""
         #if self.frame:
         #    self.frame.destroy()
-
-        # TODO: put a progress bar at the top to show how far into the experiment we are, like PsyToolkit does
 
         #self.frame = ttk.Frame(self.root, relief=tkinter.RAISED, borderwidth=12)
         #self.frame.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
@@ -304,12 +311,23 @@ class GUIWindow(application.Application):
             self.entry.destroy()
             self.entry = None
 
-        self.frame.grid_columnconfigure(1, weight=1)
-        self.text.grid(column=0, row=0, columnspan=2, sticky=tkinter.NSEW)
+        self.buttonframe = ttk.Frame(self.frame, relief=tkinter.FLAT, borderwidth=0)
+        self.buttonframe.grid(column=0, row=2, sticky=tkinter.NSEW, padx=0, pady=0)
+        self.buttonframe.grid_columnconfigure(0, weight=1)
+        self.buttonframe.grid_columnconfigure(1, weight=1)
+        yes_button = ttk.Button(self.buttonframe, text='Yes', command=lambda: self.on_user_answer('yes'))
+        yes_button.grid(column=0, row=0, sticky=tkinter.E, padx=40, pady=15)
+        no_button = ttk.Button(self.buttonframe, text='No', command=lambda: self.on_user_answer('no'))
+        no_button.grid(column=1, row=0, sticky=tkinter.W, padx=40, pady=15)
 
-        self.button = ttk.Button(self.frame, text='Yes', command=lambda: self.on_user_answer('yes'))
-        self.button.grid(column=0, row=3, sticky=tkinter.E, padx=40, pady=15)
-        ttk.Button(self.frame, text='No', command=lambda: self.on_user_answer('no')).grid(column=1, row=3, sticky=tkinter.W, padx=40, pady=15)
+    def set_up_entry(self, wide=False):
+        if self.buttonframe is not None:
+            self.buttonframe.destroy()
+        if self.entry is not None:
+            self.entry.destroy()
+        self.entry = ttk.Entry(self.frame)
+        self.entry.grid(column=0, row=2, sticky=tkinter.NSEW if wide else tkinter.N, pady=15)
+        self.entry.focus_set()
 
     def on_user_answer(self, answer):
         """Handle user's judgement about a test string in the experiment."""

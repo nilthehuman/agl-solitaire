@@ -108,6 +108,13 @@ class ExperimentState:
         """Has the experiment been started?"""
         return self.tasks_done == len(self.tasks)
 
+    def progress(self):
+        """What number of training and test strings has the participant covered thus far?"""
+        #total = sum(len(task.training_set) + len(task.test_set) for task in self.tasks)
+        up_to_active_task = self.tasks[:self.tasks.index(self.active_task()) + 1]
+        covered = sum(len(task.training_set) + len(answer for _, _, answer in task.test_set if answer is not None) for task in up_to_active_task)
+        return covered
+
     def reset_answers(self):
         """Remove participant's previous answers to any test stimuli."""
         self.tasks_done = 0
