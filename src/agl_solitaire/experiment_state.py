@@ -81,7 +81,9 @@ class ExperimentState:
             return None
         that_task = [t for t in self.tasks if t.active]
         assert 1 == len(that_task)
-        return that_task[0]
+        that_task = that_task[0]
+        assert self.tasks_done == self.tasks.index(that_task)
+        return that_task
 
     def activate_next_task(self):
         assert self.tasks

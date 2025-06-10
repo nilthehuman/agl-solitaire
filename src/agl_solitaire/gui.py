@@ -19,7 +19,7 @@ MAX_LINES_ON_SCREEN = 20
 
 
 # FIXME: this won't be needed once the GUI is refactored to a proper event driven design
-def handle_loose_exceptions(ex_type, value, _traceback):
+def handle_loose_exceptions(ex_type, _value, _traceback):
     assert ex_type is tkinter.TclError
     # let this slide and quit silently
 

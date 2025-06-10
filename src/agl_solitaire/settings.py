@@ -388,7 +388,7 @@ class Settings:
 
     def __setattr__(self, attr, value):
         """Save any and all settings changes automatically if required."""
-        if hasattr(self, attr) and getattr(self, attr) == value:
+        if hasattr(self, attr) and id(getattr(self, attr)) == id(value):
             return
         super().__setattr__(attr, value)
         if attr != 'autosave':
