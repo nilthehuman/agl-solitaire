@@ -247,7 +247,7 @@ class GUIWindow(application.Application):
                                borderwidth=0,
                                takefocus=False,
                                wrap=tkinter.WORD)
-        self.text.grid(column=0, row=0, sticky=tkinter.NSEW)
+        self.text.grid(column=0, row=1, sticky=tkinter.NSEW)
 
         self.set_up_entry()
 
