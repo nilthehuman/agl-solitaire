@@ -320,6 +320,7 @@ class GUIWindow(application.Application):
         assert GUIWindow.Status.MENU < self.status
         if self.root.timed_callback is not None:
             self.root.after_cancel(self.root.timed_callback)
+            self.root.timed_callback = None
         return super().halt_experiment()
 
     ##########################################################################################
@@ -367,27 +368,31 @@ class GUIWindow(application.Application):
             GUIWindow._SELF.text.configure(state=tkinter.DISABLED)
 
     @staticmethod
-    def sleep(seconds, callback=None):
-        def callback_wrapper():
-            if callback is not None:
-                callback()
+    def sleep(seconds):
+        def timeout_callback():
+            if GUIWindow._SELF.root.timed_callback is not None:
+                GUIWindow._SELF.root.timed_callback = None
             # trigger user input variable manually
             GUIWindow._SELF.user_input.set('')
-        GUIWindow._SELF.root.timed_callback = GUIWindow._SELF.root.after(int(seconds * 1000), callback_wrapper)
+        GUIWindow._SELF.root.timed_callback = GUIWindow._SELF.root.after(int(seconds * 1000), timeout_callback)
         GUIWindow._SELF.root.wait_variable(GUIWindow._SELF.user_input)
-        GUIWindow._SELF.root.after_cancel(GUIWindow._SELF.root.timed_callback)
+        if GUIWindow._SELF.root.timed_callback is not None:
+            GUIWindow._SELF.root.after_cancel(GUIWindow._SELF.root.timed_callback)
+            GUIWindow._SELF.root.timed_callback = None
+            return True
+        return False
 
     @staticmethod
     def breakable_loop(total_time, wait_per_cycle=1, step=None, _input_thread=None):
         assert 0 < total_time
         # ignore _input_thread, we use the tkinter event loop instead
-        def loop(remaining_time):
-            if remaining_time <= 0:
-                return
+        remaining_time = total_time
+        user_break = False
+        while 0 < remaining_time and not user_break:
             if step is not None:
                 step(remaining_time)
-            utils.sleep(wait_per_cycle, lambda: loop(remaining_time - wait_per_cycle))
-        loop(total_time)
+            user_break = utils.sleep(wait_per_cycle)
+            remaining_time -= wait_per_cycle
 
 
 # monkey patching: override a bunch of I/O functions from utils
